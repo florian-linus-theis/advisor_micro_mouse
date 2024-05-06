@@ -35,14 +35,14 @@
 #define ENCODE_MOTOR_RECHTS_B   PA1
 #define ENCODE_MOTOR_LINKS_A    PA15
 #define ENCODE_MOTOR_LINKS_B    PB3
-#define MOTOR_RECHTS_PWM_1      PB7
-#define MOTOR_RECHTS_PWM_2      PB6
-#define MOTOR_LINKS_PWM_1       PB4
-#define MOTOR_LINKS_PWM_2       PB5
+#define MOTOR_RECHTS_PWM_1      PB7     //Bennennung  nicht final, da Drehrichtung nicht bekannt
+#define MOTOR_RECHTS_PWM_2      PB6     //Bennennung  nicht final, da Drehrichtung nicht bekannt
+#define MOTOR_LINKS_PWM_1       PB4     //Bennennung  nicht final, da Drehrichtung nicht bekannt
+#define MOTOR_LINKS_PWM_2       PB5     //Bennennung  nicht final, da Drehrichtung nicht bekannt
 #define MOTOR_ENABLE            PC11
-#define MOTOR_FAULT             PD2
-#define SERVO1                  PB8
-#define SERVO2                  PB9
+#define MOTOR_nFAULT            PD2
+#define GREIFER_MOTOR_PWM_1     PB8     //Bennennung  nicht final, da Drehrichtung nicht bekannt
+#define GREIFER_MOTOR_PWM_2     PB9     //Bennennung  nicht final, da Drehrichtung nicht bekannt
 
 //Sonstige Belegungen
 #define BATTERY_VOLT            PC0
@@ -54,22 +54,33 @@
 #define IMU_MOSI                PA7
 #define IMU_MISO                PA6
 #define IMU_SCL                 PA5
-#define IMU_CS                  PA4
+#define IMU_nCS                 PA4
 #define IMU_INT                 PA8
 #define IMU_FSYNC               PB12
 #define POWER_ENABLE            PC10
-
 //Deklaration der Pinfunktionen
 void Pin_Setup(void){
 //IR Sensoren und Emmiter
 pinMode(IR_SENSOR_RF, OUTPUT);
+pinMode(IR_SENSOR_LF, OUTPUT);
+pinMode(IR_SENSOR_RD, OUTPUT);
+pinMode(IR_SENSOR_LD, OUTPUT);
+pinMode(IR_SENSOR_RS, OUTPUT);
+pinMode(IR_SENSOR_LS, OUTPUT);
+pinMode(IR_SENSOR_MID, OUTPUT);
 pinMode(IR_EMMITER_RF, INPUT_ANALOG);
+pinMode(IR_EMMITER_LF, INPUT_ANALOG);
+pinMode(IR_EMMITER_RD, INPUT_ANALOG);
+pinMode(IR_EMMITER_LD, INPUT_ANALOG);
+pinMode(IR_EMMITER_RS, INPUT_ANALOG);
+pinMode(IR_EMMITER_LS, INPUT_ANALOG);
+pinMode(IR_EMMITER_MID, INPUT_ANALOG);
 
 //User Interface
 
 //Motor
 
-//Sonstige Belegugungen
+//Sonstige Belegungen
 
 }
 
