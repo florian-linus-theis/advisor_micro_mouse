@@ -15,8 +15,9 @@
 #define MOTOR_nFAULT            PD2
 
 //Servos
-#define Servo_PWM_1     PB8
-#define Servo_PWM_2     PB9
+#define SERVO_ENABLE    PH1
+#define SERVO_PWM_1     PB8
+#define SERVO_PWM_2     PB9
 
 //Infrarot Emmitter
 #define IR_EMITTER_RF   PC8
@@ -98,26 +99,31 @@ void Pin_Setup(void){
   pinMode(IR_SENSOR_MID, INPUT_ANALOG);
 
 //IMU
-//->SPI #1
+  //->SPI #1
+  
   
 //OLED Display
-//->I2C #2
-
+  //->I2C #2
+  
+  
 //Bluetooth Modul
-//->USART #1
+  //->USART #1
+  
 
 //User-Interface-Encoder
-//->read over Interrupt
+  //->read over Interrupt
+  
 
 //Buzzer
-
+  
+  
 //Debug RGB LED
-/*RGB LED Pinmode muss OUTPUT_OPEN_DRAIN sein !!!!!!!!!!!
-  pinMode(LED_ROT, OUTPUT_OPEN_DRAIN);
+  pinMode(LED_ROT, OUTPUT_OPEN_DRAIN); //RGB LED Pinmode muss OUTPUT_OPEN_DRAIN sein !!!!!!!!!!!
   pinMode(LED_GRÜN, OUTPUT_OPEN_DRAIN);
-  pinMode(LED_BALU, OUTPUT_OPEN_DRAIN);
-*/
+  pinMode(LED_BLAU, OUTPUT_OPEN_DRAIN);
+
 
 //Sonstige Belegungen
-
+  
+    
 }
