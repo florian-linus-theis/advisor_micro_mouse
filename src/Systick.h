@@ -19,7 +19,7 @@ class Systick {
   // call the begin method explicitly.
   void begin() {
     // set
-    bitClear(TCCR2B, WGM22); //Bits werden aus Register CCR1 und CCR2 gelöscht
+    bitClear(TCCR2B, WGM22); //Bits werden aus dem Register CCR2B und A gelöscht:= 0000000
     bitClear(TCCR2A, WGM20);
     bitSet(TCCR2A, WGM21);
     // set divisor to 128 => 125kHz => 8us
