@@ -21,9 +21,9 @@ class Timer_Interrupts{
 }
 
   void Systick_Setup(void){
-    timer3.setPrescaleFactor(50); // Set prescaler to 50
-    timer3.setOverflow(65535);      // Set overflow to 16 = 50us Intervalle
-    timer3.attachInterrupt(Systick);  
+    timer3.setPrescaleFactor(122000); // Set prescaler to 122 000
+    timer3.setOverflow(65535);      // Set overflow to 65535 = 2 ms Intervalle
+    timer3.attachInterrupt(Systick_Interrupt);  
     timer3.refresh();
     timer3.resume();
 
@@ -38,7 +38,7 @@ class Timer_Interrupts{
     }
   }
   
-  void Systick(){
+  void Systick_Interrupt(){
 
     //Alle Steuerungsfunktionen, Messungen und sonstige Regelsystem-Funktionen werden hier untergebracht
 
