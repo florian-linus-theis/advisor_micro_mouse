@@ -77,6 +77,16 @@
 //Deklaration der Pinmodi
 void Pin_Setup(void){
 //Motoren
+pinMode(MOTOR_ENABLE, OUTPUT);        //Pin muss manuell angeschaltet werden
+pinMode(MOTOR_RECHTS_PWM_1, OUTPUT);
+pinMode(MOTOR_RECHTS_PWM_2, OUTPUT);
+pinMode(MOTOR_LINKS_PWM_1, OUTPUT);
+pinMode(MOTOR_LINKS_PWM_2, OUTPUT);
+pinMode(MOTOR_ENCODER_RECHTS_A, INPUT);
+pinMode(MOTOR_ENCODER_RECHTS_B, INPUT);
+pinMode(MOTOR_ENCODER_LINKS_A, INPUT);
+pinMode(MOTOR_ENCODER_LINKS_B, INPUT);
+pinMode(MOTOR_nFAULT,);                 //Pin-Konfiguration prüfen
 
 //Servos
 
