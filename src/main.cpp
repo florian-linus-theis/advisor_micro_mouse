@@ -1,6 +1,7 @@
 
 //Header-Files Include
 #include "Pin_Init.h"
+#include "Systick.h"
 
 //Library-Include
 #include <Arduino.h>
@@ -11,6 +12,7 @@
 void setup() {
   // put your setup code here, to run once:
   Pin_Setup();
+  Systick.begin();
 }
 
 void loop() {
