@@ -3,40 +3,47 @@
 #include "Arduino.h"
 #include "wiring.h"
 #include "Pin_Init.h"
+using std::vector;
+
+int interrupt_counter = 0;
+bool Sensor_Feedback;
+//Messdaten werden gespeichert, Array dient als Hilfe zur Abfrage der Sensoren und zur Definition der Kanäle
+int Channel_Emitter[6] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
+int Channel_Sensoren[6] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
+vector<int> Messung_Blind;
+vector<int> Messung_Hell;
+vector<int> Distanz_Sensoren_MM;
 
 
 class Sensoren{
   public:
-      int interrupt_counter = 0;
-      bool Sensor_Error;
-        //Messdaten werden gespeichert, Array dient als Hilfe zur Abfrage der Sensoren und zur Definition der Kanäle
-      int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
-      int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
-      vec<int> Messung_Blind;
-      vec<int> Messung_Hell;
-      vec<int> Distanz_Sensoren_MM;
-
-
-    void Distanz_Messung_Blind(void){
+      
+    void Distanz_Messung_Blind(vector<int>&Messung_Blind){
+      Messung_Blind.clear();
         for(int i = 0; i< 6; i++){
-            Messung_Blind.push_back(analogRead(Channel_Emitter[6 - i]));
+            Messung_Blind.push_back(analogRead(Channel_Emitter[i]));
         }
     }
 
-    void Distanz_Messung_Hell(void){
-      Sensor_Error = false;        //Error-Flag
+    void Distanz_Messung_Hell(vector<int>&Messung_Hell){
+      Messung_Hell.clear();
+      Sensor_Feedback = false;        //Error-Flag
       interrupt_counter = 0;
-      digitalWrite(IR_SENSOR_RS,HIGH);
+
+
+      digitalWrite(IR_SENSOR_RS,HIGH);        //Messbeginn: LED - 50us - Sensor auslesen
       while(interrupt_counter !=7){
-      timer4.resume();                // Start
+      NVIC_EnableIRQ(TIM4_IRQn);              
       }
+
+
       if(interrupt_counter == 7){
         Sensor_Feedback = false;
-        timer4.pause();
+        NVIC_DisableIRQ(TIM4_IRQn);
       }
       else{
         //Fehler ist aufgetreten
-        Sensor_Error = true;
+        Sensor_Feedback = true;
       }
     }
 };

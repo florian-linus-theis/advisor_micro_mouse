@@ -1,7 +1,7 @@
 
 //Header-Files Include
 #include "Pin_Init.h"
-#include "Systick.h"
+#include "Systick.cpp"
 
 //Library-Include
 #include <Arduino.h>
@@ -11,8 +11,14 @@
 
 void setup() {
   // put your setup code here, to run once:
+  Timer_Interrupts timer_interrupts;
+
+
+  timer_interrupts.Systick_Setup();     //TIM3
+  timer_interrupts.Timer4_Setup();      //TIM4
+
   Pin_Setup();
-  Systick.begin();
+  
 }
 
 void loop() {
