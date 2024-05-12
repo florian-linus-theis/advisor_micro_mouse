@@ -86,7 +86,7 @@ pinMode(MOTOR_ENCODER_RECHTS_A, INPUT);
 pinMode(MOTOR_ENCODER_RECHTS_B, INPUT);
 pinMode(MOTOR_ENCODER_LINKS_A, INPUT);
 pinMode(MOTOR_ENCODER_LINKS_B, INPUT);
-pinMode(MOTOR_nFAULT,);                 //Pin-Konfiguration prüfen
+pinMode(MOTOR_nFAULT, INPUT_PULLUP);                 //Pin-Konfiguration prüfen
 
 //Servos
 

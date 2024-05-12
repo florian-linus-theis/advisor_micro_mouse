@@ -1,6 +1,7 @@
 #include <iostream>
 #include <Arduino.h>
 #include "Pin_Init.h"
+#include "Sensoren.cpp"
 
 class Test{
     public:
@@ -18,9 +19,11 @@ class Test{
 
     };
 
+    Sensoren sensoren;
+
     void Sensoren_Test(void){
-        Messung_Blind();
-        Messung_Hell();
+        sensoren.Distanz_Messung_Blind(Messung_Blind);
+        sensoren.Distanz_Messung_Hell(Messung_Hell);
         
     }
 
@@ -30,13 +33,6 @@ class Test{
 
 
     }
-
-    void 
-
-
-
-
-
 };
 
 

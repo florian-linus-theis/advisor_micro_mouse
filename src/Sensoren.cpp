@@ -5,7 +5,7 @@
 #include "Pin_Init.h"
 using std::vector;
 
-int interrupt_counter = 0;
+volatile int interrupt_counter = 0;
 bool Sensor_Feedback;
 //Messdaten werden gespeichert, Array dient als Hilfe zur Abfrage der Sensoren und zur Definition der Kanäle
 int Channel_Emitter[6] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
@@ -31,7 +31,7 @@ class Sensoren{
       interrupt_counter = 0;
 
 
-      digitalWrite(IR_SENSOR_RS,HIGH);        //Messbeginn: LED - 50us - Sensor auslesen
+      digitalWrite(IR_SENSOR_RS,HIGH);        //Messbeginn: LED ON - 50us - Sensor auslesen
       while(interrupt_counter !=7){
       NVIC_EnableIRQ(TIM4_IRQn);              
       }
