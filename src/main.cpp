@@ -1,7 +1,8 @@
 
 //Header-Files Include
 #include "Pin_Init.h"
-#include "Systick.h"
+#include "Systick.cpp"
+#include "algorithms.cpp"
 
 //Library-Include
 #include <Arduino.h>
@@ -11,6 +12,7 @@
 
 void setup() {
   // put your setup code here, to run once:
+  maze_setup(); // setting up the maze file
   Pin_Setup();
   Systick.begin();
 }
