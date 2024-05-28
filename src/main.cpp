@@ -4,16 +4,16 @@
 
 // Define screen dimensions
 #define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 64
+#define SCREEN_HEIGHT 32
 
 // Define OLED reset pin
 #define OLED_RESET    -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 // TODO: Hannes Rotary Encoder Pins
-#define ENCODER_PIN_A PA0 // Example pin, change to match your STM32 setup
-#define ENCODER_PIN_B PA1 // Example pin, change to match your STM32 setup
-#define ENCODER_BUTTON_PIN PA2 // Example pin, change to match your STM32 setup
+#define ENCODER_PIN_A PH0 // Example pin, change to match your STM32 setup
+#define ENCODER_PIN_B PC15 // Example pin, change to match your STM32 setup
+#define ENCODER_BUTTON_PIN PC12 // Example pin, change to match your STM32 setup
 
 // Define an enum for all modes
 enum Mode {
@@ -94,6 +94,10 @@ void loop() {
 // Interrupt Service Routine (ISR) for rotary encoder turn
 void handleEncoderTurn() {
     encoderTurned = true;
+    // For later purposes
+    // if (currentOption != MODE_STANDBY && conformationPending = false && optionSelected = false) {
+    //     currentOption = MODE_STANDBY;
+    // }
 }
 
 // Interrupt Service Routine (ISR) for rotary encoder button press
