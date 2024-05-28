@@ -3,8 +3,6 @@
 #include <Adafruit_SSD1306.h>
 
 
-#define OLED_SDA_PIN PB11
-#define OLED_SCL_PIN PB10
 
 // Define screen dimensions
 #define SCREEN_WIDTH 128
@@ -12,12 +10,16 @@
 
 // Define OLED reset pin
 #define OLED_RESET    -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define OLED_SDA_PIN PB11 // Define OLED SDA Pin
+#define OLED_SCL_PIN PB10 // Define OLED SCL Pin
+
+// Initialize the OLED display using the Wire library -> I2C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-// TODO: Hannes Rotary Encoder Pins
-#define ENCODER_PIN_A PH0 // Example pin, change to match your STM32 setup
-#define ENCODER_PIN_B PC15 // Example pin, change to match your STM32 setup
-#define ENCODER_BUTTON_PIN PC12 // Example pin, change to match your STM32 setup
+// Define Rotary Encoder Pins
+#define ENCODER_PIN_A PH0 
+#define ENCODER_PIN_B PC15 
+#define ENCODER_BUTTON_PIN PC12  
 
 // Define an enum for all modes
 enum Mode {
@@ -31,10 +33,11 @@ enum Mode {
 };
 
 // Globals
-volatile int currentOption = MODE_STANDBY;
-volatile bool optionSelected = false;
-volatile bool encoderTurned = false;
-volatile bool confirmationPending = false;
+int current_option = MODE_STANDBY;
+int selected_option = MODE_STANDBY;
+bool optionSelected = false;
+bool encoderTurned = false;
+bool confirmationPending = false;
 
 // Function prototypes
 void displayOptions(Mode currentMode, bool confirmation);
@@ -47,15 +50,17 @@ void setup() {
     // Initialize serial communication for debugging
     Serial.begin(9600);
 
+    // So that Mouse does not turn off
     pinMode(PC10, OUTPUT);
     digitalWrite(PC10, HIGH);
 
+    // Initialize the I2C bus for Display communication with wire library
     Wire.setSCL(OLED_SCL_PIN);
     Wire.setSDA(OLED_SDA_PIN);
     Wire.begin();
 
     // Initialize the OLED display
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x64
+    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
         Serial.println(F("SSD1306 allocation failed"));
         for (;;); // Don't proceed, loop forever
     }
@@ -74,24 +79,26 @@ void setup() {
     attachInterrupt(digitalPinToInterrupt(ENCODER_BUTTON_PIN), handleEncoderButton, FALLING);
 
     // Display the initial options
-    displayOptions(static_cast<Mode>(currentOption), false);
+    displayOptions(static_cast<Mode>(current_option), false);
 }
 
 void loop() {
+    // Check if the encoder was turned
     if (encoderTurned) {
         encoderTurned = false;
-        updateEncoderState();
-        displayOptions(static_cast<Mode>(currentOption), confirmationPending);
+        updateEncoderState(); 
+        displayOptions(static_cast<Mode>(selected_option), confirmationPending);
     }
 
     if (optionSelected) {
         optionSelected = false;
         if (confirmationPending) {
             confirmationPending = false;
-            handleModeSelection(static_cast<Mode>(currentOption));
+            current_option = selected_option;
+            handleModeSelection(static_cast<Mode>(current_option));
         } else {
             confirmationPending = true;
-            displayOptions(static_cast<Mode>(currentOption), true);
+            displayOptions(static_cast<Mode>(selected_option), true);
         }
     }
 
@@ -102,10 +109,10 @@ void loop() {
 // Interrupt Service Routine (ISR) for rotary encoder turn
 void handleEncoderTurn() {
     encoderTurned = true;
-    // For later purposes
-    // if (currentOption != MODE_STANDBY && conformationPending = false && optionSelected = false) {
-    //     currentOption = MODE_STANDBY;
-    // }
+    // check if we are inside standby mode and reset the current option to standby mode
+    if (current_option != MODE_STANDBY && confirmationPending == false && optionSelected == false) {
+        current_option = MODE_STANDBY; // change to standby mode (other functions will regularly check for this value)
+    }
 }
 
 // Interrupt Service Routine (ISR) for rotary encoder button press
@@ -115,17 +122,17 @@ void handleEncoderButton() {
 
 // Update the encoder state
 void updateEncoderState() {
-    static int lastEncoded = 0;
+    static int lastEncoded = 0; // Store the last state of the encoder, static to retain value between function calls
     int MSB = digitalRead(ENCODER_PIN_A); // Most significant bit
     int LSB = digitalRead(ENCODER_PIN_B); // Least significant bit
     int encoded = (MSB << 1) | LSB; // Combine the two pin values into a single integer
     int sum = (lastEncoded << 2) | encoded; // Append the previous state to the current state
 
-    // Determine the direction based on state changes
+    // Determine the direction based on state changes and update the selected option
     if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) {
-        currentOption = (currentOption + 1) % MODE_MAX;
+        selected_option = (selected_option + 1) % MODE_MAX;
     } else if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) {
-        currentOption = (currentOption - 1 + MODE_MAX) % MODE_MAX;
+        selected_option = (selected_option - 1 + MODE_MAX) % MODE_MAX;
     }
 
     lastEncoded = encoded; // Store the current state for the next iteration
@@ -138,7 +145,7 @@ void updateEncoderState() {
 
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
-    const char* options[] = {"Stand By", "Soft Reset", "Hard Reset", "Map Maze", "BFS", "A*"};
+    const char* options[] = {"S-B", "S-Res", "H-Res", "DFS", "BFS", "A*"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
@@ -155,11 +162,15 @@ void displayOptions(Mode currentMode, bool confirmation) {
 
     for (int i = 0; i < numOptions; ++i) {
         if (i == currentMode) {
-            display.print("> ");
+            display.print(" >");
         } else {
-            display.print("  ");
+            display.print(" ");
         }
-        display.println(options[i]);
+        display.print(options[i]);
+        display.print(", ");
+        if (i == 2) {
+            display.println();
+        }
     }
     // Display the buffer on the screen
     display.display();
@@ -167,29 +178,36 @@ void displayOptions(Mode currentMode, bool confirmation) {
 
 // Function to handle the selected mode
 void handleModeSelection(Mode mode) {
+    display.clearDisplay();
     switch (mode) {
         case MODE_STANDBY:
             Serial.println("Stand By Mode selected");
+            delay(1000); // Delay to allow the user to read the message
             // Handle Stand By Mode
             break;
         case MODE_SOFT_RESET:
             Serial.println("Soft Reset Mode selected");
+            delay(1000);
             // Handle Soft Reset Mode
             break;
         case MODE_HARD_RESET:
             Serial.println("Hard Reset Mode selected");
+            delay(1000);
             // Handle Hard Reset Mode
             break;
         case MODE_MAP_MAZE:
             Serial.println("Map Maze Mode selected");
+            delay(1000);
             // Handle Map Maze Mode
             break;
         case MODE_BFS:
             Serial.println("BFS Mode selected");
+            delay(1000);
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
             Serial.println("A* Mode selected");
+            delay(1000);
             // Handle A* Mode
             break;
         default:
