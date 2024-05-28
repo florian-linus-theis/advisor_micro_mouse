@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-
+#include "mms_interaction.h"
 #include "location.h"
 #include "state.h"
 #include "API.h"

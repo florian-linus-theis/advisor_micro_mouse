@@ -5,6 +5,7 @@
 #include "a_star_nodes.h"
 #include <iostream>
 #include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
+#include "mms_interaction.h"
 
 extern int current_option; // current state selected by the user
 

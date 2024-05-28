@@ -5,6 +5,7 @@
 #include "maze.h"
 #include "location.h"
 #include "API.h"
+#include "mms_interaction.h"
 
 extern int current_option; // current state selected by the user
 
