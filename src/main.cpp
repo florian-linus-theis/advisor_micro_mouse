@@ -6,11 +6,21 @@
 #include "Timer_Setup.cpp"
 #include "Systick.cpp"
 #include "algorithms.cpp"
+#include "display.h"
+
 
 //Library-Include
 #include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-// put function declarations here:
+// put function and external variable declarations here:
+extern int current_option;
+extern int selected_option;
+extern bool optionSelected;
+extern bool encoderTurned;
+extern bool confirmationPending;
 
 
 
@@ -23,6 +33,7 @@ void setup() {
   maze_setup(); // setting up the maze file
   HardwareSerial Serial1(BLUETOOTH_RX, BLUETOOTH_TX);
   Serial1.begin(115200);
+  display_setup();
 
 
 //Start Systick Timer
@@ -31,7 +42,28 @@ void setup() {
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  // Check if the encoder was turned
+    if (encoderTurned) {
+        encoderTurned = false;
+        updateEncoderState(); 
+        displayOptions(static_cast<Mode>(selected_option), confirmationPending);
+    }
+
+    // Check if an option/state was selected
+    if (optionSelected) {
+        optionSelected = false;
+        if (confirmationPending) {
+            confirmationPending = false;
+            current_option = selected_option;
+            handleModeSelection(static_cast<Mode>(current_option));
+        } else {
+            confirmationPending = true;
+            displayOptions(static_cast<Mode>(selected_option), true);
+        }
+    }
+
+    // Sleep to reduce CPU usage (adjust as necessary)
+    delay(100);
 }
 
 //put funktions here
