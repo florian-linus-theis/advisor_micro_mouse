@@ -5,6 +5,9 @@
 #include "a_star_nodes.h"
 #include <iostream>
 #include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
+#include "mms_interaction.h"
+
+extern int current_option; // current state selected by the user
 
 class AStarAlgorithm {
 private:
@@ -129,6 +132,9 @@ public:
 
         // iterate through the vector and execute the actions
         for (counter; counter < act_vector_psp.size(); counter++){
+            if (current_option == 0) { // If we have an external interrupt triggered by the rotation of the rotary encoder
+                return; // return to main loop
+            }
             int act = act_vector_psp[counter]; // Get action from vector
             if (act == 1) {
                 turn_right();

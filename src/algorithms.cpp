@@ -14,6 +14,7 @@ constexpr bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
 constexpr bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
 std::vector<int> GOAL_POSITION = {-1,-1}; // Global variable to store the goal position
 
+extern int current_option; // current option selected by the user
 
 void maze_setup(){
     // TODO: OLED Display Feedback geben wenn Maze fertig ist
@@ -42,6 +43,9 @@ void bfs_algorithm(){
     }
     BFSAlgorithm bfs(&maze, &GOAL_POSITION, BALLGREIFER); // Initialize BFS algorithm
     int solution_position = bfs.find_bfs_shortest_path(); // Find the shortest path using BFS algorithm (also important for a* as we need to know the goal position first)
+    if (current_option == 0) {
+        return; // if we have triggered external reset 
+    }
     bfs.execute_shortest_path(solution_position); // Execute the shortest path found by the BFS algorithm
     return;
 }
@@ -59,6 +63,9 @@ void a_star_algorithm(){
     }
     AStarAlgorithm a_star_algorithm(&maze, GOAL_POSITION, BALLGREIFER); // Initialize A* algorithm
     A_star_node* solution_a_star = a_star_algorithm.prioritize_straight_paths(); // Find the shortest path using A* algorithm
+    if (current_option == 0) {
+        return; // if we have triggered external reset 
+    }
     a_star_algorithm.execute_shortest_path_psp(solution_a_star); // Execute the shortest path found by the A* algorithm
     return;
 }

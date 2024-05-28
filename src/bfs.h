@@ -1,10 +1,12 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-
+#include "mms_interaction.h"
 #include "location.h"
 #include "state.h"
 #include "API.h"
+
+extern int current_option; // current option selected by the user
 
 class BFSAlgorithm {
 private:
@@ -107,6 +109,9 @@ public:
 
         // Execute the actions in the maze
         while (counter >= 0) {    // start at the back of actions (at origin) and execute them in the maze until we are at the first action
+            if (current_option == 0) { // If we have an external interrupt triggered by the rotation of the rotary encoder
+                return; // return to main loop
+            }
             int act = act_vector[counter]; // Get action from vector
             if (act == 1) {
                 turn_right();
