@@ -1,5 +1,6 @@
 
 //#include <iostream>
+#pragma once
 #include "Arduino.h"
 #include "Pin_Setup.h"
 #include "Systick.cpp"
