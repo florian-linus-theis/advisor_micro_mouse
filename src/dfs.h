@@ -6,7 +6,7 @@
 #include "location.h"
 #include "API.h"
 
-
+extern int current_option; // current state selected by the user
 
 // Location object stack for tracking locations that may need to be explored during mapping
 std::stack<Location> loc_stack;
@@ -58,6 +58,9 @@ void dfs_map_maze() {
     // recursive call inside this while-loop
     Location next_loc;
     while (true) {
+        if (current_option == 0) {
+            return; // if we have triggered external reset
+        }
         // If loc_stack is empty, backtrack to the initial position then return
         if (loc_stack.empty()) {
             // if we are not at the origin yet, we move back and try again
