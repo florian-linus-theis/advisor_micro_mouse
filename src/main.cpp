@@ -2,6 +2,10 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 
+
+#define OLED_SDA_PIN PB11
+#define OLED_SCL_PIN PB10
+
 // Define screen dimensions
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
@@ -43,6 +47,13 @@ void setup() {
     // Initialize serial communication for debugging
     Serial.begin(9600);
 
+    pinMode(PC10, OUTPUT);
+    digitalWrite(PC10, HIGH);
+
+    Wire.setSCL(OLED_SCL_PIN);
+    Wire.setSDA(OLED_SDA_PIN);
+    Wire.begin();
+
     // Initialize the OLED display
     if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x64
         Serial.println(F("SSD1306 allocation failed"));
@@ -51,9 +62,6 @@ void setup() {
 
     // Clear the buffer
     display.clearDisplay();
-
-    display.setTextSize(1); // Change this to 2, 3, etc., to increase the font size
-    display.setTextColor(SSD1306_WHITE);
 
     // Initialize rotary encoder pins
     pinMode(ENCODER_PIN_A, INPUT);
