@@ -1,7 +1,12 @@
+//Include Librarys
 #include "Arduino.h"
 #include "wiring.h"
+#include "iostream"
+#include "vector"
+//#include "HardwareTimer.h"
 
-//Pin renaming
+
+//Pin Naming
 //System
 #define POWER_ENABLE    PC10  //Main Power Latch - enable directly after startup to keep Robot ON
 #define V_BAT           PC0   //Battery Voltage divided by 1,47
@@ -72,93 +77,46 @@
 #define LED_GREEN       PA12
 #define LED_BLUE        PC3
 
-void Pin_Init(void);
+
+//Function and Variable Initialisation - - - - - - - - - - - - - - - - - - - - -
+//Pin_Setup
+extern void Pin_Init(void);
+extern void Pin_Setup(void);
 
 
-void Pin_Setup(void) {
-//Pinmode Declaration
+//Clock_Setup
+
+
+
+//Timer_Setup
+HardwareTimer timer14(TIM14);
+HardwareTimer timer3(TIM3);
+HardwareTimer timer4(TIM4);
+HardwareTimer timer2(TIM2);
+HardwareTimer timer5(TIM5);
+HardwareTimer timer6(TIM6);
+HardwareTimer timer7(TIM7);
+HardwareTimer timer10(TIM10);
+HardwareTimer timer1(TIM1);
+
+extern void Timer_Setup(void);
+
+
+
+//Systick
+extern void Systick_Interrupt(void);
+extern void update(void);
+
+
+
+//ADC_Setup
+extern void ADC_Setup(void);
+
+
+
+//Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//Sensors
+extern void Timer6_Interrupt(void);
+extern void Timer7_Interrupt(void);
+
 //Motors
-  pinMode(MOTOR_nENABLE, OUTPUT);
-  pinMode(MOTOR_RIGHT_PWM_1, OUTPUT);
-  pinMode(MOTOR_RIGHT_PWM_2, OUTPUT);
-  pinMode(MOTOR_LEFT_PWM_1, OUTPUT);
-  pinMode(MOTOR_LEFT_PWM_2, OUTPUT);
-  pinMode(MOTOR_ENCODER_RIGHT_A, INPUT);
-  pinMode(MOTOR_ENCODER_RIGHT_B, INPUT);
-  pinMode(MOTOR_ENCODER_LEFT_A, INPUT);
-  pinMode(MOTOR_ENCODER_LEFT_B, INPUT);
-  pinMode(MOTOR_nFAULT, INPUT);
-
-//Servos
-  pinMode(SERVO_ENABLE, OUTPUT);
-  //pinMode(SERVO_PWM_1, OUTPUT);   //leave unconfigured as floating Input, until testet in Hardware!
-  //pinMode(SERVO_PWM_2, OUTPUT);
-
-
-//Infrared Emmitter
-  pinMode(IR_EMITTER_RF, OUTPUT);
-  pinMode(IR_EMITTER_LF, OUTPUT);
-  pinMode(IR_EMITTER_RD, OUTPUT);
-  pinMode(IR_EMITTER_LD, OUTPUT);
-  pinMode(IR_EMITTER_RS, OUTPUT);
-  pinMode(IR_EMITTER_LS, OUTPUT);
-  pinMode(IR_EMITTER_MID, OUTPUT);
-
-//Infrared Sensors
-  pinMode(IR_SENSOR_RF, INPUT_ANALOG);
-  pinMode(IR_SENSOR_LF, INPUT_ANALOG);
-  pinMode(IR_SENSOR_RD, INPUT_ANALOG);
-  pinMode(IR_SENSOR_LD, INPUT_ANALOG);
-  pinMode(IR_SENSOR_RS, INPUT_ANALOG);
-  pinMode(IR_SENSOR_LS, INPUT_ANALOG);
-  pinMode(IR_SENSOR_MID, INPUT_ANALOG);
-
-
-//IMU
-  //->SPI #1
-  //TO-DO !!!!! --------------------------------
-
-  
-//OLED Display
-  pinMode(OLED_SCL, OUTPUT);
-  pinMode(OLED_SCL, OUTPUT);
-  
-  
-//Bluetooth Module
-  pinMode(BLUETOOTH_RX, INPUT);
-  pinMode(BLUETOOTH_TX, OUTPUT);
-  
-
-//User-Interface-Encoder
-  pinMode(UI_BUTTON, INPUT_PULLUP);   //Pullup important (no Hardware Pullup upsi)
-  pinMode(UI_ENCODER_A, INPUT);
-  pinMode(UI_ENCODER_B, INPUT);
-  
-
-//Buzzer
-  pinMode(BUZZER, OUTPUT);  
-  
-  
-//Debug RGB LED
-  pinMode(LED_RED, OUTPUT_OPEN_DRAIN);
-  pinMode(LED_GREEN, OUTPUT_OPEN_DRAIN);
-  pinMode(LED_BLUE, OUTPUT_OPEN_DRAIN);
-  
-
-
-  Pin_Init();
-}
-
-
-void Pin_Init() {
-//Turn ON Power Latch 
-  digitalWrite(POWER_ENABLE, HIGH);
-
-//Turn OFF Motor Driver
-  digitalWrite(MOTOR_nENABLE, HIGH);
-
-//Turn OFF Debug LED
-  digitalWrite(LED_RED, HIGH);
-  digitalWrite(LED_GREEN, HIGH);
-  digitalWrite(LED_BLUE, HIGH);
-}

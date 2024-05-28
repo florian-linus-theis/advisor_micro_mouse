@@ -1,11 +1,7 @@
-
-//#include <iostream>
-#include "Arduino.h"
-#include "Pin_Setup.h"
-#include "Systick.cpp"
-#include "Sensors.cpp"
+#include "Setup.h"
 
 //unused Timers 8,9,11,12,13
+/*
 HardwareTimer timer14(TIM14);
 HardwareTimer timer3(TIM3);
 HardwareTimer timer4(TIM4);
@@ -15,7 +11,7 @@ HardwareTimer timer6(TIM6);
 HardwareTimer timer7(TIM7);
 HardwareTimer timer10(TIM10);
 HardwareTimer timer1(TIM1);
-
+*/
 
 void Systick_Setup();
 void Timer3_Setup();

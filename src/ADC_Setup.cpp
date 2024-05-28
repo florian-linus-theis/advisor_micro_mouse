@@ -1,5 +1,5 @@
-#include <Arduino.h>
-#include <wiring.h>
+#include "Setup.h"
+
 
 void ADC_Setup() {
     analogReadResolution(12);

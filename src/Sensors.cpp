@@ -1,9 +1,4 @@
-#include <iostream>
-#include <vector>
-#include "Arduino.h"
-#include "wiring.h"
-#include "Pin_Setup.h"
-#include "Timer_Setup.cpp"
+#include "Setup.h"
 
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};

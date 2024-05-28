@@ -1,17 +1,16 @@
+//Include Header Files
+#include "Setup.h"
 
-//Header-Files Include
-#include "Pin_Setup.h"
+//Include C-Files
+#include "Pin_Setup.cpp"
 #include "Clock_Setup.cpp"
 #include "ADC_Setup.cpp"
 #include "Timer_Setup.cpp"
 #include "Systick.cpp"
 #include "algorithms.cpp"
 
-//Library-Include
-#include <Arduino.h>
 
-// put function declarations here:
-
+// put function declarations in Header Files
 
 
 void setup() {
@@ -26,7 +25,7 @@ void setup() {
 
 
 //Start Systick Timer
-  Timer14.resume();
+  timer14.resume();
 }
 
 
