@@ -25,7 +25,7 @@ void setup() {
 
 
 //Start Systick Timer
-  Timer14.resume();
+  timer14.resume();
 }
 
 
