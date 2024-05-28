@@ -6,16 +6,6 @@
 #include "Pin_Setup.h"
 #include "Timer_Setup.h"
 
-HardwareTimer timer14(TIM14);
-HardwareTimer timer3(TIM3);
-HardwareTimer timer4(TIM4);
-HardwareTimer timer2(TIM2);
-HardwareTimer timer5(TIM5);
-HardwareTimer timer6(TIM6);
-HardwareTimer timer7(TIM7);
-HardwareTimer timer10(TIM10);
-HardwareTimer timer1(TIM1);
-
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
 
