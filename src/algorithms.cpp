@@ -8,6 +8,7 @@
 #include "bfs.h" // importing breadth-first-search algorithm
 #include "a_star_nodes.h" // importing a_star_node class
 #include "a_star_algorithm.h" // importing AStarAlgorithm class
+#include "display.h"
 
 
 constexpr bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
@@ -17,7 +18,7 @@ std::vector<int> GOAL_POSITION = {-1,-1}; // Global variable to store the goal p
 extern int current_option; // current option selected by the user
 
 void maze_setup(){
-    // TODO: OLED Display Feedback geben wenn Maze fertig ist
+    display_print("Setting up maze...");
     initialize_maze(); //initializing maze
     if (BALLGREIFER == true) {
         initialize_maze_with_ballgreifer();
@@ -26,11 +27,12 @@ void maze_setup(){
 
 void dfs_mapping(){
     if (MAPPING_COMPLETE == true) {
-        // log("Maze already mapped");
+        display_print("Maze already mapped");
         return;
     }
     // TODO: buzzer sounds for start and end of mapping
     // log("Mapping the maze..."); 
+    display_print("Mapping maze...");
     dfs_map_maze(); // Mapping the maze using depth-first search 
     set_dir(0); // Reset heading to north
     return;
@@ -38,7 +40,7 @@ void dfs_mapping(){
 
 void bfs_algorithm(){
     if (MAPPING_COMPLETE == false) {
-        // log("Maze not mapped yet");
+        display_print("Maze not mapped yet");
         return;
     }
     BFSAlgorithm bfs(&maze, &GOAL_POSITION, BALLGREIFER); // Initialize BFS algorithm
@@ -52,11 +54,11 @@ void bfs_algorithm(){
 
 void a_star_algorithm(){
     if (MAPPING_COMPLETE == false) {
-        // log("Maze not mapped yet");
+        display_print("Maze not mapped yet");
         return;
     }
     if (GOAL_POSITION[0] == -1 && GOAL_POSITION[1] == -1) {
-        // log("Goal position not found yet");
+        display_print("Goal pos not found yet");
         BFSAlgorithm bfs(&maze, &GOAL_POSITION, BALLGREIFER); // Initialize BFS algorithm
         bfs.find_bfs_shortest_path(); 
         return;

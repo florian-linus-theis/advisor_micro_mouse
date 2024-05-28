@@ -6,6 +6,7 @@
 #include <iostream>
 #include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
 #include "mms_interaction.h"
+#include "display.h"
 
 extern int current_option; // current state selected by the user
 
@@ -54,10 +55,9 @@ public:
             openSet_psp.pop();
             current_state->location->set_visited(true);  // Mark state's location as visited
             
-            std::cerr << current_state->to_string() << std::endl; // (added)
             // If it is goal, return the position of it in global state vector
             if (current_state->is_goal()) {
-                std::cerr << "goal state found" << std::endl;
+                display_print("Goal state found");
                 return current_state;
             }
 
@@ -106,8 +106,7 @@ public:
     // Function to execute the shortest path found by the A* algorithm
     void execute_shortest_path_psp(A_star_node* solution) {
         if (solution == nullptr) {  // If no solution was found
-            // std::cerr << "No solution found" << std::endl; 
-            // TODO: output with OLED Display 
+            display_print("No solution found");
             return;
         }
         
@@ -119,9 +118,9 @@ public:
             temp = state_vector_psp[temp.position_parent_in_vec];   // Traverse up to parent
         } while (temp.position_parent_in_vec != -1);
 
-        // std::cerr << "Backtracking complete" << std::endl;
-        // TODO: output with OLED Display
-        int counter = 0;;
+        display_print("Backtracking complete");
+        delay(2000); // Delay for 2 seconds to give the user time to read the display
+        int counter = 0;
         // Accounting for the fact that we might have to grab the ball first
         if (BALLGREIFER == true) {
             grab_ball();
@@ -143,5 +142,6 @@ public:
             }
             move_forward();
         }
+        display_print("Path executed");
     }
 };
