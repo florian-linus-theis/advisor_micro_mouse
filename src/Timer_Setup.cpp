@@ -23,7 +23,7 @@ void Timer10_Setup();
 void Timer1_Setup(); 
 
 
-void Timer_Setup() {
+void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
 //Systick Timer14
     Systick_Setup();
 
@@ -46,7 +46,8 @@ void Timer_Setup() {
 
 
 
-void Systick_Setup(void) {
+
+void Systick_Setup(void) {  //Systick Timer Setup
     timer14.setPrescaleFactor(122000);          // Set prescaler to 122000
     timer14.setOverflow(65535);                 // Set overflow to 65535 = 2 ms intervals
     timer14.attachInterrupt(Systick_Interrupt);  

@@ -5,16 +5,11 @@ int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
 
 //Meassurement Data Vector
-std::vector<uint32_t> Distanz_Sensoren;
 std::vector<uint32_t> Messung_Blind;
 std::vector<uint32_t> Messung_Hell;
-std::vector<uint32_t> Distanz_Sensoren_MM;
 uint32_t Distance_Sensor_Mid_MM;
-int Messung_Mid;
 
 int interrupt_counter;
-bool Sensor_Error;
-bool Error_Flag;
 int Flag_Mid;  
 
 
@@ -30,7 +25,7 @@ void Distanz_Messung_Blind(void){
 
 void Distanz_Messung_Hell(void) {
   interrupt_counter = 0;    // Reset the interrupt counter
-  Distanz_Sensoren.clear(); // Clear previous measurements
+  Messung_Hell.clear(); // Clear previous measurements
 
   // Turn on the first emitter
   digitalWrite(Channel_Emitter[0], HIGH);
@@ -43,7 +38,7 @@ void Distanz_Messung_Hell(void) {
 }
 
 void Timer6_Interrupt(void) {
-  Distanz_Sensoren.push_back(analogRead(Channel_Sensoren[interrupt_counter]));  // Read the current sensor value 
+  Messung_Hell.push_back(analogRead(Channel_Sensoren[interrupt_counter]));  // Read the current sensor value 
   digitalWrite(Channel_Emitter[interrupt_counter], LOW);                        // Turn off the current emitter
 
   interrupt_counter++;  // Move to the next sensor
@@ -80,12 +75,12 @@ void Timer7_Interrupt(void){
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 
 void printDistanzSensoren(void) {
-  Serial1.println("Distanz_Sensoren Messwerte:");
+  Serial1.println("Messung_Hell Messwerte:");
   for (int i = 0; i < 6; i++) {
     Serial1.print("Sensor ");
     Serial1.print(i);
     Serial1.print(": ");
-    Serial1.println(Distanz_Sensoren[i]);
+    Serial1.println(Messung_Hell[i]);
   }
   
   Serial1.print("Distanz_Sensor Mitte:");

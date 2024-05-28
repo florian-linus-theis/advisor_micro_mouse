@@ -3,7 +3,7 @@
 #include "wiring.h"
 #include "iostream"
 #include "vector"
-//#include "HardwareTimer.h"
+#include "HardwareTimer.h"
 
 
 //Pin Naming
@@ -80,8 +80,8 @@
 
 //Function and Variable Initialisation - - - - - - - - - - - - - - - - - - - - -
 //Pin_Setup
-extern void Pin_Init(void);
 extern void Pin_Setup(void);
+extern void Set_Output(void);
 
 
 //Clock_Setup
