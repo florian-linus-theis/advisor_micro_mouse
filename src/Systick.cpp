@@ -1,7 +1,5 @@
+#include "Setup.h"
 
-#include <iostream>
-#include "Arduino.h"
-#include "wiring.h"
 
 void Systick_Interrupt() {
 

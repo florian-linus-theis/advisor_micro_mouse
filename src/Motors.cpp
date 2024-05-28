@@ -1,8 +1,5 @@
-#include <iostream>
-#include <vector>
-#include "Arduino.h"
-#include "wiring.h"
-#include "Pin_Setup.h"
+#include "Setup.h"
+
 
 class motors
 {

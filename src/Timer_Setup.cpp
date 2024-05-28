@@ -1,9 +1,4 @@
-
-//#include <iostream>
-#include "Arduino.h"
-#include "Pin_Setup.h"
-#include "Systick.cpp"
-#include "Sensors.cpp"
+#include "Setup.h"
 
 //unused Timers 8,9,11,12,13
 HardwareTimer timer14(TIM14);
@@ -28,7 +23,7 @@ void Timer10_Setup();
 void Timer1_Setup(); 
 
 
-void Timer_Setup() {
+void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
 //Systick Timer14
     Systick_Setup();
 
@@ -51,7 +46,8 @@ void Timer_Setup() {
 
 
 
-void Systick_Setup(void) {
+
+void Systick_Setup(void) {  //Systick Timer Setup
     timer14.setPrescaleFactor(122000);          // Set prescaler to 122000
     timer14.setOverflow(65535);                 // Set overflow to 65535 = 2 ms intervals
     timer14.attachInterrupt(Systick_Interrupt);  
@@ -96,6 +92,16 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6.refresh();
     timer6.pause();
 }
+void Timer6_Restart() {
+    timer6.pause();
+    timer6.setCount(0);
+    timer6.refresh();
+    timer6.resume();
+}
+void Timer6_Pause() {
+    timer6.pause();
+}
+  
 
 void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
     // Configure timer
@@ -103,6 +109,15 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
     timer7.setOverflow(60);                     // Set overflow to 16 = 50us intervals
     timer7.attachInterrupt(Timer7_Interrupt);
     timer7.refresh();
+    timer7.pause();
+}
+void Timer7_Restart() {
+    timer7.pause();
+    timer7.setCount(0);
+    timer7.refresh();
+    timer7.resume();
+}
+void Timer7_Pause() {
     timer7.pause();
 }
 

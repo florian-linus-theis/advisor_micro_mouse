@@ -1,25 +1,15 @@
-#include <iostream>
-#include <vector>
-#include "Arduino.h"
-#include "wiring.h"
-#include "Pin_Setup.h"
-#include "Timer_Setup.cpp"
+#include "Setup.h"
 
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
 
 //Meassurement Data Vector
-std::vector<uint32_t> Distanz_Sensoren;
 std::vector<uint32_t> Messung_Blind;
 std::vector<uint32_t> Messung_Hell;
-std::vector<uint32_t> Distanz_Sensoren_MM;
 uint32_t Distance_Sensor_Mid_MM;
-int Messung_Mid;
 
 int interrupt_counter;
-bool Sensor_Error;
-bool Error_Flag;
 int Flag_Mid;  
 
 
@@ -35,23 +25,20 @@ void Distanz_Messung_Blind(void){
 
 void Distanz_Messung_Hell(void) {
   interrupt_counter = 0;    // Reset the interrupt counter
-  Distanz_Sensoren.clear(); // Clear previous measurements
+  Messung_Hell.clear(); // Clear previous measurements
 
   // Turn on the first emitter
   digitalWrite(Channel_Emitter[0], HIGH);
 
   // Enable the interrupt to start the measurement process
-  timer6.pause();
-  timer6.setCount(0);
-  timer6.refresh();
-  timer6.resume();
+  Timer6_Restart();
 
   // Wait for the process to complete
   while (interrupt_counter < 6) {} // Wait in a non-blocking way (e.g., other code can run here)
 }
 
 void Timer6_Interrupt(void) {
-  Distanz_Sensoren.push_back(analogRead(Channel_Sensoren[interrupt_counter]));  // Read the current sensor value 
+  Messung_Hell.push_back(analogRead(Channel_Sensoren[interrupt_counter]));  // Read the current sensor value 
   digitalWrite(Channel_Emitter[interrupt_counter], LOW);                        // Turn off the current emitter
 
   interrupt_counter++;  // Move to the next sensor
@@ -60,7 +47,7 @@ void Timer6_Interrupt(void) {
     digitalWrite(Channel_Emitter[interrupt_counter], HIGH);
   } else if (interrupt_counter >= 6){   // All emitters processed
     digitalWrite(Channel_Emitter[interrupt_counter], LOW);
-    timer6.pause();
+    Timer6_Pause();
   }
 }
 
@@ -71,10 +58,7 @@ void Timer6_Interrupt(void) {
 void Distanz_Mid_Sensor(void){
     Flag_Mid = 0;
     digitalWrite(IR_EMITTER_MID, HIGH);
-    timer7.pause();
-    timer7.setCount(0);
-    timer7.refresh();
-    timer7.resume();
+    Timer7_Restart();
     
     while(Flag_Mid == 0){}
 }
@@ -83,7 +67,7 @@ void Timer7_Interrupt(void){
     Distance_Sensor_Mid_MM = analogRead(IR_SENSOR_MID);
     digitalWrite(IR_EMITTER_MID, LOW);
     Flag_Mid++;
-    timer7.pause();
+    Timer7_Pause();
 }
 
 
@@ -91,12 +75,12 @@ void Timer7_Interrupt(void){
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 
 void printDistanzSensoren(void) {
-  Serial1.println("Distanz_Sensoren Messwerte:");
+  Serial1.println("Messung_Hell Messwerte:");
   for (int i = 0; i < 6; i++) {
     Serial1.print("Sensor ");
     Serial1.print(i);
     Serial1.print(": ");
-    Serial1.println(Distanz_Sensoren[i]);
+    Serial1.println(Messung_Hell[i]);
   }
   
   Serial1.print("Distanz_Sensor Mitte:");

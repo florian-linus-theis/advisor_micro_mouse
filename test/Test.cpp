@@ -1,5 +1,6 @@
 #include <Arduino.h>
-#include <Pin_Setup.h>
+#include <Setup.h>
+#include <Pin_Setup.cpp>
 using std::vector;
 
 
