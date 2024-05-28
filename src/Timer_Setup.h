@@ -3,8 +3,8 @@
 #pragma once
 #include "Arduino.h"
 #include "Pin_Setup.h"
-#include "Systick.cpp"
-#include "Sensors.cpp"
+#include "Systick.h"
+#include "Sensors.h"
 
 //unused Timers 8,9,11,12,13
 HardwareTimer timer14(TIM14);
