@@ -36,10 +36,7 @@ void Distanz_Messung_Hell(void) {
   digitalWrite(Channel_Emitter[0], HIGH);
 
   // Enable the interrupt to start the measurement process
-  timer6.pause();
-  timer6.setCount(0);
-  timer6.refresh();
-  timer6.resume();
+  Timer6_Restart();
 
   // Wait for the process to complete
   while (interrupt_counter < 6) {} // Wait in a non-blocking way (e.g., other code can run here)
@@ -55,7 +52,7 @@ void Timer6_Interrupt(void) {
     digitalWrite(Channel_Emitter[interrupt_counter], HIGH);
   } else if (interrupt_counter >= 6){   // All emitters processed
     digitalWrite(Channel_Emitter[interrupt_counter], LOW);
-    timer6.pause();
+    Timer6_Pause();
   }
 }
 
@@ -66,10 +63,7 @@ void Timer6_Interrupt(void) {
 void Distanz_Mid_Sensor(void){
     Flag_Mid = 0;
     digitalWrite(IR_EMITTER_MID, HIGH);
-    timer7.pause();
-    timer7.setCount(0);
-    timer7.refresh();
-    timer7.resume();
+    Timer7_Restart();
     
     while(Flag_Mid == 0){}
 }
@@ -78,7 +72,7 @@ void Timer7_Interrupt(void){
     Distance_Sensor_Mid_MM = analogRead(IR_SENSOR_MID);
     digitalWrite(IR_EMITTER_MID, LOW);
     Flag_Mid++;
-    timer7.pause();
+    Timer7_Pause();
 }
 
 

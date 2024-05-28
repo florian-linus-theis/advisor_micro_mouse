@@ -1,7 +1,6 @@
 #include "Setup.h"
 
 //unused Timers 8,9,11,12,13
-/*
 HardwareTimer timer14(TIM14);
 HardwareTimer timer3(TIM3);
 HardwareTimer timer4(TIM4);
@@ -11,7 +10,7 @@ HardwareTimer timer6(TIM6);
 HardwareTimer timer7(TIM7);
 HardwareTimer timer10(TIM10);
 HardwareTimer timer1(TIM1);
-*/
+
 
 void Systick_Setup();
 void Timer3_Setup();
@@ -92,6 +91,16 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6.refresh();
     timer6.pause();
 }
+void Timer6_Restart() {
+    timer6.pause();
+    timer6.setCount(0);
+    timer6.refresh();
+    timer6.resume();
+}
+void Timer6_Pause() {
+    timer6.pause();
+}
+  
 
 void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
     // Configure timer
@@ -99,6 +108,15 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
     timer7.setOverflow(60);                     // Set overflow to 16 = 50us intervals
     timer7.attachInterrupt(Timer7_Interrupt);
     timer7.refresh();
+    timer7.pause();
+}
+void Timer7_Restart() {
+    timer7.pause();
+    timer7.setCount(0);
+    timer7.refresh();
+    timer7.resume();
+}
+void Timer7_Pause() {
     timer7.pause();
 }
 
