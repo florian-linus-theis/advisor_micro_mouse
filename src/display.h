@@ -34,26 +34,25 @@ enum Mode {
     MODE_MAX // This can be used to determine the number of modes
 };
 
-
+// declaring Global variables from main file 
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;
 extern bool encoderTurned;
 extern bool confirmationPending;
 
-
-// Function prototypes
-void displayOptions(Mode currentMode, bool confirmation);
-void handleModeSelection(Mode mode);
-void handleEncoderTurn();
-void handleEncoderButton();
-void updateEncoderState();
+// Rotary encoder debouncing variables
+volatile unsigned long lastTurnTime = 0;
+const unsigned long debounceDelay = 5; // Debounce delay in milliseconds
 
 
 // Functions
 // Interrupt Service Routine (ISR) for rotary encoder turn
 void handleEncoderTurn() {
-    encoderTurned = true;
+    if ((millis() - lastTurnTime) > debounceDelay) {
+        encoderTurned = true;
+        lastTurnTime = millis(); // Update the last turn time
+    }
     // check if we are inside standby mode and reset the current option to standby mode
     if (current_option != MODE_STANDBY && confirmationPending == false && optionSelected == false) {
         current_option = MODE_STANDBY; // change to standby mode (other functions will regularly check for this value)

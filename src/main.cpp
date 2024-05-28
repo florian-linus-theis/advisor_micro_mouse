@@ -4,7 +4,7 @@
 #include "display.h"
 
 
-// Global vairables 
+// Global variables 
 int current_option = MODE_STANDBY;
 int selected_option = MODE_STANDBY;
 bool optionSelected = false;
