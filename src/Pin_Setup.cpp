@@ -68,6 +68,8 @@ void Pin_Setup(void) {
   pinMode(LED_RED, OUTPUT_OPEN_DRAIN);
   pinMode(LED_GREEN, OUTPUT_OPEN_DRAIN);
   pinMode(LED_BLUE, OUTPUT_OPEN_DRAIN);
+//Sontiges
+  pinMode(POWER_ENABLE, OUTPUT);
   
 
 
@@ -81,7 +83,7 @@ void Set_Output(void) {
   digitalWrite(POWER_ENABLE, HIGH);
 
 //Turn OFF Motor Driver
-  digitalWrite(MOTOR_nENABLE, HIGH);
+  digitalWrite(MOTOR_nENABLE, LOW);
 
 //Turn OFF Debug LED
   digitalWrite(LED_RED, HIGH);

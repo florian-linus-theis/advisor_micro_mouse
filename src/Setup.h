@@ -85,7 +85,7 @@ extern void Set_Output(void);
 
 
 //Clock_Setup
-
+extern void Clock_Setup();
 
 
 //Timer_Setup
@@ -124,8 +124,18 @@ extern void ADC_Setup(void);
 extern void Timer6_Interrupt(void);
 extern void Timer7_Interrupt(void);
 
+extern void Distanz_Messung_Blind(void);
+extern void Distanz_Messung_Hell(void);
+
+extern u_int32_t Distance_Sensor_Mid_MM;
+extern void Distanz_Mid_Sensor();
+extern void printDistanzSensoren(void);
+
 //Motors
 
 
 //Move
 extern void Forward(int dutyCycle);
+
+//Bluetooth
+
