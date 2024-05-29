@@ -5,7 +5,8 @@ Willkommen zum GitHub-Workflow unseres Teams! Hier ist eine kurze Anleitung, wie
 **Branches verwenden:**
 - Wir verwenden verschiedene Branches, um an verschiedenen Funktionen oder Aufgaben gleichzeitig zu arbeiten, ohne die Hauptentwicklungslinie zu beeinträchtigen.
 - Überprüft vor Beginn der Arbeit, ob bereits eine entsprechende Branch vorhanden ist. Falls nicht, erstellt eine neue Branch für eure Arbeit.
-- Unsere Branches sind: Main Branch, HAL Branch (Hardware Abstraction Layer) für Sensorik und Motoren, Algorithmus Branch, Middle Layer Branch (Datenverarbeitung und Aufbereitung für Top Layer Algorithmus), Top Layer Branch
+- Eure Branch könnt ihr zB nach eurem Arbeitsbereich benennen: Main Branch, HAL Branch (Hardware Abstraction Layer) für Sensorik und Motoren, Algorithmus Branch, Middle Layer Branch (Datenverarbeitung und Aufbereitung für Top Layer Algorithmus), Top Layer Branch
+- Auch eine Benennung mit eurem Name o.Ä. macht Sinn
 
 **Branch wechseln:**
 - Bevor Änderungen vorgenommen oder neue Funktionen hinzugefügt werden, stellt sicher, dass ihr zur entsprechenden Branch gewechselt seid.

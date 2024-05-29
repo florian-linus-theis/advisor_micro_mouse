@@ -1,51 +1,49 @@
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+//Include Header Files
+//#include "Setup.h"
+
+//Include C-Files
+#include "Pin_Setup.cpp"
+#include "Clock_Setup.cpp"
+#include "Timer_Setup.cpp"
+#include "ADC_Setup.cpp"
+#include "Systick.cpp"
+#include "algorithms.cpp"
 #include "display.h"
 
 
-// Global variables 
-int current_option = MODE_STANDBY;
-int selected_option = MODE_STANDBY;
-bool optionSelected = false;
-bool encoderTurned = false;
-bool confirmationPending = false;
+
+//Library-Include
+#include <Arduino.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
+
+// put external variable declarations here:
+extern int current_option;
+extern int selected_option;
+extern bool optionSelected;
+extern bool encoderTurned;
+extern bool confirmationPending;
+
+// put function declarations in Header Files
+
 
 void setup() {
-    // Initialize serial communication
-    Serial.begin(9600);
+  //Setup
+  Pin_Setup();
+  Clock_Setup();
+  Timer_Setup();
+  ADC_Setup();
+  maze_setup(); // setting up the maze file
+  HardwareSerial Serial1(BLUETOOTH_RX, BLUETOOTH_TX);
+  Serial1.begin(115200);
+  display_setup(); // display setup
 
-    // So that Mouse does not turn off
-    pinMode(PC10, OUTPUT);
-    digitalWrite(PC10, HIGH);
 
-    // Initialize the I2C bus for Display communication with wire library
-    Wire.setSCL(OLED_SCL_PIN);
-    Wire.setSDA(OLED_SDA_PIN);
-    Wire.begin();
-
-    // Initialize the OLED display
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
-        Serial.println(F("SSD1306 allocation failed"));
-        for (;;); // Don't proceed, loop forever
-    }
-
-    // Clear the buffer
-    display.clearDisplay();
-
-    // Initialize rotary encoder pins
-    pinMode(ENCODER_PIN_A, INPUT);
-    pinMode(ENCODER_PIN_B, INPUT);
-    pinMode(ENCODER_BUTTON_PIN, INPUT_PULLUP);
-
-    // Attach interrupts
-    attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A), handleEncoderTurn, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_B), handleEncoderTurn, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENCODER_BUTTON_PIN), handleEncoderButton, FALLING);
-
-    // Display the initial options
-    displayOptions(static_cast<Mode>(current_option), false);
+//Start Systick Timer
+  timer14.resume();
 }
+
 
 void loop() {
     // Check if the encoder was turned
@@ -54,12 +52,10 @@ void loop() {
         updateEncoderState(); 
         displayOptions(static_cast<Mode>(selected_option), confirmationPending);
     }
-
     if (optionSelected) {
         optionSelected = false;
         if (confirmationPending) {
             confirmationPending = false;
-            
             current_option = selected_option;
             handleModeSelection(static_cast<Mode>(current_option));
         } else {
@@ -67,7 +63,4 @@ void loop() {
             displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
-
-    // Sleep to reduce CPU usage (adjust as necessary)
-    // delay(100);
 }
