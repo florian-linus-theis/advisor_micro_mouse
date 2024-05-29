@@ -4,6 +4,8 @@
 #include "iostream"
 #include "vector"
 #include "HardwareTimer.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 
 //Pin Naming
@@ -85,27 +87,21 @@ extern void Set_Output(void);
 
 
 //Clock_Setup
-
+extern void Clock_Setup();
 
 
 //Timer_Setup
-/*
-extern HardwareTimer timer14(TIM14);
-extern HardwareTimer timer3(TIM3);
-extern HardwareTimer timer4(TIM4);
-extern HardwareTimer timer2(TIM2);
-extern HardwareTimer timer5(TIM5);
-extern HardwareTimer timer6(TIM6);
-extern HardwareTimer timer7(TIM7);
-extern HardwareTimer timer10(TIM10);
-extern HardwareTimer timer1(TIM1);
-*/
-extern void Timer_Setup(void);
+extern HardwareTimer *timer14;
+extern HardwareTimer *timer3;
+extern HardwareTimer *timer4;
+extern HardwareTimer *timer2;
+extern HardwareTimer *timer5;
+extern HardwareTimer *timer6;
+extern HardwareTimer *timer7;
+extern HardwareTimer *timer10;
+extern HardwareTimer *timer1;
 
-extern void Timer6_Restart(void);
-extern void Timer6_Pause(void);
-extern void Timer7_Restart(void);
-extern void Timer7_Pause(void);
+extern void Timer_Setup(void);
 
 
 //Systick
@@ -118,10 +114,24 @@ extern void update(void);
 extern void ADC_Setup(void);
 
 
+//User-Interface
+//Bluetooth
+extern HardwareSerial *ble;
+
+
 
 //Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //Sensors
 extern void Timer6_Interrupt(void);
 extern void Timer7_Interrupt(void);
 
+extern void Distanz_Messung_Blind(void);
+extern void Distanz_Messung_Hell(void);
+extern void Distanz_Mid_Sensor();
+extern void printDistanzSensoren(void);
+
 //Motors
+
+
+//Move
+extern void Forward(int dutyCycle);

@@ -1,48 +1,49 @@
+//#pragma once
 //Include Header Files
-//#include "Setup.h"
+#include "Setup.h"
 
 //Include C-Files
+#include "algorithms.h"
+#include "display.h"
+/*
 #include "Pin_Setup.cpp"
 #include "Clock_Setup.cpp"
 #include "Timer_Setup.cpp"
 #include "ADC_Setup.cpp"
 #include "Systick.cpp"
-#include "algorithms.cpp"
-#include "display.h"
+#include "algorithms.h"
+*/
 
+//Library-Include in Setup.h Header File
 
-
-//Library-Include
-#include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
 // put external variable declarations here:
+/*
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;
 extern bool encoderTurned;
 extern bool confirmationPending;
+*/
 
 // put function declarations in Header Files
 
 
+
+
 void setup() {
-  //Setup
+  //Setup  
   Pin_Setup();
   Clock_Setup();
   Timer_Setup();
   ADC_Setup();
   maze_setup(); // setting up the maze file
-  HardwareSerial Serial1(BLUETOOTH_RX, BLUETOOTH_TX);
-  Serial1.begin(115200);
-  display_setup(); // display setup
-
-
-//Start Systick Timer
-  timer14.resume();
+  display_setup();
+  digitalWrite(LED_GREEN, LOW);
+  //Start Systick Timer
+  // timer14.resume();
 }
+
 
 
 void loop() {
@@ -63,4 +64,6 @@ void loop() {
             displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
+    // Sleep to reduce CPU usage (adjust as necessary)
+    //delay(100);
 }
