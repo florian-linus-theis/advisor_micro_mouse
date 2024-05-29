@@ -16,7 +16,7 @@
 #define SWD_CLK         PA14
 
 //Drive Motors & Encoders
-#define MOTOR_nENABLE          PC11   //HIGH = Motor Driver disabled,   LOW = Motor Driver enabled !!!
+#define MOTOR_ENABLE          PC11   //HIGH = Motor Driver disabled,   LOW = Motor Driver enabled !!!
 #define MOTOR_RIGHT_PWM_1      PB7    //PWM Outputs to Motor H-Bridge
 #define MOTOR_RIGHT_PWM_2      PB6
 #define MOTOR_LEFT_PWM_1       PB4

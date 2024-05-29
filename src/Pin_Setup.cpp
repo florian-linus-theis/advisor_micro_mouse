@@ -6,7 +6,7 @@ HardwareSerial *ble = nullptr;
 void Pin_Setup(void) {
 //Pinmode Declaration
 //Motors
-  pinMode(MOTOR_nENABLE, OUTPUT);
+  pinMode(MOTOR_ENABLE, OUTPUT);
   pinMode(MOTOR_RIGHT_PWM_1, OUTPUT);
   pinMode(MOTOR_RIGHT_PWM_2, OUTPUT);
   pinMode(MOTOR_LEFT_PWM_1, OUTPUT);
@@ -91,7 +91,7 @@ void Set_Output(void) {
   digitalWrite(POWER_ENABLE, HIGH);
 
 //Turn OFF Motor Driver
-  digitalWrite(MOTOR_nENABLE, HIGH);
+  digitalWrite(MOTOR_ENABLE, HIGH);
 
 //Turn OFF Debug LED
   digitalWrite(LED_RED, HIGH);

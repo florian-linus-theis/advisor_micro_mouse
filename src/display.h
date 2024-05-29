@@ -3,6 +3,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <string>
+#include <robin.h>
 
 
 // Define screen dimensions
@@ -143,6 +144,7 @@ void handleModeSelection(Mode mode) {
         case MODE_MAP_MAZE:
             display_print("Map Maze Mode selected");
             delay(1000);
+            robin_test();
             // Handle Map Maze Mode
             break;
         case MODE_BFS:
