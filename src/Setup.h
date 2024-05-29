@@ -125,3 +125,7 @@ extern void Timer6_Interrupt(void);
 extern void Timer7_Interrupt(void);
 
 //Motors
+
+
+//Move
+extern void Forward(int dutyCycle);

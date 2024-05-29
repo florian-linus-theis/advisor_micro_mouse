@@ -1,5 +1,5 @@
 //Include Header Files
-//#include "Setup.h"
+#include "Setup.h"
 
 //Include C-Files
 #include "Pin_Setup.cpp"
@@ -9,6 +9,9 @@
 #include "Systick.cpp"
 #include "algorithms.cpp"
 #include "display.h"
+
+//Für Tests in Main
+#include "Sensors.cpp"
 
 
 
@@ -47,7 +50,7 @@ void setup() {
 
 void loop() {
   // Check if the encoder was turned
-    if (encoderTurned) {
+    /*if (encoderTurned) {
         encoderTurned = false;
         updateEncoderState(); 
         displayOptions(static_cast<Mode>(selected_option), confirmationPending);
@@ -67,7 +70,20 @@ void loop() {
     }
 
     // Sleep to reduce CPU usage (adjust as necessary)
-    delay(100);
+    delay(100);*/
+
+  while(Distance_Sensor_Mid_MM < 2500){
+    Distanz_Mid_Sensor();
+  }
+   while(Distance_Sensor_Mid_MM > 2500){
+    Distanz_Mid_Sensor();
+  }
+  delay(1000);
+   while(Distance_Sensor_Mid_MM < 2500){
+    Distanz_Mid_Sensor();
+    Forward(10);
+  }
+  
 }
 
 //put funktions here
