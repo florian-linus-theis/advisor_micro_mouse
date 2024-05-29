@@ -1,5 +1,8 @@
 #include "Setup.h"
 
+HardwareSerial *ble = nullptr;
+//HardwareSerial *ble;
+
 void Pin_Setup(void) {
 //Pinmode Declaration
 //Motors
@@ -52,6 +55,10 @@ void Pin_Setup(void) {
 //Bluetooth Module
   pinMode(BLUETOOTH_RX, INPUT);
   pinMode(BLUETOOTH_TX, OUTPUT);
+  //HardwareSerial *ble = &Serial1;
+  //ble = &Serial1;  // Beispiel: Verwenden von Serial1
+  HardwareSerial *ble = new HardwareSerial(BLUETOOTH_RX, BLUETOOTH_TX);
+  ble->begin(115200);
   
 
 //User-Interface-Encoder
