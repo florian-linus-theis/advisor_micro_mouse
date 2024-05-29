@@ -61,6 +61,7 @@
 //OLED Display
 #define OLED_SCL        PB10  //SSD1306 Display Driver over I2C#2, Adress: 0x3C
 #define OLED_SDA        PB11
+#define OLED_RESET      -1    // Reset pin # (or -1 if sharing Arduino reset pin)
 
 //Bluetooth Module
 #define BLUETOOTH_TX    PA9   //HM-19 Bluetooth Module over UART#1, Baud Rate: 115200

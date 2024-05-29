@@ -4,7 +4,9 @@
 #include "HardwareTimer.h"
 #include "stm32f4xx_hal.h"
 #include <Setup.h>
+#include <display.h>
 
+extern bool encoderTurned;
 
 // bool Error_Flag;
 // int Flag_Mid;  
@@ -36,7 +38,6 @@ void Distanz_Mid_Sensor(void);
 // void Timer3_Setup(void);
 // void Timer4_Setup(void);
 
-// Motor functions
 void ForwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();
@@ -54,28 +55,28 @@ void BackwardLeft(int dutyCycle) {
 }
 
 void ForwardRight(int dutyCycle) {
-   timer4->setCount(0);
-   timer4->resume();
-   timer4->setCaptureCompare(1, dutyCycle, PERCENT_COMPARE_FORMAT);
-   timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-   timer4->refresh();
+    timer4->setCount(0);
+    timer4->resume();
+    timer4->setCaptureCompare(1, dutyCycle, PERCENT_COMPARE_FORMAT);
+    timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+    timer4->refresh();
 }
 
 void BackwardRight(int dutyCycle) {
-   timer4->setCount(0);
-   timer4->resume();
-   timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-   timer4->setCaptureCompare(2, dutyCycle, PERCENT_COMPARE_FORMAT);
-   timer4->refresh();
+    timer4->setCount(0);
+    timer4->resume();
+    timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+    timer4->setCaptureCompare(2, dutyCycle, PERCENT_COMPARE_FORMAT);
+    timer4->refresh();
 }
 
 void ForwardBoth(int dutyCycle) {
-    ForwardLeft(dutyCycle);
+    BackwardLeft(dutyCycle);
     ForwardRight(dutyCycle);
 }
 
 void BackwardBoth(int dutyCycle) {
-    BackwardLeft(dutyCycle);
+    ForwardLeft(dutyCycle);
     BackwardRight(dutyCycle);
 }
 
@@ -116,111 +117,25 @@ void Timer4_Setup() {   // Motor PWM Right
 }
 
 void robin_test() {
+    while(1) {
+        // Wait for the encoder to be turned
         digitalWrite(MOTOR_ENABLE, LOW);
-        ForwardBoth(30);
+        ForwardBoth(10);
+        delay(3000);
+        if (encoderTurned) {
+            encoderTurned = false;
+            break;
+        }
+        BackwardBoth(10);
+        delay(3000);
+        if (encoderTurned) {
+            encoderTurned = false;
+            break;
+        }
+    }
+    // Stop the motors
+    digitalWrite(MOTOR_ENABLE, HIGH);
         // Other sensor or distance measuring code
 }
 
 
-// // SENSORS --------------------------------------------------------------------------------------------------------
-
-// void Sensor_Sync_Setup(void) {
-//     // Configure timer
-//     timer9.setPrescaleFactor(50); // Set prescaler to 50
-//     timer9.setOverflow(33);       // Set overflow to 16 = 50us intervals
-//     timer9.attachInterrupt(Sensor_Interrupt);
-//     timer9.refresh();
-//     timer9.pause();
-// }
-
-// void Sensor_Interrupt(void) {
-//     // Read the current sensor value
-//     Distanz_Sensoren.push_back(analogRead(Channel_Sensoren[interrupt_counter]));
-//     // Turn off the current emitter
-//     digitalWrite(Channel_Emitter[interrupt_counter], LOW);
-
-//     // Move to the next sensor
-//     interrupt_counter++;
-
-//     if (interrupt_counter < 6) {
-//         // Turn on the next emitter
-//         digitalWrite(Channel_Emitter[interrupt_counter], HIGH);
-//     } if (interrupt_counter >= 6) {
-//         // All emitters processed
-//         timer9.pause();
-//         Error_Flag = false;
-//         digitalWrite(Channel_Emitter[interrupt_counter], LOW);
-//     }
-// }
-
-// void Distanz_Messung_Hell(void) {
-//     // Reset the interrupt counter
-//     interrupt_counter = 0;
-//     Distanz_Sensoren.clear(); // Clear previous measurements
-
-//     // Turn on the first emitter
-//     digitalWrite(Channel_Emitter[0], HIGH);
-
-//     // Enable the interrupt to start the measurement process
-//     timer9.setCount(0);
-//     timer9.refresh();
-//     timer9.resume();
-//     // NVIC_EnableIRQ(TIM9_IRQn);
-
-//     // Wait for the process to complete
-//     while (interrupt_counter < 6) {
-//         // Wait in a non-blocking way (e.g., other code can run here)
-//     }
-
-//     // Disable the interrupt as the process is complete
-//     // NVIC_DisableIRQ(TIM9_IRQn);
-// }
-
-// void printDistanzSensoren(void) {
-//     Serial1.println("Distanz_Sensoren Messwerte:");
-//     for (int i = 0; i < 6; i++) {
-//         Serial1.print("Sensor ");
-//         Serial1.print(i);
-//         Serial1.print(": ");
-//         Serial1.println(Distanz_Sensoren[i]);
-//     }
-    
-//     Serial1.print("Distanz_Sensor Mitte:");
-//     Serial1.println(Distance_Sensor_Mid_MM);
-//     Serial1.print("Encoder L:");
-
-//     uint32_t encoder_value = TIM2->CNT;
-//     // int32_t encoder_value = timer2.getCount();
-//     // int32_t encoder_value = MyTim->getCount();
-//     // int32_t encoder_value = __HAL_TIM_GET_COUNTER(&htim2);
-//     Serial1.println(encoder_value);
-// }
-
-// // Mid Sensor Implementation
-// void Mid_Sensor_Setup(void) {
-//     // Configure timer
-//     timer8.setPrescaleFactor(400); // Set prescaler to 50
-//     timer8.setOverflow(60);        // Set overflow to 16 = 50us intervals
-//     timer8.attachInterrupt(Mid_Sensor_Interrupt);
-//     timer8.refresh();
-//     timer8.pause();
-// }
-
-// void Distanz_Mid_Sensor(void){
-//     Flag_Mid = 0;
-//     digitalWrite(IR_EMITTER_MID, HIGH);
-//     timer8.setCount(0);
-//     timer8.refresh();
-//     timer8.resume();
-    
-//     while(Flag_Mid < 1){
-//         // Wait for flag to be set in interrupt
-//     }
-// }
-
-// void Mid_Sensor_Interrupt(void){
-//     Distance_Sensor_Mid_MM = analogRead(IR_SENSOR_MID);
-//     digitalWrite(IR_EMITTER_MID, LOW);
-//     Flag_Mid++;
-//     timer8.pause();
-// }

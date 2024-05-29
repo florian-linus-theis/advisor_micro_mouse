@@ -27,19 +27,31 @@ extern bool encoderTurned;
 extern bool confirmationPending;
 */
 
+// Global variables 
+int current_option = MODE_STANDBY;
+int selected_option = MODE_STANDBY;
+bool optionSelected = false;
+bool encoderTurned = false;
+bool confirmationPending = false;
+
+
+
 // put function declarations in Header Files
 
 
 
 
 void setup() {
-  //Setup  
-  Pin_Setup();
-  Clock_Setup();
-  Timer_Setup();
-  ADC_Setup();
-  maze_setup(); // setting up the maze file
-  display_setup();
+    //Setup  
+    Pin_Setup();
+    Clock_Setup();
+    Timer_Setup();
+    ADC_Setup();
+    maze_setup(); // setting up the maze file
+    display_setup();
+
+    // Display the initial options
+    displayOptions(static_cast<Mode>(current_option), false);
 
   //Start Systick Timer
   // timer14.resume();
@@ -48,18 +60,18 @@ void setup() {
 //   Sensor_Sync_Setup();
 //   analogReadResolution(12);
 //   Mid_Sensor_Setup();
-  ble->println("test1");
-  Timer2_Setup();
-  Timer3_Setup();
-  Timer4_Setup();
-  ble->println("test2");
+    ble->println("test1");
+    Timer2_Setup();
+    Timer3_Setup();
+    Timer4_Setup();
+    ble->println("test2");
 
 
-  digitalWrite(POWER_ENABLE, HIGH); //Roboter an
-  digitalWrite(MOTOR_ENABLE, HIGH); //Motoren aus!
-  digitalWrite(LED_BLUE, HIGH);
-  digitalWrite(LED_RED, HIGH);
-  digitalWrite(LED_GREEN, HIGH);
+    digitalWrite(POWER_ENABLE, HIGH); //Roboter an
+    digitalWrite(MOTOR_ENABLE, HIGH); //Motoren aus!
+    digitalWrite(LED_BLUE, HIGH);
+    digitalWrite(LED_RED, HIGH);
+    digitalWrite(LED_GREEN, HIGH);
 }
 
 

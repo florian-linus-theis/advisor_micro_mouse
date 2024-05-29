@@ -4,24 +4,15 @@
 #include <Adafruit_SSD1306.h>
 #include <string>
 #include <robin.h>
+#include <Setup.h>
 
 
 // Define screen dimensions
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 32
 
-// Define OLED reset pin
-#define OLED_RESET    -1 // Reset pin # (or -1 if sharing Arduino reset pin)
-#define OLED_SDA_PIN PB11 // Define OLED SDA Pin
-#define OLED_SCL_PIN PB10 // Define OLED SCL Pin
-
 // Initialize the OLED display using the Wire library -> I2C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-
-// Define Rotary Encoder Pins
-#define ENCODER_PIN_A PH0 
-#define ENCODER_PIN_B PC15 
-#define ENCODER_BUTTON_PIN PC12  
 
 
 // Define an enum for all modes
@@ -66,8 +57,8 @@ void handleEncoderButton() {
 
 // Update the encoder state
 void updateEncoderState() {
-    int right = digitalRead(ENCODER_PIN_A);
-    int left = digitalRead(ENCODER_PIN_B);
+    int right = digitalRead(UI_ENCODER_A);
+    int left = digitalRead(UI_ENCODER_B);
     if (right == 0) {
         selected_option = (selected_option + 1) % MODE_MAX;
     } else {
@@ -142,7 +133,7 @@ void handleModeSelection(Mode mode) {
             // Handle Hard Reset Mode
             break;
         case MODE_MAP_MAZE:
-            display_print("Map Maze Mode selected");
+            display_print("DFS Mode selected");
             delay(1000);
             robin_test();
             // Handle Map Maze Mode
@@ -172,8 +163,8 @@ void display_setup() {
     digitalWrite(PC10, HIGH);
 
     // Initialize the I2C bus for Display communication with wire library
-    Wire.setSCL(OLED_SCL_PIN);
-    Wire.setSDA(OLED_SDA_PIN);
+    Wire.setSCL(OLED_SCL);
+    Wire.setSDA(OLED_SDA);
     Wire.begin();
 
     // Initialize the OLED display
@@ -185,15 +176,10 @@ void display_setup() {
     // Clear the buffer
     display.clearDisplay();
 
-    // Initialize rotary encoder pins
-    pinMode(ENCODER_PIN_A, INPUT);
-    pinMode(ENCODER_PIN_B, INPUT);
-    pinMode(ENCODER_BUTTON_PIN, INPUT_PULLUP);
-
     // Attach interrupts
-    attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_A), handleEncoderTurn, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENCODER_PIN_B), handleEncoderTurn, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(ENCODER_BUTTON_PIN), handleEncoderButton, FALLING);
+    attachInterrupt(digitalPinToInterrupt(UI_ENCODER_A), handleEncoderTurn, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(UI_ENCODER_B), handleEncoderTurn, CHANGE);
+    attachInterrupt(digitalPinToInterrupt(UI_BUTTON), handleEncoderButton, FALLING);
 
     // Display the initial options
     displayOptions(static_cast<Mode>(current_option), false);
