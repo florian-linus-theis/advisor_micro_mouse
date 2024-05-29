@@ -46,7 +46,7 @@ class PID
             //error-Werte für jeden Sensor berechnen
             for(int i=0; i<6; i++){
                 errorVec[i] = SensorInput[i]-NeutralSensorValues[i];
-                cout << errorVec[i] << "\n";
+                cout << errorVec[i] << endl;
             }
 
             //walls[0] = Wand links, Wall[1] = Wand vorne, Walls[2] = Wand rechts
@@ -81,11 +81,22 @@ class PID
                 errorDivideVec[1] += 2;
                 errorDivideVec[2] += 0;
             }
-
-            rotation_error = rotation_error/(errorDivideVec[0]+0.001); //+0.001 um DIV by 0 zu vermeiden
-            x_error = x_error/(errorDivideVec[1]+0.001);
-            y_error = y_error/(errorDivideVec[2]+0.001);
-            cout << rotation_error << " -- " << x_error << " -- " << y_error << "\n";
+            if (errorDivideVec[0] == 0){
+                rotation_error = 0;
+            } else { 
+                rotation_error = rotation_error/(errorDivideVec[0]);
+            }
+            if (errorDivideVec[1] == 0){
+                x_error = 0; 
+            } else {
+                x_error = x_error/(errorDivideVec[1]);
+            }
+            if (errorDivideVec[2] == 0){
+                y_error = 0;
+            } else {
+                y_error = y_error/(errorDivideVec[2]);
+            }
+            cout << rotation_error << " -- " << x_error << " -- " << y_error << endl;
 
             return {rotation_error,x_error,y_error};
         }
@@ -125,10 +136,8 @@ class PID
                 previousErrorVec[2] = 0;
             }
 
-            out_L = -OutputWeight[0]*rotation_output + OutputWeight[0]*x_error + OutputWeight[2]*y_error;
-            out_L = out_L/(OutputWeight[0]+OutputWeight[1]+OutputWeight[2]);
-            out_R = OutputWeight[0]*rotation_output - OutputWeight[0]*x_error + OutputWeight[2]*y_error;
-            out_R = out_R/(OutputWeight[0]+OutputWeight[1]+OutputWeight[2]);
+            out_L = -OutputWeight[0]*rotation_output + OutputWeight[0]*x_output + OutputWeight[2]*y_output;
+            out_R = OutputWeight[0]*rotation_output - OutputWeight[0]*x_output + OutputWeight[2]*y_output;
 
             return {out_L,out_R};
         }
