@@ -110,8 +110,8 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
 
 void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
     // Configure timer
-    timer7->setPrescaleFactor(400);              // Set prescaler to 50
-    timer7->setOverflow(60);                     // Set overflow to 16 = 50us intervals
+    timer7->setPrescaleFactor(50);              // Set prescaler to 50
+    timer7->setOverflow(16);                     // Set overflow to 16 = 50us intervals
     timer7->attachInterrupt(Timer7_Interrupt);
     timer7->refresh();
     timer7->pause();

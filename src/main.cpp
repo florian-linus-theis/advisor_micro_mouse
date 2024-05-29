@@ -46,7 +46,7 @@ void setup() {
 
 void loop() {
   // Check if the encoder was turned
-    /*if (encoderTurned) {
+    if (encoderTurned) {
         encoderTurned = false;
         updateEncoderState(); 
         displayOptions(static_cast<Mode>(selected_option), confirmationPending);
@@ -66,7 +66,8 @@ void loop() {
     }
 
     // Sleep to reduce CPU usage (adjust as necessary)
-    delay(100);*/
+    //delay(100);
+
 
     Distanz_Messung_Hell();
     Distanz_Mid_Sensor();

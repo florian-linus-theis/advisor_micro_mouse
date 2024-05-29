@@ -66,6 +66,7 @@ void Distanz_Mid_Sensor(void){
 }
 
 void Timer7_Interrupt(void){
+  digitalWrite(LED_BLUE, LOW);
     Distance_Sensor_Mid_MM = analogRead(IR_SENSOR_MID);
     digitalWrite(IR_EMITTER_MID, LOW);
     Flag_Mid++;
@@ -76,7 +77,6 @@ void Timer7_Interrupt(void){
 
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 void printDistanzSensoren(void) {
-  digitalWrite(LED_BLUE, LOW);
   ble->println("Messung_Hell Messwerte:");
   for (int i = 0; i < 6; i++) {
     ble->print("Sensor ");
