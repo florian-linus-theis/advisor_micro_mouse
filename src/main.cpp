@@ -63,7 +63,7 @@ void loop() {
             handleModeSelection(static_cast<Mode>(current_option));
         } else {
             confirmationPending = true;
-            displayOptions(static_cast<Mode>(selected_option), true);
+            displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
 
