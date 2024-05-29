@@ -27,7 +27,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 enum Mode {
     MODE_STANDBY,
     MODE_SOFT_RESET,
-    MODE_HARD_RESET,
+    MODE_SHOW_DATA,
     MODE_MAP_MAZE,
     MODE_BFS,
     MODE_ASTAR,
@@ -43,7 +43,7 @@ extern bool confirmationPending;
 
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
-const unsigned long debounceDelay = 5; // Debounce delay in milliseconds
+const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 
 
 // Functions
@@ -66,22 +66,13 @@ void handleEncoderButton() {
 
 // Update the encoder state
 void updateEncoderState() {
-    static int lastEncoded = 0; // Store the last state of the encoder, static to retain value between function calls
-    int MSB = digitalRead(ENCODER_PIN_A); // Most significant bit
-    int LSB = digitalRead(ENCODER_PIN_B); // Least significant bit
-    int encoded = (MSB << 1) | LSB; // Combine the two pin values into a single integer
-    int sum = (lastEncoded << 2) | encoded; // Append the previous state to the current state
-
-    // Determine the direction based on state changes and update the selected option
-    if (sum == 0b1101 || sum == 0b0100 || sum == 0b0010 || sum == 0b1011) {
+    int right = digitalRead(ENCODER_PIN_A);
+    int left = digitalRead(ENCODER_PIN_B);
+    if (right == 0) {
         selected_option = (selected_option + 1) % MODE_MAX;
-    } else if (sum == 0b1110 || sum == 0b0111 || sum == 0b0001 || sum == 0b1000) {
+    } else {
         selected_option = (selected_option - 1 + MODE_MAX) % MODE_MAX;
     }
-
-    lastEncoded = encoded; // Store the current state for the next iteration
-
-    // If the encoder is turned while waiting for confirmation, cancel confirmation
     if (confirmationPending) {
         confirmationPending = false;
     }
@@ -89,17 +80,19 @@ void updateEncoderState() {
 
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
-    const char* options[] = {"S-B", "S-Res", "H-Res", "DFS", "BFS", "A*"};
+    const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
     display.clearDisplay();
     display.setTextSize(1);
     display.setTextColor(SSD1306_WHITE);
+    display.setRotation(2); 
+    display.display();
 
     display.setCursor(0, 0);
     if (confirmation) {
-        display.println("Press again to confirm:");
+        display.println("Press to Confirm:");
     } else {
         display.println("Available Modes:");
     }
@@ -111,53 +104,13 @@ void displayOptions(Mode currentMode, bool confirmation) {
             display.print(" ");
         }
         display.print(options[i]);
-        display.print(", ");
+        display.print(" ");
         if (i == 2) {
             display.println();
         }
     }
     // Display the buffer on the screen
     display.display();
-}
-
-// Function to handle the selected mode
-void handleModeSelection(Mode mode) {
-    display.clearDisplay();
-    switch (mode) {
-        case MODE_STANDBY:
-            display.println("Stand By Mode selected");
-            delay(1000); // Delay to allow the user to read the message
-            // Handle Stand By Mode
-            break;
-        case MODE_SOFT_RESET:
-            display.println("Soft Reset Mode selected");
-            delay(1000);
-            // Handle Soft Reset Mode
-            break;
-        case MODE_HARD_RESET:
-            display.println("Hard Reset Mode selected");
-            delay(1000);
-            // Handle Hard Reset Mode
-            break;
-        case MODE_MAP_MAZE:
-            display.println("Map Maze Mode selected");
-            delay(1000);
-            // Handle Map Maze Mode
-            break;
-        case MODE_BFS:
-            display.println("BFS Mode selected");
-            delay(1000);
-            // Handle BFS Mode
-            break;
-        case MODE_ASTAR:
-            display.println("A* Mode selected");
-            delay(1000);
-            // Handle A* Mode
-            break;
-        default:
-            display.println("Invalid mode");
-            break;
-    }
 }
 
 void display_print(std::string text, int text_size = 1){
@@ -168,3 +121,45 @@ void display_print(std::string text, int text_size = 1){
     display.println(text.c_str());
     display.display();
 }
+
+
+// Function to handle the selected mode
+void handleModeSelection(Mode mode) {
+    display.clearDisplay();
+    switch (mode) {
+        case MODE_STANDBY:
+            display_print("Stand By Mode selected");
+            delay(1000); // Delay to allow the user to read the message
+            // Handle Stand By Mode
+            break;
+        case MODE_SOFT_RESET:
+            display_print("Soft Reset Mode selected");
+            delay(1000);
+            // Handle Soft Reset Mode
+            break;
+        case MODE_SHOW_DATA:
+            display_print("Data Mode selected");
+            delay(1000);
+            // Handle Hard Reset Mode
+            break;
+        case MODE_MAP_MAZE:
+            display_print("Map Maze Mode selected");
+            delay(1000);
+            // Handle Map Maze Mode
+            break;
+        case MODE_BFS:
+            display_print("BFS Mode selected");
+            delay(1000);
+            // Handle BFS Mode
+            break;
+        case MODE_ASTAR:
+            display_print("A* Mode selected");
+            delay(1000);
+            // Handle A* Mode
+            break;
+        default:
+            display_print("Invalid mode");
+            break;
+    }
+}
+

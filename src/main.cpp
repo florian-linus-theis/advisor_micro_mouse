@@ -59,6 +59,7 @@ void loop() {
         optionSelected = false;
         if (confirmationPending) {
             confirmationPending = false;
+            
             current_option = selected_option;
             handleModeSelection(static_cast<Mode>(current_option));
         } else {
@@ -68,5 +69,5 @@ void loop() {
     }
 
     // Sleep to reduce CPU usage (adjust as necessary)
-    delay(100);
+    // delay(100);
 }
