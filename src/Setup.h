@@ -127,8 +127,6 @@ extern void Timer7_Interrupt(void);
 
 extern void Distanz_Messung_Blind(void);
 extern void Distanz_Messung_Hell(void);
-
-extern u_int32_t Distance_Sensor_Mid_MM;
 extern void Distanz_Mid_Sensor();
 extern void printDistanzSensoren(void);
 

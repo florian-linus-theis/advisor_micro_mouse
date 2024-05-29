@@ -57,7 +57,8 @@ void Pin_Setup(void) {
   pinMode(BLUETOOTH_TX, OUTPUT);
   //HardwareSerial *ble = &Serial1;
   //ble = &Serial1;  // Beispiel: Verwenden von Serial1
-  HardwareSerial *ble = new HardwareSerial(BLUETOOTH_RX, BLUETOOTH_TX);
+  ble = new HardwareSerial(USART1);
+  //HardwareSerial *ble = new HardwareSerial(BLUETOOTH_RX, BLUETOOTH_TX);
   ble->begin(115200);
   
 
@@ -90,7 +91,7 @@ void Set_Output(void) {
   digitalWrite(POWER_ENABLE, HIGH);
 
 //Turn OFF Motor Driver
-  digitalWrite(MOTOR_nENABLE, LOW);
+  digitalWrite(MOTOR_nENABLE, HIGH);
 
 //Turn OFF Debug LED
   digitalWrite(LED_RED, HIGH);

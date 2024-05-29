@@ -18,11 +18,13 @@
 
 
 // put external variable declarations here:
+/*
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;
 extern bool encoderTurned;
 extern bool confirmationPending;
+*/
 
 // put function declarations in Header Files
 
@@ -37,8 +39,8 @@ void setup() {
   ADC_Setup();
   maze_setup(); // setting up the maze file
   display_setup();
+  digitalWrite(LED_GREEN, LOW);
 }
-
 
 
 
@@ -66,6 +68,7 @@ void loop() {
     // Sleep to reduce CPU usage (adjust as necessary)
     delay(100);*/
 
+    Distanz_Messung_Hell();
     Distanz_Mid_Sensor();
     printDistanzSensoren();
     delay(200);

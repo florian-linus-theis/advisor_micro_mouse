@@ -76,14 +76,14 @@ void Timer7_Interrupt(void){
 
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 void printDistanzSensoren(void) {
+  digitalWrite(LED_BLUE, LOW);
   ble->println("Messung_Hell Messwerte:");
   for (int i = 0; i < 6; i++) {
     ble->print("Sensor ");
     ble->print(i);
     ble->print(": ");
-    //ble->println(Messung_Hell[i]);
+    ble->println(Messung_Hell[i]);
   }
-  
   ble->print("Distanz_Sensor Mitte:");
   ble->println(Distance_Sensor_Mid_MM);
 }
