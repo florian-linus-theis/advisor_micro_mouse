@@ -1,10 +1,9 @@
-
 //Header-Files Include
 #include "Pin_Setup.h"
-#include "Clock_Setup.cpp"
-#include "ADC_Setup.cpp"
-#include "Timer_Setup.cpp"
-#include "Systick.cpp"
+#include "Clock_Setup.h"
+#include "ADC_Setup.h"
+#include "Timer_Setup.h"
+#include "Systick.h"
 #include "algorithms.cpp"
 
 //Library-Include
@@ -26,7 +25,7 @@ void setup() {
 
 
 //Start Systick Timer
-  Timer14.resume();
+  timer14.resume();
 }
 
 

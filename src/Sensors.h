@@ -1,10 +1,10 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include "Arduino.h"
 #include "wiring.h"
 #include "Pin_Setup.h"
-#include "Timer_Setup.cpp"
-
+#include "Timer_Setup.h"
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
@@ -12,8 +12,6 @@ int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF
 //Meassurement Data Vector
 std::vector<uint32_t> Distanz_Sensoren;
 std::vector<uint32_t> Messung_Blind;
-std::vector<uint32_t> Messung_Hell;
-std::vector<uint32_t> Distanz_Sensoren_MM;
 uint32_t Distance_Sensor_Mid_MM;
 int Messung_Mid;
 
