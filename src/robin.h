@@ -38,7 +38,7 @@ void Distanz_Mid_Sensor(void);
 // void Timer3_Setup(void);
 // void Timer4_Setup(void);
 
-void ForwardLeft(int dutyCycle) {
+void BackwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();
     timer3->setCaptureCompare(1, dutyCycle, PERCENT_COMPARE_FORMAT);
@@ -46,7 +46,7 @@ void ForwardLeft(int dutyCycle) {
     timer3->refresh();
 }
 
-void BackwardLeft(int dutyCycle) {
+void ForwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();
     timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
@@ -71,12 +71,12 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    BackwardLeft(dutyCycle);
+    ForwardLeft(dutyCycle);
     ForwardRight(dutyCycle);
 }
 
 void BackwardBoth(int dutyCycle) {
-    ForwardLeft(dutyCycle);
+    BackwardLeft(dutyCycle);
     BackwardRight(dutyCycle);
 }
 
