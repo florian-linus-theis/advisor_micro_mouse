@@ -40,19 +40,19 @@ void setup() {
   maze_setup(); // setting up the maze file
   display_setup();
   digitalWrite(LED_GREEN, LOW);
+  //Start Systick Timer
+  // timer14.resume();
 }
 
 
 
 void loop() {
-  // Check if the encoder was turned
+    // Check if the encoder was turned
     if (encoderTurned) {
         encoderTurned = false;
         updateEncoderState(); 
         displayOptions(static_cast<Mode>(selected_option), confirmationPending);
     }
-
-    // Check if an option/state was selected
     if (optionSelected) {
         optionSelected = false;
         if (confirmationPending) {
@@ -61,34 +61,9 @@ void loop() {
             handleModeSelection(static_cast<Mode>(current_option));
         } else {
             confirmationPending = true;
-            displayOptions(static_cast<Mode>(selected_option), true);
+            displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
-
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);
-
-
-    Distanz_Messung_Hell();
-    Distanz_Mid_Sensor();
-    printDistanzSensoren();
-    delay(200);
-    /*
-    while(Distance_Sensor_Mid_MM < 1500){
-        Distanz_Mid_Sensor();
-        printDistanzSensoren();
-    }
-    while(Distance_Sensor_Mid_MM > 1500){
-        Distanz_Mid_Sensor();
-        printDistanzSensoren();
-    }
-    delay(1000);
-    while(Distance_Sensor_Mid_MM < 1500){
-        Distanz_Mid_Sensor();
-        Forward(10);
-        printDistanzSensoren();
-    }
-    */
 }
-
-//put funktions here
