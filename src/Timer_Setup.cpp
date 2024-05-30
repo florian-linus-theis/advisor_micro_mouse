@@ -122,6 +122,14 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 
 }
 
+void Timer11_Setuo(){
+    timer6->setPrescaleFactor(8);               // Set prescaler to 50
+    timer6->setOverflow(22000);                     // Set overflow to 16 = 50us intervals
+    timer6->attachInterrupt(Systick_Interrupt);
+    timer6->refresh();
+    timer6->pause();
+}
+
 
 void Timer1_Setup() {       //Buzzer PWM TImer
 
