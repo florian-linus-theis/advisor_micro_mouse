@@ -39,7 +39,7 @@ void update_direction(int turn_direction) {
 std::vector<bool> get_walls() {
     std::vector<bool> walls(4, false); // initializing list containing 4 walls each to be false by default
 
-    // Check for walls in each direction
+    // Check for walls in each direction independent of the current direction 
     walls[cur_direction] = API::wallFront(); // Is there a wall in front
     walls[(cur_direction + 1) % 4] = API::wallRight(); // Is there a wall to the right
     walls[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
