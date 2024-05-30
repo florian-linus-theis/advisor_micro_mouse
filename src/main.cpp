@@ -45,10 +45,10 @@ bool confirmationPending = false;
 void setup() {
     //Setup  
     Pin_Setup();
-    Clock_Setup();
-    Timer_Setup();
-    ADC_Setup();
-    maze_setup(); // setting up the maze file
+    //Clock_Setup();
+    //Timer_Setup();
+    //ADC_Setup();
+    //maze_setup(); // setting up the maze file
     display_setup();
     //setup_servo();
 
@@ -62,11 +62,11 @@ void setup() {
 //   Sensor_Sync_Setup();
 //   analogReadResolution(12);
 //   Mid_Sensor_Setup();
-    ble->println("test1");
-    Timer2_Setup();
-    Timer3_Setup();
-    Timer4_Setup();
-    ble->println("test2");
+    // ble->println("test1");
+    // Timer2_Setup();
+    // Timer3_Setup();
+    // Timer4_Setup();
+    // ble->println("test2");
 }
 
 

@@ -13,39 +13,45 @@ const int servoFrequency = 50;  // Servo PWM frequency in Hz
 // }
 
 void servoTest(){
+    digitalWrite(LED_BLUE, HIGH);
     digitalWrite(LED_GREEN, LOW);
 
-    analogWriteFrequency(servoFrequency);   // Set the PWM frequency
+    //analogWriteFrequency(servoFrequency);   // Set the PWM frequency
     analogWrite(SERVO_PWM_1, 13);           // duty between 13-25 to achieve 1-2ms pulse
     delay(1000);
+    while (true) {;;}
+
     analogWrite(SERVO_PWM_1, 17);
     delay(1000);
+    while (true) {;;}
+
     analogWrite(SERVO_PWM_1, 21);
     delay(1000);
     analogWrite(SERVO_PWM_1, 25);
 
     digitalWrite(LED_GREEN, HIGH);
     digitalWrite(LED_RED, LOW);
+    while (true) {;;}
 }
 
 
 // Function to write an angle to the servo
-void writeServo(int angle) {
-    // Map the angle to the pulse width
-    int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth);
-    // Calculate the duty cycle for the desired pulse width
-    int dutyCycle = (pulseWidth * 4096) / (1000000 / servoFrequency);
-    analogWrite(SERVO_PWM_1, dutyCycle);
-}
+// void writeServo(int angle) {
+//     // Map the angle to the pulse width
+//     int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth);
+//     // Calculate the duty cycle for the desired pulse width
+//     int dutyCycle = (pulseWidth * 4096) / (1000000 / servoFrequency);
+//     analogWrite(SERVO_PWM_1, dutyCycle);
+// }
 
 
-void writeServo(int pin, int angle) {
-    // Map the angle to the pulse width
-    int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth);
+// void writeServo(int pin, int angle) {
+//     // Map the angle to the pulse width
+//     int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth);
 
-    // Update the PWM duty cycle
-    timer10->setCaptureCompare(1, pulseWidth, MICROSEC_COMPARE_FORMAT);
-}
+//     // Update the PWM duty cycle
+//     timer10->setCaptureCompare(1, pulseWidth, MICROSEC_COMPARE_FORMAT);
+// }
 
 
 
