@@ -2,9 +2,9 @@
 #include <Setup.h>
 #include <Arduino.h>
 
-const int minPulseWidth = 544;  // Minimum pulse width in microseconds
-const int maxPulseWidth = 2400; // Maximum pulse width in microseconds
-const int servoFrequency = 50;  // Servo PWM frequency in Hz
+// const int minPulseWidth = 544;  // Minimum pulse width in microseconds
+// const int maxPulseWidth = 2400; // Maximum pulse width in microseconds
+// const int servoFrequency = 50;  // Servo PWM frequency in Hz
 
 
 
@@ -20,11 +20,22 @@ const int servoFrequency = 50;  // Servo PWM frequency in Hz
 
 void writeServo(int angle) {
     // Map the angle to the pulse width
-    int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth);
-    float percentage = pulseWidth / 180 * 100;
+    int decimal = 0; 
+    switch (angle) {
+        case 0:
+            decimal = 1638;
+            break;
+        case 90:
+            decimal = 4915;
+            break;
+        case 180:
+            decimal = 8192;
+            break;
+    }
+    decimal = 8192;
 
     // Update the PWM duty cycle
-    timer10->setCaptureCompare(1, percentage, PERCENT_COMPARE_FORMAT);
+    timer10->setCaptureCompare(1, decimal, TICK_COMPARE_FORMAT);
     timer10->refresh();
 }
 
