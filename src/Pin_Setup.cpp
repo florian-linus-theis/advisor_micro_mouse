@@ -2,6 +2,21 @@
 
 HardwareSerial *ble = nullptr;
 
+void Set_Output(void) {
+//Turn ON Power Latch 
+  digitalWrite(POWER_ENABLE, HIGH);
+
+//Turn OFF Motor Driver
+  digitalWrite(MOTOR_ENABLE, HIGH);
+
+//Turn OFF Debug LED
+  digitalWrite(LED_RED, HIGH);
+  digitalWrite(LED_GREEN, HIGH);
+  digitalWrite(LED_BLUE, HIGH);
+
+  // Servo
+  digitalWrite(SERVO_ENABLE, HIGH);
+}
 
 void Pin_Setup(void) {
 //Pinmode Declaration
@@ -82,20 +97,4 @@ void Pin_Setup(void) {
 
 
   Set_Output();
-}
-
-void Set_Output(void) {
-//Turn ON Power Latch 
-  digitalWrite(POWER_ENABLE, HIGH);
-
-//Turn OFF Motor Driver
-  digitalWrite(MOTOR_ENABLE, HIGH);
-
-//Turn OFF Debug LED
-  digitalWrite(LED_RED, HIGH);
-  digitalWrite(LED_GREEN, HIGH);
-  digitalWrite(LED_BLUE, HIGH);
-
-  // Servo
-  digitalWrite(SERVO_ENABLE, HIGH);
 }

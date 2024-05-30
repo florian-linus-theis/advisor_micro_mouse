@@ -126,7 +126,7 @@ void handleModeSelection(Mode mode) {
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
             delay(1000);
-            // handle_ballgrabber(); // Function to handle the ball grabber
+            handle_ballgrabber(); // Function to handle the ball grabber
             // Handle Soft Reset Mode
             break;
         case MODE_SHOW_DATA:

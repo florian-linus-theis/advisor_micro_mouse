@@ -1,7 +1,6 @@
 #pragma once
 #include <Setup.h>
 #include <Arduino.h>
-#include "Servo.h"
 
 const int minPulseWidth = 544;  // Minimum pulse width in microseconds
 const int maxPulseWidth = 2400; // Maximum pulse width in microseconds
@@ -70,15 +69,15 @@ void writeServo(int pin, int angle) {
 void handle_ballgrabber(){
     servoTest();
 
-    while (true) {
-        // // Sweep the servo back and forth
-        // for (int angle = 0; angle <= 180; angle += 10) {
-        //     writeServo(SERVO_PWM_1, angle);  // Move servo to the current angle
-        //     delay(500);  // Wait for the servo to reach the position
-        // }
-        // for (int angle = 180; angle >= 0; angle -= 10) {
-        //     writeServo(SERVO_PWM_1, angle);  // Move servo to the current angle
-        //     delay(500);  // Wait for the servo to reach the position
-        // }
-    }
+    // while (true) {
+    //     // // Sweep the servo back and forth
+    //     // for (int angle = 0; angle <= 180; angle += 10) {
+    //     //     writeServo(SERVO_PWM_1, angle);  // Move servo to the current angle
+    //     //     delay(500);  // Wait for the servo to reach the position
+    //     // }
+    //     // for (int angle = 180; angle >= 0; angle -= 10) {
+    //     //     writeServo(SERVO_PWM_1, angle);  // Move servo to the current angle
+    //     //     delay(500);  // Wait for the servo to reach the position
+    //     // }
+    // }
 }
