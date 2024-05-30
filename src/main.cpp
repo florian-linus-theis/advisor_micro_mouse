@@ -1,13 +1,12 @@
 //#pragma once
 //Include Header Files
-#include "Setup.h"
+#include "Setup\Setup.h"
 
 //Include C-Files
 #include "algorithms.h"
 #include "display.h"
 #include <robin.h>
 #include <ballgrabber.h>
-#include <Clock_Setup.h>
 
 //Library-Include in Setup.h Header File
 
@@ -36,11 +35,11 @@ bool confirmationPending = false;
 
 
 void setup() {
-    //Setup  
+    //Setup
+    Clock_Setup();  
     Pin_Setup();
-    Clock_Setup();
     Timer_Setup();
-    // ADC_Setup();
+    ADC_Setup();
     maze_setup(); // setting up the maze file
     display_setup();
 
@@ -50,10 +49,10 @@ void setup() {
     //Start Systick Timer
     // timer14.resume();
   
-  // Robin's Code
-//   Sensor_Sync_Setup();
-//   analogReadResolution(12);
-//   Mid_Sensor_Setup();
+    // Robin's Code
+    // Sensor_Sync_Setup();
+    // analogReadResolution(12);
+    // Mid_Sensor_Setup();
     // ble->println("test1");
     // Timer2_Setup();
     // Timer3_Setup();

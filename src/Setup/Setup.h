@@ -89,7 +89,7 @@ extern void Set_Output(void);
 
 
 //Clock_Setup
-extern void Clock_Setup();
+extern void Clock_Setup(void);
 
 
 //Timer_Setup

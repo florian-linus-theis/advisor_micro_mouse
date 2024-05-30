@@ -1,7 +1,5 @@
 #pragma once
-#include <Setup.h>
-#include <Arduino.h>
-#include <Timer_Setup.h>
+#include <Setup\Setup.h>
 
 // const int minPulseWidth = 544;  // Minimum pulse width in microseconds
 // const int maxPulseWidth = 2400; // Maximum pulse width in microseconds
