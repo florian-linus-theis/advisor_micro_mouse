@@ -3,6 +3,7 @@
 #include "wiring.h"
 #include "iostream"
 #include "vector"
+#include "cmath"
 #include "HardwareTimer.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -16,7 +17,7 @@
 #define SWD_CLK         PA14
 
 //Drive Motors & Encoders
-#define MOTOR_nENABLE          PC11   //HIGH = Motor Driver disabled,   LOW = Motor Driver enabled !!!
+#define MOTOR_ENABLE          PC11   //HIGH = Motor Driver disabled,   LOW = Motor Driver enabled !!!
 #define MOTOR_RIGHT_PWM_1      PB7    //PWM Outputs to Motor H-Bridge
 #define MOTOR_RIGHT_PWM_2      PB6
 #define MOTOR_LEFT_PWM_1       PB4
@@ -61,6 +62,7 @@
 //OLED Display
 #define OLED_SCL        PB10  //SSD1306 Display Driver over I2C#2, Adress: 0x3C
 #define OLED_SDA        PB11
+#define OLED_RESET      -1    // Reset pin # (or -1 if sharing Arduino reset pin)
 
 //Bluetooth Module
 #define BLUETOOTH_TX    PA9   //HM-19 Bluetooth Module over UART#1, Baud Rate: 115200
@@ -125,10 +127,12 @@ extern HardwareSerial *ble;
 extern void Timer6_Interrupt(void);
 extern void Timer7_Interrupt(void);
 
-extern void Distanz_Messung_Blind(void);
-extern void Distanz_Messung_Hell(void);
-extern void Distanz_Mid_Sensor();
+extern void Distanz_Messung_Sensoren(void);
+
+extern void Distanz_Mid_Sensor(void);
 extern void printDistanzSensoren(void);
+extern int Distance_Sensor_Mid_MM;
+
 
 //Motors
 

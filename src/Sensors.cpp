@@ -2,28 +2,38 @@
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS};
+int Distance_Sensor[6] = {};
+int calibration_sensor[6] = {165,185,181 ,174,238,161};
 
 //Meassurement Data Vector
-std::vector<uint32_t> Messung_Blind;
-std::vector<uint32_t> Messung_Hell;
-uint32_t Distance_Sensor_Mid_MM;
+int Distance_Sensor_Mid_MM;
+double Abs_Sensor_Calibration;
 
 int interrupt_counter;
 int Flag_Mid;
+
+void Distanz_Messung_Hell(void);
+void Distanz_Messung_Sensoren(void);
+void Distanz_Mid_Sensor(void);
 
 
 //Main Navigation Infrared Sensor Measurement - - - - - - - - - - - - - - - - - - - - - -
 
 void Distanz_Messung_Blind(void){
   for(int i = 0; i < 6; i++){
-    Messung_Blind.push_back(analogRead(Channel_Emitter[i]));
+    Distance_Sensor[i] = analogRead(Channel_Sensoren[i]);
   }
+}
+
+void Distanz_Messung_Sensoren(void){
+  Distanz_Messung_Blind();
+  Distanz_Messung_Hell();
+  delay(1000);
 }
 
 
 void Distanz_Messung_Hell(void) {
   interrupt_counter = 0;    // Reset the interrupt counter
-  Messung_Hell.clear(); // Clear previous measurements
 
   // Turn on the first emitter
   digitalWrite(Channel_Emitter[0], HIGH);
@@ -37,8 +47,11 @@ void Distanz_Messung_Hell(void) {
   while (interrupt_counter < 6) {} // Wait in a non-blocking way (e.g., other code can run here)
 }
 
-void Timer6_Interrupt(void) {
-  Messung_Hell.push_back(analogRead(Channel_Sensoren[interrupt_counter]));  // Read the current sensor value 
+void Timer6_Interrupt(void) { 
+  Distance_Sensor[interrupt_counter] =  analogRead(Channel_Sensoren[interrupt_counter]) - Distance_Sensor[interrupt_counter] - calibration_sensor[interrupt_counter]; // Read Sensor Values
+  if(Distance_Sensor[interrupt_counter] < 0){
+    Distance_Sensor[interrupt_counter] = 0;         //Allow only positive Values
+  }
   digitalWrite(Channel_Emitter[interrupt_counter], LOW);                        // Turn off the current emitter
 
   interrupt_counter++;  // Move to the next sensor
@@ -82,7 +95,7 @@ void printDistanzSensoren(void) {
     ble->print("Sensor ");
     ble->print(i);
     ble->print(": ");
-    ble->println(Messung_Hell[i]);
+    ble->println(Distance_Sensor[i]);
   }
   ble->print("Distanz_Sensor Mitte:");
   ble->println(Distance_Sensor_Mid_MM);

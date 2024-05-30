@@ -1,12 +1,29 @@
 #include "Setup.h"
 
 HardwareSerial *ble = nullptr;
-//HardwareSerial *ble;
+
+void Set_Output(void) {
+//Turn ON Power Latch 
+  digitalWrite(POWER_ENABLE, HIGH);
+
+//Turn OFF Motor Driver
+  digitalWrite(MOTOR_ENABLE, HIGH);
+
+//Turn OFF Debug LED
+  digitalWrite(LED_RED, HIGH);
+  digitalWrite(LED_GREEN, HIGH);
+  digitalWrite(LED_BLUE, HIGH);
+
+  // Servo
+  digitalWrite(SERVO_ENABLE, HIGH);
+}
+
+
 
 void Pin_Setup(void) {
 //Pinmode Declaration
 //Motors
-  pinMode(MOTOR_nENABLE, OUTPUT);
+  pinMode(MOTOR_ENABLE, OUTPUT);
   pinMode(MOTOR_RIGHT_PWM_1, OUTPUT);
   pinMode(MOTOR_RIGHT_PWM_2, OUTPUT);
   pinMode(MOTOR_LEFT_PWM_1, OUTPUT);
@@ -19,8 +36,8 @@ void Pin_Setup(void) {
 
 //Servos
   pinMode(SERVO_ENABLE, OUTPUT);
-  //pinMode(SERVO_PWM_1, OUTPUT);   //leave unconfigured as floating Input, until testet in Hardware!
-  //pinMode(SERVO_PWM_2, OUTPUT);
+  pinMode(SERVO_PWM_1, OUTPUT);   
+  //pinMode(SERVO_PWM_2, OUTPUT); //leave unconfigured as floating Input
 
 
 //Infrared Emmitter
@@ -82,19 +99,4 @@ void Pin_Setup(void) {
 
 
   Set_Output();
-}
-
-
-
-void Set_Output(void) {
-//Turn ON Power Latch 
-  digitalWrite(POWER_ENABLE, HIGH);
-
-//Turn OFF Motor Driver
-  digitalWrite(MOTOR_nENABLE, HIGH);
-
-//Turn OFF Debug LED
-  digitalWrite(LED_RED, HIGH);
-  digitalWrite(LED_GREEN, HIGH);
-  digitalWrite(LED_BLUE, HIGH);
 }

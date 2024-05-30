@@ -3,6 +3,7 @@
 #include <vector>
 #include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
 #include "location.h"
+#include <ballgrabber.h>
 #include "display.h"
 #include "movement.cpp"
 
@@ -41,7 +42,7 @@ void update_direction(int turn_direction) {
 std::vector<bool> get_walls() {
     std::vector<bool> walls(4, false); // initializing list containing 4 walls each to be false by default
 
-    // Check for walls in each direction
+    // Check for walls in each direction independent of the current direction 
     walls[cur_direction] = API::wallFront(); // Is there a wall in front
     walls[(cur_direction + 1) % 4] = API::wallRight(); // Is there a wall to the right
     walls[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
@@ -120,11 +121,17 @@ void turn_toward(Location loc) {
     set_dir(_dir); // turning towards desired location
 }
 
+
 void grab_ball(){
     // Drive to the ball
     go_to_start();
     move_forward();
     fast_turn_right();
+    move_grabber_forward();
     move_forward(0.75); 
+    delay(500); 
+    move_grabber_backward();
+    turn_around();
+    move_forward(0.75);
     fast_turn_right(); 
-}
+} 
