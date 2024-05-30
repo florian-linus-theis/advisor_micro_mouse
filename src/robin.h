@@ -81,41 +81,6 @@ void BackwardBoth(int dutyCycle) {
 }
 
 
-void Timer2_Setup(void){                //einziges funktionierendes Encoder Setup :)))
-  RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
-	RCC->APB1ENR|=RCC_APB1ENR_TIM2EN;
-	GPIOA->MODER|=(1<<1)|(1<<3);
-	GPIOA->AFR[0]|=(1<<0)|(1<<4);
-	TIM2->ARR = 4294967295;
-	TIM2->CCMR1 |= (TIM_CCMR1_CC1S_0 | TIM_CCMR1_CC2S_0 ); 
-	TIM2->CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC2P);  
-	TIM2->SMCR |= TIM_SMCR_SMS_0 | TIM_SMCR_SMS_1;   
-	TIM2->CR1 |= TIM_CR1_CEN;
-}
-
-
-void Timer3_Setup() {   // Motor PWM Left
-    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_1);
-    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
-    timer3->setPrescaleFactor(8);
-    timer3->setOverflow(1000);
-    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-    timer3->refresh();
-    timer3->resume();
-}
-
-void Timer4_Setup() {   // Motor PWM Right
-   timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
-   timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
-   timer4->setPrescaleFactor(8);
-   timer4->setOverflow(1000);
-   timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-   timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-   timer4->refresh();
-   timer4->resume();
-}
-
 void robin_test() {
     while(1) {
         // Wait for the encoder to be turned

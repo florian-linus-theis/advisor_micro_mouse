@@ -5,8 +5,9 @@
 //Include C-Files
 #include "algorithms.h"
 #include "display.h"
-#include "robin.h"
-#include "ballgrabber.h"
+#include <robin.h>
+#include <ballgrabber.h>
+#include <Clock_Setup.h>
 
 //Library-Include in Setup.h Header File
 
@@ -39,7 +40,7 @@ void setup() {
     Pin_Setup();
     Clock_Setup();
     Timer_Setup();
-    ADC_Setup();
+    // ADC_Setup();
     maze_setup(); // setting up the maze file
     display_setup();
 
