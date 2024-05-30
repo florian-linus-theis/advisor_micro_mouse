@@ -6,6 +6,7 @@
 #include "algorithms.h"
 #include "display.h"
 #include "robin.h"
+#include "ballgrabber.h"
 /*
 #include "Pin_Setup.cpp"
 #include "Clock_Setup.cpp"
@@ -49,6 +50,7 @@ void setup() {
     ADC_Setup();
     maze_setup(); // setting up the maze file
     display_setup();
+    // setup_servo();
 
     // Display the initial options
     displayOptions(static_cast<Mode>(current_option), false);
@@ -65,15 +67,7 @@ void setup() {
     Timer3_Setup();
     Timer4_Setup();
     ble->println("test2");
-
-
-    digitalWrite(POWER_ENABLE, HIGH); //Roboter an
-    digitalWrite(MOTOR_ENABLE, HIGH); //Motoren aus!
-    digitalWrite(LED_BLUE, HIGH);
-    digitalWrite(LED_RED, HIGH);
-    digitalWrite(LED_GREEN, HIGH);
 }
-
 
 
 void loop() {

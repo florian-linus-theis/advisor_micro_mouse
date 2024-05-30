@@ -3,6 +3,7 @@
 #include <vector>
 #include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
 #include "location.h"
+#include <ballgrabber.h>
 
 
 // For tracking current global direction
@@ -119,9 +120,18 @@ void turn_toward(Location loc) {
     set_dir(_dir); // turning towards desired location
 }
 
-void grab_ball(){
-    // Drive to the ball
-    move_forward(); move_forward(); turn_right(); move_forward();
-    // Drive back to the start
-    turn_around(); move_forward(); turn_right();
-}
+// void grab_ball(){
+//     // Drive to the ball
+//     go_to_start();
+//     move_grabber_forward();
+//     move_forward(0.3);
+//     right_curve(0.3);
+//     move_forward(0.3); //hier evtl kürzer 
+//     delay(1000); // give ball time to be grabbed
+//     move_grabber_backward(); // ball grabbed
+//     turn_around(); 
+//     move_forward(0.3);
+//     right_curve(0.3); // now in center of cell (0, 2)
+// }
+
+void grab_ball(){}
