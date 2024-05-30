@@ -119,10 +119,17 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
 
 
 void Timer10_Setup() {      //Servo1 PWM TImer
-    timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
-    timer10->setOverflow(20000, HERTZ_FORMAT);  // 20ms period (50Hz)
-    timer10->setCaptureCompare(1, 1500, MICROSEC_COMPARE_FORMAT);  // Center the servo
-
+    // timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
+    // timer10->setPrescaleFactor(200);
+    // timer10->setOverflow(50, HERTZ_FORMAT);  // 20ms period (50Hz)
+    // timer10->setCaptureCompare(1, 1500, MICROSEC_COMPARE_FORMAT); 
+    // timer10->refresh();
+    // timer10->resume();
+    timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, SERVO_PWM_1);
+    timer10->setPrescaleFactor(200);
+    timer10->setOverflow(1000);
+    timer10->setCaptureCompare(1, 50, PERCENT_COMPARE_FORMAT);
+    timer10->refresh();
     timer10->resume();
 }
 
