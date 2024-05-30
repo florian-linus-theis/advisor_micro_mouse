@@ -5,7 +5,7 @@
 #include "location.h"
 #include <ballgrabber.h>
 #include "display.h"
-#include "movement.cpp"
+#include <movement.h>
 
 
 // For tracking current global direction
@@ -124,13 +124,13 @@ void turn_toward(Location loc) {
 
 void grab_ball(){
     // Drive to the ball
-    go_to_start();
+    go_to_start(DUTY_FAST);
     move_forward();
     fast_turn_right();
-    move_grabber_forward();
+    move_ballgrabber_forward();
     move_forward(0.75); 
     delay(500); 
-    move_grabber_backward();
+    move_ballgrabber_backward();
     turn_around();
     move_forward(0.75);
     fast_turn_right(); 
