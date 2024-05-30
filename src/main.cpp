@@ -48,11 +48,11 @@ void setup() {
     displayOptions(static_cast<Mode>(current_option), false);
 
     //Start Systick Timer
-    // timer14.resume();
+    timer14->resume();
   
   // Robin's Code
 //   Sensor_Sync_Setup();
-//   analogReadResolution(12);
+    analogReadResolution(12);
 //   Mid_Sensor_Setup();
     // ble->println("test1");
     // Timer2_Setup();

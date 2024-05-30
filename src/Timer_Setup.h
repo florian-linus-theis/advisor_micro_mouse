@@ -25,8 +25,8 @@ void Timer1_Setup();
 
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
-//Systick Timer14
-   // Systick_Setup();
+
+   Systick_Setup();
 
 //Motor Timers
     Timer3_Setup(); //PWM Timer Left        //TO-DO
@@ -129,15 +129,21 @@ void Timer10_Setup() {      //Servo1 PWM TImer
     timer10->resume();
 }
 
-void Timer11_Setuo(){
-    timer6->setPrescaleFactor(8);               // Set prescaler to 50
-    timer6->setOverflow(22000);                     // Set overflow to 16 = 50us intervals
-    timer6->attachInterrupt(Systick_Interrupt);
-    timer6->refresh();
-    timer6->pause();
-}
+
 
 
 void Timer1_Setup() {       //Buzzer PWM TImer
+
+}
+
+void Systick_Interrupt() {
+
+  //Alle Steuerungsfunktionen, Messungen und sonstige Regelsystem-Funktionen werden hier untergebracht
+
+  //Encoder Values lese;
+
+  //Distanz_Messung_Sensoren();
+
+  //Regelungssysteme;
 
 }
