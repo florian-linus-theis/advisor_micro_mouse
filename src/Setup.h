@@ -3,6 +3,7 @@
 #include "wiring.h"
 #include "iostream"
 #include "vector"
+#include "cmath"
 #include "HardwareTimer.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -126,10 +127,12 @@ extern HardwareSerial *ble;
 extern void Timer6_Interrupt(void);
 extern void Timer7_Interrupt(void);
 
-extern void Distanz_Messung_Blind(void);
-extern void Distanz_Messung_Hell(void);
-extern void Distanz_Mid_Sensor();
+extern void Distanz_Messung_Sensoren(void);
+
+extern void Distanz_Mid_Sensor(void);
 extern void printDistanzSensoren(void);
+extern int Distance_Sensor_Mid_MM;
+
 
 //Motors
 
