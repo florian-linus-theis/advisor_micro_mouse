@@ -36,7 +36,7 @@ bool confirmationPending = false;
 
 void setup() {
     //Setup
-    Clock_Setup();  
+    //Clock_Setup();  
     Pin_Setup();
     Timer_Setup();
     ADC_Setup();
@@ -51,7 +51,6 @@ void setup() {
   
     // Robin's Code
     // Sensor_Sync_Setup();
-    // analogReadResolution(12);
     // Mid_Sensor_Setup();
     // ble->println("test1");
     // Timer2_Setup();
