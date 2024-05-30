@@ -50,7 +50,7 @@ void setup() {
     ADC_Setup();
     maze_setup(); // setting up the maze file
     display_setup();
-    // setup_servo();
+    //setup_servo();
 
     // Display the initial options
     displayOptions(static_cast<Mode>(current_option), false);

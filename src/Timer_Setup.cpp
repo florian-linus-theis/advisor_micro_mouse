@@ -29,9 +29,9 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
    // Systick_Setup();
 
 //Motor Timers
-   // Timer3_Setup(); //PWM Timer Left        //TO-DO
-   // Timer4_Setup(); //PWM Timer Right       //TO-DO
-    //Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
+    // Timer3_Setup(); //PWM Timer Left        //TO-DO
+    // Timer4_Setup(); //PWM Timer Right       //TO-DO
+    // Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
     // Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
 
 //Infrared Timers
@@ -39,7 +39,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     Timer7_Setup(); //Mid Sensor Interrupt Timer
 
 //Servo1 PWM Timer
-    Timer10_Setup();                        //TO-DO
+    //Timer10_Setup();                        //TO-DO
 
 //Buzzer PWM Timer
     Timer1_Setup();                         //TO-DO
@@ -79,10 +79,10 @@ void Systick_Setup(void) {  //Systick Timer Setup
 
 
 // void Timer2_Setup(){    //Motor Encoder Left
-//     //configuring Timer in Encoder Mode sadly not possible with HardwareTimer Lib...
-//     //look at this shit :/
-//     //brother ehhhwww
-//     RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
+//  //configuring Timer in Encoder Mode sadly not possible with HardwareTimer Lib...
+//  //look at this shit :/
+//  //brother ehhhwww
+//  RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
 // 	RCC->APB1ENR|=RCC_APB1ENR_TIM2EN;
 // 	GPIOA->MODER|=(1<<1)|(1<<3);
 // 	GPIOA->AFR[0]|=(1<<0)|(1<<4);
@@ -119,7 +119,11 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
 
 
 void Timer10_Setup() {      //Servo1 PWM TImer
+    timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
+    timer10->setOverflow(20000, HERTZ_FORMAT);  // 20ms period (50Hz)
+    timer10->setCaptureCompare(1, 1500, MICROSEC_COMPARE_FORMAT);  // Center the servo
 
+    timer10->resume();
 }
 
 
