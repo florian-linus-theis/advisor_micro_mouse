@@ -26,8 +26,8 @@ int selected_option = MODE_STANDBY;
 bool optionSelected = false;
 bool encoderTurned = false;
 bool confirmationPending = false;
-double encoder_value_left;
-double encoder_value_right;
+uint32_t encoder_value_left;
+int encoder_value_right;
 
 
 
@@ -56,7 +56,7 @@ void setup() {
 //   analogReadResolution(12);
 //   Mid_Sensor_Setup();
     // ble->println("test1");
-    // Timer2_Setup();
+    Timer2_Setup();
     // Timer3_Setup();
     // Timer4_Setup();
     // ble->println("test2");
@@ -83,15 +83,22 @@ void loop() {
         }
     }
     Distanz_Messung_Sensoren();
-    digitalWrite(LED_RED, LOW);
     printDistanzSensoren();
+    digitalWrite(LED_BLUE, HIGH);
 
-encoder_value_left = timer2->getCount();
-    encoder_value_right = timer5->getCount();
-    ble->print("Motor Rechts get Ticks:");
-    //ble->println(encoder_value_right);
-    ble->print("Motor Links get Ticks:");
-    //ble->println(encoder_value_left);
+    encoder_value_left = read_encoder_left_ticks();
+    encoder_value_right = read_encoder_right_ticks();
+    if(encoder_value_left < 500){
+      digitalWrite(LED_RED, HIGH);
+      digitalWrite(LED_GREEN, LOW);
+    }
+    else{
+      digitalWrite(LED_GREEN, HIGH);
+      digitalWrite(LED_RED, LOW);
+    }
+    // display_print("Rechts: " + std::to_string(encoder_value_right));
+    delay(1000);
+    display_print("Links: "+ std::to_string(encoder_value_left));
     
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);

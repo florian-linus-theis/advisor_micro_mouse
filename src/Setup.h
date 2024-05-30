@@ -135,7 +135,10 @@ extern int Distance_Sensor_Mid_MM;
 
 
 //Motors
-
+extern uint32_t encoder_value_left;
+extern int encoder_value_right;
+extern int read_encoder_left_ticks(void);
+extern int read_encoder_right_ticks(void);
 
 //Move
 extern void Forward(int dutyCycle);

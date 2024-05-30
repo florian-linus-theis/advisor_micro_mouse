@@ -157,4 +157,9 @@ void robin_test() {
         // Other sensor or distance measuring code
 }
 
-
+int read_encoder_right_ticks(void){
+    return TIM5->CNT;
+}
+int read_encoder_left_ticks(void){
+    return TIM2->CNT;
+}
