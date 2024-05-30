@@ -29,17 +29,17 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
    // Systick_Setup();
 
 //Motor Timers
-   // Timer3_Setup(); //PWM Timer Left        //TO-DO
-   // Timer4_Setup(); //PWM Timer Right       //TO-DO
-    Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
-    Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
+    Timer3_Setup(); //PWM Timer Left        //TO-DO
+    Timer4_Setup(); //PWM Timer Right       //TO-DO
+    // Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
+    // Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
 
 //Infrared Timers
-    Timer6_Setup(); //Main Interrupt Timer
-    Timer7_Setup(); //Mid Sensor Interrupt Timer
+    //Timer6_Setup(); //Main Interrupt Timer
+    //Timer7_Setup(); //Mid Sensor Interrupt Timer
 
 //Servo1 PWM Timer
-    Timer10_Setup();                        //TO-DO
+    //Timer10_Setup();                        //TO-DO
 
 //Buzzer PWM Timer
     Timer1_Setup();                         //TO-DO
@@ -58,31 +58,9 @@ void Systick_Setup(void) {  //Systick Timer Setup
 
 
 
-void Timer3_Setup() {   //Motor PWM Left
-    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_LEFT_PWM_1);
-    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_LEFT_PWM_2);
-    timer3->setPrescaleFactor(4);
-    timer3->setOverflow(1000);
-    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-    timer3->resume();
-}
-void Timer4_Setup() {   //Motor PWM Right
-    timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_RIGHT_PWM_1);
-    timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_RIGHT_PWM_2);
-    timer4->setPrescaleFactor(4);
-    timer4->setOverflow(1000);
-    timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-    timer4->resume();
-}
 
-
-void Timer2_Setup(){    //Motor Encoder Left
-    //configuring Timer in Encoder Mode sadly not possible with HardwareTimer Lib...
-    //look at this shit :/
-    //brother ehhhwww
-    RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
+void Timer2_Setup(void){                //einziges funktionierendes Encoder Setup :)))
+  RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
 	RCC->APB1ENR|=RCC_APB1ENR_TIM2EN;
 	GPIOA->MODER|=(1<<1)|(1<<3);
 	GPIOA->AFR[0]|=(1<<0)|(1<<4);
@@ -92,6 +70,30 @@ void Timer2_Setup(){    //Motor Encoder Left
 	TIM2->SMCR |= TIM_SMCR_SMS_0 | TIM_SMCR_SMS_1;   
 	TIM2->CR1 |= TIM_CR1_CEN;
 }
+
+
+void Timer3_Setup() {   // Motor PWM Left
+    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_1);
+    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
+    timer3->setPrescaleFactor(8);
+    timer3->setOverflow(1000);
+    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+    timer3->refresh();
+    timer3->resume();
+}
+
+void Timer4_Setup() {   // Motor PWM Right
+   timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
+   timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
+   timer4->setPrescaleFactor(8);
+   timer4->setOverflow(1000);
+   timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+   timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+   timer4->refresh();
+   timer4->resume();
+}
+
 
 void Timer5_Setup() {   //Motor Encoder Right
     //copy from Timer2
@@ -119,7 +121,12 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
 
 
 void Timer10_Setup() {      //Servo1 PWM TImer
-
+    timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
+    timer10->setPrescaleFactor(26); // Set prescaler to 26
+    timer10->setOverflow(64615); // Set overflow to 64615
+    timer10->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+    timer10->refresh();
+    timer10->resume();
 }
 
 void Timer11_Setuo(){
@@ -133,14 +140,4 @@ void Timer11_Setuo(){
 
 void Timer1_Setup() {       //Buzzer PWM TImer
 
-}
-
-
-//Move_______________________________________________________________________________
-
-void Forward(int dutyCycle) {
-  timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-  timer3->setCaptureCompare(2, dutyCycle, PERCENT_COMPARE_FORMAT);
-  timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-  timer4->setCaptureCompare(2, dutyCycle, PERCENT_COMPARE_FORMAT);
 }

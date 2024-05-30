@@ -3,6 +3,9 @@
 #include <vector>
 #include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
 #include "location.h"
+#include <ballgrabber.h>
+#include "display.h"
+#include <movement.h>
 
 
 // For tracking current global direction
@@ -39,7 +42,7 @@ void update_direction(int turn_direction) {
 std::vector<bool> get_walls() {
     std::vector<bool> walls(4, false); // initializing list containing 4 walls each to be false by default
 
-    // Check for walls in each direction
+    // Check for walls in each direction independent of the current direction 
     walls[cur_direction] = API::wallFront(); // Is there a wall in front
     walls[(cur_direction + 1) % 4] = API::wallRight(); // Is there a wall to the right
     walls[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
@@ -60,27 +63,26 @@ std::vector<bool> get_walls() {
 
 
 // Function to take all actions to move forward and update belief state
-void move_forward() {
-    API::moveForward();  // Move forward in maze
+void move_forward(int squares = 1) {
+    if(current_option == MODE_STANDBY) return;
+    int duty_cycle = DUTY_SLOW;
+    if (current_option == MODE_BFS || current_option == MODE_ASTAR) {
+        duty_cycle = DUTY_FAST;
+    }
+    move_forward_low_level(duty_cycle, squares);  // Move forward in maze
     update_position();  // Update current position
 }
 
 // Function to take all actions to turn left and update belief state
-void turn_left() {
+void fast_turn_left() {
     API::turnLeft();
     update_direction(-1);  // We are turning left
 }
 
 // Function to take all actions to turn right and update belief state
-void turn_right() {
+void fast_turn_right() {
     API::turnRight();
     update_direction(+1);  // We are turning right
-}
-
-// Function to take all actions to turn around
-void turn_around() {
-    turn_right();
-    turn_right();
 }
 
 // Function to change current direction to a specific direction
@@ -89,14 +91,14 @@ void set_dir(int _dir) {
         return;
     }
     if (_dir == (cur_direction + 1) % 4) {  // If need to turn right once
-        turn_right();
+        rotate_right();
         return;
     }
     if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
         turn_around();
         return;
     }
-    turn_left();  // If need to turn left once
+    rotate_left();  // If need to turn left once
 }
 
 // Function to turn toward an adjacent location object
@@ -119,9 +121,17 @@ void turn_toward(Location loc) {
     set_dir(_dir); // turning towards desired location
 }
 
+
 void grab_ball(){
     // Drive to the ball
-    move_forward(); move_forward(); turn_right(); move_forward();
-    // Drive back to the start
-    turn_around(); move_forward(); turn_right();
-}
+    go_to_start(DUTY_FAST);
+    move_forward();
+    fast_turn_right();
+    move_ballgrabber_forward();
+    move_forward(0.75); 
+    delay(500); 
+    move_ballgrabber_backward();
+    turn_around();
+    move_forward(0.75);
+    fast_turn_right(); 
+} 

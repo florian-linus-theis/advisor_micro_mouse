@@ -118,16 +118,18 @@ public:
             temp = state_vector_psp[temp.position_parent_in_vec];   // Traverse up to parent
         } while (temp.position_parent_in_vec != -1);
 
+        // reverse the vector to get the correct order of actions
+        reverse(act_vector_psp.begin(), act_vector_psp.end());
+
         display_print("Backtracking complete");
         delay(2000); // Delay for 2 seconds to give the user time to read the display
         int counter = 0;
+        
         // Accounting for the fact that we might have to grab the ball first
         if (BALLGREIFER == true) {
             grab_ball();
             counter += 2; // So that we skip the first two actions
         }
-        // reverse the vector to get the correct order of actions
-        reverse(act_vector_psp.begin(), act_vector_psp.end());
 
         // iterate through the vector and execute the actions
         for (counter; counter < act_vector_psp.size(); counter++){
@@ -136,9 +138,9 @@ public:
             }
             int act = act_vector_psp[counter]; // Get action from vector
             if (act == 1) {
-                turn_right();
+                fast_turn_right();
             } else if (act == 3) {
-                turn_left();
+                fast_turn_left();
             }
             move_forward();
         }
