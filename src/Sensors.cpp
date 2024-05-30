@@ -66,7 +66,6 @@ void Distanz_Mid_Sensor(void){
 }
 
 void Timer7_Interrupt(void){
-  digitalWrite(LED_BLUE, LOW);
     Distance_Sensor_Mid_MM = analogRead(IR_SENSOR_MID);
     digitalWrite(IR_EMITTER_MID, LOW);
     Flag_Mid++;

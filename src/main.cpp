@@ -7,14 +7,6 @@
 #include "display.h"
 #include "robin.h"
 #include "ballgrabber.h"
-/*
-#include "Pin_Setup.cpp"
-#include "Clock_Setup.cpp"
-#include "Timer_Setup.cpp"
-#include "ADC_Setup.cpp"
-#include "Systick.cpp"
-#include "algorithms.h"
-*/
 
 //Library-Include in Setup.h Header File
 
@@ -45,18 +37,17 @@ bool confirmationPending = false;
 void setup() {
     //Setup  
     Pin_Setup();
-    //Clock_Setup();
-    //Timer_Setup();
-    //ADC_Setup();
-    //maze_setup(); // setting up the maze file
+    Clock_Setup();
+    Timer_Setup();
+    ADC_Setup();
+    maze_setup(); // setting up the maze file
     display_setup();
-    //setup_servo();
 
     // Display the initial options
     displayOptions(static_cast<Mode>(current_option), false);
 
-  //Start Systick Timer
-  // timer14.resume();
+    //Start Systick Timer
+    // timer14.resume();
   
   // Robin's Code
 //   Sensor_Sync_Setup();
