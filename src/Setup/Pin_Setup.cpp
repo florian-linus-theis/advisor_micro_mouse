@@ -86,13 +86,13 @@ void Pin_Setup(void) {  //Pinmode Declaration and Communication Port Initializat
 */  
 
 
-//OLED Display
+//OLED Display -> I2C #2
   pinMode(OLED_SCL, OUTPUT);
   pinMode(OLED_SCL, OUTPUT);
   
   
 
-//Bluetooth Module
+//Bluetooth Module -> UART #1
   pinMode(BLUETOOTH_RX, INPUT);
   pinMode(BLUETOOTH_TX, OUTPUT);
   //HardwareSerial *ble = &Serial1;

@@ -58,6 +58,31 @@ void Systick_Setup(void) {  //Systick Timer Setup
 
 
 
+void Timer3_Setup() {   // Motor PWM Left
+    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_1);
+    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
+    timer3->setPrescaleFactor(8);
+    timer3->setOverflow(1000);
+    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+    timer3->refresh();
+    timer3->resume();
+}
+
+
+
+void Timer4_Setup() {   // Motor PWM Right
+   timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
+   timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
+   timer4->setPrescaleFactor(8);
+   timer4->setOverflow(1000);
+   timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+   timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+   timer4->refresh();
+   timer4->resume();
+}
+
+
 
 void Timer2_Setup(void){                //einziges funktionierendes Encoder Setup :)))
   RCC->AHB1ENR|=RCC_AHB1ENR_GPIOAEN;
@@ -71,28 +96,6 @@ void Timer2_Setup(void){                //einziges funktionierendes Encoder Setu
 	TIM2->CR1 |= TIM_CR1_CEN;
 }
 
-
-void Timer3_Setup() {   // Motor PWM Left
-    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_1);
-    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
-    timer3->setPrescaleFactor(8);
-    timer3->setOverflow(1000);
-    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-    timer3->refresh();
-    timer3->resume();
-}
-
-void Timer4_Setup() {   // Motor PWM Right
-   timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
-   timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
-   timer4->setPrescaleFactor(8);
-   timer4->setOverflow(1000);
-   timer4->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-   timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
-   timer4->refresh();
-   timer4->resume();
-}
 
 
 void Timer5_Setup() {   //Motor Encoder Right
@@ -110,6 +113,7 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
 }
   
 
+
 void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
     // Configure timer
     timer7->setPrescaleFactor(50);              // Set prescaler to 50
@@ -120,6 +124,7 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
 }
 
 
+
 void Timer10_Setup() {      //Servo1 PWM TImer
     timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
     timer10->setPrescaleFactor(26); // Set prescaler to 26
@@ -128,6 +133,7 @@ void Timer10_Setup() {      //Servo1 PWM TImer
     timer10->refresh();
     timer10->resume();
 }
+
 
 
 void Timer1_Setup() {       //Buzzer PWM TImer

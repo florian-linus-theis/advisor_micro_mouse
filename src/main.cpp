@@ -1,24 +1,14 @@
-//#pragma once
 //Include Header Files
 #include "Setup\Setup.h"
 
-//Include C-Files
+//Include Librarys in Setup.h !!!
+
 #include "algorithms.h"
 #include "display.h"
 #include <robin.h>
 #include <ballgrabber.h>
 
-//Library-Include in Setup.h Header File
 
-
-// put external variable declarations here:
-/*
-extern int current_option;
-extern int selected_option;
-extern bool optionSelected;
-extern bool encoderTurned;
-extern bool confirmationPending;
-*/
 
 // Global variables 
 int current_option = MODE_STANDBY;
@@ -29,14 +19,9 @@ bool confirmationPending = false;
 
 
 
-// put function declarations in Header Files
-
-
-
-
 void setup() {
     //Setup
-    //Clock_Setup();  
+    //Clock_Setup();  //not sure if working correctly!!!
     Pin_Setup();
     Timer_Setup();
     ADC_Setup();

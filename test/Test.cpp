@@ -1,6 +1,5 @@
 #include <Arduino.h>
-#include <Setup.h>
-#include <Pin_Setup.cpp>
+#include <Setup\Setup.h>
 using std::vector;
 
 
@@ -37,7 +36,7 @@ void setup() {
 //Hauptschleife
 void loop() {
   digitalWrite(POWER_ENABLE, HIGH);
-  digitalWrite(MOTOR_nENABLE, HIGH);
+  digitalWrite(MOTOR_ENABLE, HIGH);
   Distanz_Messung_Blind(Messung_Blind);
   Distanz_Messung_Hell(Messung_Hell);
   for(int i = 0; i < 6; i++){
@@ -165,7 +164,7 @@ void Motor_Fehler(){
   digitalWrite(MOTOR_RIGHT_PWM_1, LOW);
   digitalWrite(MOTOR_RIGHT_PWM_2, LOW);
   Serial.print("Motor-Fehler aufgetreten, Maus abgeschalten");
-  digitalWrite(MOTOR_nENABLE, LOW);
+  digitalWrite(MOTOR_ENABLE, LOW);
   digitalWrite(POWER_ENABLE, LOW);
   digitalWrite(LED_RED, HIGH);
 }

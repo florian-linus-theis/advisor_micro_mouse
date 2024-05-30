@@ -1,5 +1,12 @@
 #include "Setup.h"
 
+/*
+Clock Overview:
+    Processor Core Clock:          168MHz
+    APB1 & APB2 Timer Clocks:      84MHz
+    APB1 & APB2 Peripheral Clocks: 42MHz
+*/
+
 
 void Clock_Setup() {
     RCC->APB1ENR |= RCC_APB1ENR_PWREN;

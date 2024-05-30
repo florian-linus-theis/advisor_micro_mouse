@@ -150,3 +150,12 @@ extern double Abs_Sensor_Calibration;
 
 extern int interrupt_counter;
 extern int Flag_Mid;
+
+
+
+//User-Interface
+extern int current_option;
+extern int selected_option;
+extern bool optionSelected;
+extern bool encoderTurned;
+extern bool confirmationPending;
