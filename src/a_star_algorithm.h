@@ -138,9 +138,9 @@ public:
             }
             int act = act_vector_psp[counter]; // Get action from vector
             if (act == 1) {
-                turn_right();
+                fast_turn_right();
             } else if (act == 3) {
-                turn_left();
+                fast_turn_left();
             }
             move_forward();
         }

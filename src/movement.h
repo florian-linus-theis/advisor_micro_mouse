@@ -152,6 +152,7 @@ void right_curve(int duty_cycle){
 
 void accelerate(){ 
     while(avg_distance_traveled < tick_accelerate){
+        int duty_cycle = DUTY_SLOW;
         for(int n = 1; n < 4; n++){
             duty_cycle += duty_interval;      // stepwise acceleration
             int start_time = millis();
@@ -165,6 +166,7 @@ void accelerate(){
 
 void decelerate(){
     while(avg_distance_traveled < tick_accelerate){
+        int duty_cycle = DUTY_FAST;
         for(int n = 1; n < 4; n++){
              duty_cycle -= duty_interval;      // stepwise deceleration
             int start_time = millis();
@@ -176,20 +178,20 @@ void decelerate(){
     reset_distance_traveled();
 }
 
-void calc_next_move(std::vector<std::string> moves, int state){
-    if(state == slow && moves[2] == "Forward"){
-        accelerate();
-        state = fast;
-    } else if(state == slow && moves[2] == "Turn"){
-        move_forward_low_level(30);
-        state = slow;
-    } else if(state == fast && moves[2] == "Forward"){
-        move_forward_low_level(70);
-        state = slow;    
-    } else if(state == fast && moves[2] == "Turn"){
-        decelerate();
-        state = slow;    
-    } else if(moves[0] = "Turn" && moves[2] == "Turn"){
-        state = slow;    
-    }
-}
+// void calc_next_move(std::vector<std::string> moves, int state){
+//     if(state == slow && moves[2] == "Forward"){
+//         accelerate();
+//         state = fast;
+//     } else if(state == slow && moves[2] == "Turn"){
+//         move_forward_low_level(30);
+//         state = slow;
+//     } else if(state == fast && moves[2] == "Forward"){
+//         move_forward_low_level(70);
+//         state = slow;    
+//     } else if(state == fast && moves[2] == "Turn"){
+//         decelerate();
+//         state = slow;    
+//     } else if(moves[0] = "Turn" && moves[2] == "Turn"){
+//         state = slow;    
+//     }
+// }
