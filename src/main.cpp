@@ -43,7 +43,7 @@ void setup() {
     maze_setup(); // setting up the maze file
     display_setup();
 
-    // Display the initial options
+    // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
 
     //Start Systick Timer
@@ -79,9 +79,9 @@ void loop() {
             displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
-    Distanz_Messung_Sensoren();
-    digitalWrite(LED_RED, LOW);
-    printDistanzSensoren();
+    // Distanz_Messung_Sensoren();
+    // digitalWrite(LED_RED, LOW);
+    // printDistanzSensoren();
 
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);
