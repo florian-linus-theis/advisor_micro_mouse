@@ -1,8 +1,15 @@
-#pragma once
+//Include Librarys
 #include "Arduino.h"
 #include "wiring.h"
+#include "iostream"
+#include "vector"
+#include "cmath"
+#include "HardwareTimer.h"
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
-//Pin renaming
+
+//Pin Naming
 //System
 #define POWER_ENABLE    PC10  //Main Power Latch - enable directly after startup to keep Robot ON
 #define V_BAT           PC0   //Battery Voltage divided by 1,47
@@ -10,7 +17,7 @@
 #define SWD_CLK         PA14
 
 //Drive Motors & Encoders
-#define MOTOR_nENABLE          PC11   //HIGH = Motor Driver disabled,   LOW = Motor Driver enabled !!!
+#define MOTOR_ENABLE          PC11   //HIGH = Motor Driver disabled,   LOW = Motor Driver enabled !!!
 #define MOTOR_RIGHT_PWM_1      PB7    //PWM Outputs to Motor H-Bridge
 #define MOTOR_RIGHT_PWM_2      PB6
 #define MOTOR_LEFT_PWM_1       PB4
@@ -55,6 +62,7 @@
 //OLED Display
 #define OLED_SCL        PB10  //SSD1306 Display Driver over I2C#2, Adress: 0x3C
 #define OLED_SDA        PB11
+#define OLED_RESET      -1    // Reset pin # (or -1 if sharing Arduino reset pin)
 
 //Bluetooth Module
 #define BLUETOOTH_TX    PA9   //HM-19 Bluetooth Module over UART#1, Baud Rate: 115200
@@ -73,93 +81,61 @@
 #define LED_GREEN       PA12
 #define LED_BLUE        PC3
 
-void Pin_Init(void);
+
+//Function and Variable Initialisation - - - - - - - - - - - - - - - - - - - - -
+//Pin_Setup
+extern void Pin_Setup(void);
+extern void Set_Output(void);
 
 
-void Pin_Setup(void) {
-//Pinmode Declaration
+//Clock_Setup
+extern void Clock_Setup();
+
+
+//Timer_Setup
+extern HardwareTimer *timer14;
+extern HardwareTimer *timer3;
+extern HardwareTimer *timer4;
+extern HardwareTimer *timer2;
+extern HardwareTimer *timer5;
+extern HardwareTimer *timer6;
+extern HardwareTimer *timer7;
+extern HardwareTimer *timer10;
+extern HardwareTimer *timer1;
+
+extern void Timer_Setup(void);
+
+
+//Systick
+extern void Systick_Interrupt(void);
+extern void update(void);
+
+
+
+//ADC_Setup
+extern void ADC_Setup(void);
+
+
+//User-Interface
+//Bluetooth
+extern HardwareSerial *ble;
+
+
+
+//Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+//Sensors
+extern void Timer6_Interrupt(void);
+extern void Timer7_Interrupt(void);
+
+extern void Distanz_Messung_Sensoren(void);
+
+extern void Distanz_Mid_Sensor(void);
+extern void printDistanzSensoren(void);
+extern int Distance_Sensor_Mid_MM;
+
+
 //Motors
-  pinMode(MOTOR_nENABLE, OUTPUT);
-  pinMode(MOTOR_RIGHT_PWM_1, OUTPUT);
-  pinMode(MOTOR_RIGHT_PWM_2, OUTPUT);
-  pinMode(MOTOR_LEFT_PWM_1, OUTPUT);
-  pinMode(MOTOR_LEFT_PWM_2, OUTPUT);
-  pinMode(MOTOR_ENCODER_RIGHT_A, INPUT);
-  pinMode(MOTOR_ENCODER_RIGHT_B, INPUT);
-  pinMode(MOTOR_ENCODER_LEFT_A, INPUT);
-  pinMode(MOTOR_ENCODER_LEFT_B, INPUT);
-  pinMode(MOTOR_nFAULT, INPUT);
-
-//Servos
-  pinMode(SERVO_ENABLE, OUTPUT);
-  //pinMode(SERVO_PWM_1, OUTPUT);   //leave unconfigured as floating Input, until testet in Hardware!
-  //pinMode(SERVO_PWM_2, OUTPUT);
 
 
-//Infrared Emmitter
-  pinMode(IR_EMITTER_RF, OUTPUT);
-  pinMode(IR_EMITTER_LF, OUTPUT);
-  pinMode(IR_EMITTER_RD, OUTPUT);
-  pinMode(IR_EMITTER_LD, OUTPUT);
-  pinMode(IR_EMITTER_RS, OUTPUT);
-  pinMode(IR_EMITTER_LS, OUTPUT);
-  pinMode(IR_EMITTER_MID, OUTPUT);
-
-//Infrared Sensors
-  pinMode(IR_SENSOR_RF, INPUT_ANALOG);
-  pinMode(IR_SENSOR_LF, INPUT_ANALOG);
-  pinMode(IR_SENSOR_RD, INPUT_ANALOG);
-  pinMode(IR_SENSOR_LD, INPUT_ANALOG);
-  pinMode(IR_SENSOR_RS, INPUT_ANALOG);
-  pinMode(IR_SENSOR_LS, INPUT_ANALOG);
-  pinMode(IR_SENSOR_MID, INPUT_ANALOG);
-
-
-//IMU
-  //->SPI #1
-  //TO-DO !!!!! --------------------------------
-
-  
-//OLED Display
-  pinMode(OLED_SCL, OUTPUT);
-  pinMode(OLED_SCL, OUTPUT);
-  
-  
-//Bluetooth Module
-  pinMode(BLUETOOTH_RX, INPUT);
-  pinMode(BLUETOOTH_TX, OUTPUT);
-  
-
-//User-Interface-Encoder
-  pinMode(UI_BUTTON, INPUT_PULLUP);   //Pullup important (no Hardware Pullup upsi)
-  pinMode(UI_ENCODER_A, INPUT);
-  pinMode(UI_ENCODER_B, INPUT);
-  
-
-//Buzzer
-  pinMode(BUZZER, OUTPUT);  
-  
-  
-//Debug RGB LED
-  pinMode(LED_RED, OUTPUT_OPEN_DRAIN);
-  pinMode(LED_GREEN, OUTPUT_OPEN_DRAIN);
-  pinMode(LED_BLUE, OUTPUT_OPEN_DRAIN);
-  
-
-
-  Pin_Init();
-}
-
-
-void Pin_Init() {
-//Turn ON Power Latch 
-  digitalWrite(POWER_ENABLE, HIGH);
-
-//Turn OFF Motor Driver
-  digitalWrite(MOTOR_nENABLE, HIGH);
-
-//Turn OFF Debug LED
-  digitalWrite(LED_RED, HIGH);
-  digitalWrite(LED_GREEN, HIGH);
-  digitalWrite(LED_BLUE, HIGH);
-}
+//Move
+extern void Forward(int dutyCycle);

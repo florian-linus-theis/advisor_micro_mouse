@@ -1,7 +1,5 @@
-#pragma once
-#include <iostream>
-#include "Arduino.h"
-#include "wiring.h"
+#include "Setup.h"
+
 
 void Systick_Interrupt() {
 

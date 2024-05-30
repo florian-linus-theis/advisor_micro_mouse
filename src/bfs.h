@@ -1,10 +1,13 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-
+#include "mms_interaction.h"
 #include "location.h"
 #include "state.h"
 #include "API.h"
+#include "display.h"
+
+extern int current_option; // current option selected by the user
 
 class BFSAlgorithm {
 private:
@@ -39,6 +42,7 @@ public:
         // while we have not every state in the state_vector
         while (counter < state_vector.size()) {
             if (counter >= maze_height*maze_width) { // If we have explored every possible state and no solution was found
+                display_print("No solution found");
                 break;
             }
             State* current_state = &state_vector[counter]; // Get the first node (state) we have not yet explored from the global array (FIFO)
@@ -46,8 +50,8 @@ public:
 
             // If it is goal, return the position of it in global state vector
             if (current_state->is_goal()) {
-                // log("goal state found");
                 // TODO: Buzzer success sound
+                display_print("Goal state found");
                 *GOAL_POSITION = current_state->location->position;
                 return counter;
             }
@@ -82,18 +86,19 @@ public:
 
             counter++;
         }
-        // log("No solution found");
-        // Todo OLED display Text "No solution found"
+        display_print("No solution found");
         return -1; // If no solution is found
     }
 
     void execute_shortest_path(int solution_position) {
         if (solution_position == -1) {  // If no solution was found
+            display_print("could not execute");
+            delay(1000);
+            display_print("No solution found");
             return;
         }
         State state = state_vector[solution_position]; // Get the goal state
         while (state.action != -1) {   // While I have not reached the home position
-            // log(state.to_string()); // (added)
             act_vector.push_back(state.action);  // Push action to vector
             state = state_vector[state.parent];    // Traverse up to parent
         }
@@ -107,14 +112,18 @@ public:
 
         // Execute the actions in the maze
         while (counter >= 0) {    // start at the back of actions (at origin) and execute them in the maze until we are at the first action
+            if (current_option == 0) { // If we have an external interrupt triggered by the rotation of the rotary encoder
+                return; // return to main loop
+            }
             int act = act_vector[counter]; // Get action from vector
             if (act == 1) {
-                turn_right();
+                fast_turn_right();
             } else if (act == 3) {
-                turn_left();
+                fast_turn_left();
             }
             move_forward();
             counter--;
         }
+        display_print("Execution complete");
     }
 };
