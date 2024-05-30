@@ -116,6 +116,25 @@ void Timer4_Setup() {   // Motor PWM Right
    timer4->resume();
 }
 
+void Timer5_Setup(void) {   //Encoder Setup links
+    // Enable GPIOA, GPIOB, and TIM5 clock
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOBEN;
+    RCC->APB1ENR |= RCC_APB1ENR_TIM5EN;
+
+    // Configure PA15 and PB3 as alternate function mode (AF)
+    GPIOA->MODER |= (1 << (2*15)); // PA15
+    GPIOB->MODER |= (1 << (2*3));  // PB3
+    GPIOA->AFR[1] |= (1 << (4 * (15 - 8))); // PA15
+    GPIOB->AFR[0] |= (1 << (4 * 3));        // PB3
+
+    // Configure TIM5 settings
+    TIM5->ARR = 4294967295;
+    TIM5->CCMR1 |= (TIM_CCMR1_CC1S_0 | TIM_CCMR1_CC2S_0); 
+    TIM5->CCER &= ~(TIM_CCER_CC1P | TIM_CCER_CC2P);  
+    TIM5->SMCR |= TIM_SMCR_SMS_0 | TIM_SMCR_SMS_1;   
+    TIM5->CR1 |= TIM_CR1_CEN;
+}
+
 void robin_test() {
     while(1) {
         // Wait for the encoder to be turned

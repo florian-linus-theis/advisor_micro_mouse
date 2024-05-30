@@ -26,6 +26,8 @@ int selected_option = MODE_STANDBY;
 bool optionSelected = false;
 bool encoderTurned = false;
 bool confirmationPending = false;
+double encoder_value_left;
+double encoder_value_right;
 
 
 
@@ -58,6 +60,7 @@ void setup() {
     // Timer3_Setup();
     // Timer4_Setup();
     // ble->println("test2");
+    Timer5_Setup();
 }
 
 
@@ -83,6 +86,13 @@ void loop() {
     digitalWrite(LED_RED, LOW);
     printDistanzSensoren();
 
+encoder_value_left = timer2->getCount();
+    encoder_value_right = timer5->getCount();
+    ble->print("Motor Rechts get Ticks:");
+    //ble->println(encoder_value_right);
+    ble->print("Motor Links get Ticks:");
+    //ble->println(encoder_value_left);
+    
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);
 }

@@ -93,10 +93,10 @@ void Systick_Setup(void) {  //Systick Timer Setup
 // 	TIM2->CR1 |= TIM_CR1_CEN;
 // }
 
-void Timer5_Setup() {   //Motor Encoder Right
+/*void Timer5_Setup() {   //Motor Encoder Right
     //copy from Timer2
 }
-
+*/
 
 
 void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
