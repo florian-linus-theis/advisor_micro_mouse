@@ -14,6 +14,7 @@ const int servoFrequency = 50;  // Servo PWM frequency in Hz
 // }
 
 void servoTest(){
+    digitalWrite(LED_GREEN, LOW);
     analogWriteFrequency(servoFrequency);   // Set the PWM frequency
     analogWrite(SERVO_PWM_1, 13);           // duty between 13-25 to achieve 1-2ms pulse
     delay(1000);
