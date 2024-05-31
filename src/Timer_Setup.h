@@ -25,8 +25,8 @@ void Timer1_Setup();
 
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
-//Systick Timer14
-   // Systick_Setup();
+
+   Systick_Setup();
 
 //Motor Timers
     Timer3_Setup(); //PWM Timer Left        //TO-DO
@@ -130,6 +130,20 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 }
 
 
+
+
 void Timer1_Setup() {       //Buzzer PWM TImer
+
+}
+
+void Systick_Interrupt() {
+
+  //Alle Steuerungsfunktionen, Messungen und sonstige Regelsystem-Funktionen werden hier untergebracht
+
+  //Encoder Values lese;
+
+  //Distanz_Messung_Sensoren();
+
+  //Regelungssysteme;
 
 }

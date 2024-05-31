@@ -108,7 +108,6 @@ extern void Timer_Setup(void);
 
 //Systick
 extern void Systick_Interrupt(void);
-extern void update(void);
 
 
 
