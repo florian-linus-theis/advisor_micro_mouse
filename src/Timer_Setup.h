@@ -25,23 +25,14 @@ void Timer1_Setup();
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
 
-   Systick_Setup();
-
-//Motor Timers
-    Timer3_Setup(); //PWM Timer Left        //TO-DO
-    Timer4_Setup(); //PWM Timer Right       //TO-DO
-    // Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
-    // Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
-
-//Infrared Timers
-    //Timer6_Setup(); //Main Interrupt Timer
-    //Timer7_Setup(); //Mid Sensor Interrupt Timer
-
-//Servo1 PWM Timer
-    //Timer10_Setup();  //Servo1 PWM                      //TO-DO
-
-//Buzzer PWM Timer
-    //Timer1_Setup();                         //TO-DO
+    Systick_Setup();
+    // Timer1_Setup();      // TO DO
+    // Timer2_Setup();
+    // Timer3_Setup();
+    // Timer4_Setup();
+    // Timer5_Setup();
+    //Timer6_Setup();
+    // Timer10_Setup();
 }
 
 
