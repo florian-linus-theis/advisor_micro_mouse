@@ -34,7 +34,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     // Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
 
 //Infrared Timers
-    //Timer6_Setup(); //Main Interrupt Timer
+    Timer6_Setup(); //Main Interrupt Timer
     
 
 //Servo1 PWM Timer
@@ -48,8 +48,8 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
 
 
 void Systick_Setup(void) {  //Systick Timer Setup
-    timer14->setPrescaleFactor(122000);          // Set prescaler to 122000
-    timer14->setOverflow(65535);                 // Set overflow to 65535 = 2 ms intervals
+    timer14->setPrescaleFactor(10);          // Set prescaler to 122000
+    timer14->setOverflow(32535);                 // Set overflow to 65535 = 2 ms intervals
     timer14->attachInterrupt(Systick_Interrupt);  
     timer14->refresh();
     timer14->pause();
