@@ -29,7 +29,6 @@ HardwareSerial Serial1(BLUETOOTH_RX, BLUETOOTH_TX);
 void Distanz_Messung_Hell(void);
 void Sensor_Interrupt(void);
 void Sensor_Sync_Setup(void);
-void printDistanzSensoren(void);
 
 void Mid_Sensor_Interrupt(void);
 void Mid_Sensor_Setup(void);

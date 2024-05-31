@@ -24,6 +24,7 @@ void setup() {
     Timer_Setup();
     ADC_Setup();
     maze_setup(); // setting up the maze file
+    set_Interrupt_Priority();
 
     // Setup Complete
     // Display the initial options on display
@@ -58,9 +59,9 @@ void loop() {
             displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
-    // Distanz_Messung_Sensoren();
+    Distanz_Messung_Sensoren();
     // digitalWrite(LED_RED, LOW);
-    // printDistanzSensoren();
+    printDistanzSensoren();
 
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);

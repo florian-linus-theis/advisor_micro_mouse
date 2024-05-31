@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "Setup/Setup.h"
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS, IR_EMITTER_MID};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS, IR_SENSOR_MID};
@@ -7,7 +7,6 @@ int calibration_sensor[7] = {165,185,181 ,174,238,161, 0};    //Kalibierung fehl
 bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
-double Abs_Sensor_Calibration;
 
 int interrupt_counter;
 
@@ -28,11 +27,11 @@ void Distanz_Messung_Sensoren(void){
   Distanz_Messung_Hell();
 
   for(int i = 0; i < 7; i++){
-    if (Distance_Sensor[i] > 0){
-      Distance_Sensor[i] = 'flase';       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
+    if (Distance_Sensor[i] > 15){
+      Walls_Flag[i] = true;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
     }
     else{
-      Distance_Sensor[i] = 'true';
+      Walls_Flag[i] = false;
     }
   }
 }

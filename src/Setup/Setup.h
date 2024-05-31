@@ -114,6 +114,7 @@ extern HardwareTimer *timer10;
 extern HardwareTimer *timer1;
 
 extern void Timer_Setup(void);
+extern void set_Interrupt_Priority(void);
 
 
 
