@@ -80,9 +80,6 @@ void loop() {
             displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
-    // Distanz_Messung_Sensoren();
-    // digitalWrite(LED_RED, LOW);
-    // printDistanzSensoren();
 
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);

@@ -9,6 +9,7 @@ void Systick_Interrupt() {
   //Encoder Values lese;
 
   Distanz_Messung_Sensoren();
+  printDistanzSensoren();
 
   //Regelungssysteme;
 
