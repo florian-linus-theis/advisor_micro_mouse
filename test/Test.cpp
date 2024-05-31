@@ -166,5 +166,5 @@ void Motor_Fehler(){
   Serial.print("Motor-Fehler aufgetreten, Maus abgeschalten");
   digitalWrite(MOTOR_ENABLE, LOW);
   digitalWrite(POWER_ENABLE, LOW);
-  digitalWrite(LED_RED, HIGH);
+  digitalWrite(LED_RED, LOW);           // LOW == Einschalten
 }

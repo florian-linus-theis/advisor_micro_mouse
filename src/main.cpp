@@ -24,12 +24,14 @@ void setup() {
     Timer_Setup();
     ADC_Setup();
     maze_setup(); // setting up the maze file
+    set_Interrupt_Priority();
 
     // Setup Complete
     // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
 
     //Start Systick Timer
+    timer14->resume();
     
     //   Mid_Sensor_Setup();
     ble->println("test1");
@@ -42,25 +44,25 @@ void setup() {
 
 void loop() {
     // Check if the encoder was turned
-    if (encoderTurned) {
-        encoderTurned = false;
-        updateEncoderState(); 
-        displayOptions(static_cast<Mode>(selected_option), confirmationPending);
-    }
-    if (optionSelected) {
-        optionSelected = false;
-        if (confirmationPending) {
-            confirmationPending = false;
-            current_option = selected_option;
-            handleModeSelection(static_cast<Mode>(current_option));
-        } else {
-            confirmationPending = true;
-            displayOptions(static_cast<Mode>(selected_option), confirmationPending);
-        }
-    }
-    // Distanz_Messung_Sensoren();
+    // if (encoderTurned) {
+    //     encoderTurned = false;
+    //     updateEncoderState(); 
+    //     displayOptions(static_cast<Mode>(selected_option), confirmationPending);
+    // }
+    // if (optionSelected) {
+    //     optionSelected = false;
+    //     if (confirmationPending) {
+    //         confirmationPending = false;
+    //         current_option = selected_option;
+    //         handleModeSelection(static_cast<Mode>(current_option));
+    //     } else {
+    //         confirmationPending = true;
+    //         displayOptions(static_cast<Mode>(selected_option), confirmationPending);
+    //     }
+    // }
+    
     // digitalWrite(LED_RED, LOW);
-    // printDistanzSensoren();
+    
 
     // Sleep to reduce CPU usage (adjust as necessary)
     //delay(100);
