@@ -163,3 +163,5 @@ extern int selected_option;
 extern bool optionSelected;
 extern bool encoderTurned;
 extern bool confirmationPending;
+
+extern void Buzzer_beep(int, int);

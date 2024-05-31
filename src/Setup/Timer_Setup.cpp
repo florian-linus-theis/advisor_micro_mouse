@@ -25,11 +25,11 @@ void Timer1_Setup();
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
 
-   Systick_Setup();
+   //Systick_Setup();
 
 //Motor Timers
-    Timer3_Setup(); //PWM Timer Left        //TO-DO
-    Timer4_Setup(); //PWM Timer Right       //TO-DO
+    //Timer3_Setup(); //PWM Timer Left        //TO-DO
+    //Timer4_Setup(); //PWM Timer Right       //TO-DO
     // Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
     // Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
 
@@ -38,7 +38,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     
 
 //Servo1 PWM Timer
-    //Timer10_Setup();                        //TO-DO
+    Timer10_Setup();                        //TO-DO
 
 //Buzzer PWM Timer
     Timer1_Setup();                         //TO-DO
@@ -122,7 +122,7 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
 
 
 void Timer10_Setup() {      //Servo1 PWM TImer
-    timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
+    timer10->setMode(TIM_CHANNEL_ALL, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
     timer10->setPrescaleFactor(26); // Set prescaler to 26
     timer10->setOverflow(64615); // Set overflow to 64615
     timer10->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
@@ -132,5 +132,13 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 
 
 void Timer1_Setup() {       //Buzzer PWM TImer
-
+    timer1->setMode(4, TIMER_OUTPUT_COMPARE_PWM1, BUZZER);
+    timer1->setPrescaleFactor(84);    // Set prescaler so that 1 tick equals 1us
+    //freq = 1/T = 1/(Overflow*1us)
+    //Overflow = 1/(freq*1us) = 100000/freq
+    int freq = 2000;
+    timer1->setOverflow(1000000/freq);
+    timer1->setCaptureCompare(4, 0, PERCENT_COMPARE_FORMAT);
+    timer1->refresh();
+    timer1->pause();
 }

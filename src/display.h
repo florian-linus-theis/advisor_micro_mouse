@@ -131,6 +131,7 @@ void handleModeSelection(Mode mode) {
         case MODE_BFS:
             display_print("BFS Mode selected");
             delay(1000);
+            Buzzer_beep(2000, 4);
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
@@ -141,5 +142,19 @@ void handleModeSelection(Mode mode) {
         default:
             display_print("Invalid mode");
             break;
+    }
+}
+
+void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
+    int overflow = 1000000/freq;
+    timer1->setOverflow(overflow);
+    timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
+    timer1->refresh();
+
+    for(int i=0; i<beeps; i++) {
+        timer1->resume();
+        delay(100);
+        timer1->pause();
+        delay(100);
     }
 }

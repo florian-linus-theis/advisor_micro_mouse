@@ -32,7 +32,7 @@ void setup() {
     //Start Systick Timer
     
     //   Mid_Sensor_Setup();
-    // ble->println("test1");
+    ble->println("test1");
     // Timer2_Setup();
     // Timer3_Setup();
     // Timer4_Setup();
