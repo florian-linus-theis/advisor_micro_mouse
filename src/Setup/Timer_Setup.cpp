@@ -7,6 +7,7 @@ HardwareTimer *timer4 = new HardwareTimer(TIM4);
 HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer5 = new HardwareTimer(TIM5);
 HardwareTimer *timer6 = new HardwareTimer(TIM6);
+HardwareTimer *timer7 = new HardwareTimer(TIM7);
 HardwareTimer *timer10 = new HardwareTimer(TIM10);
 HardwareTimer *timer1 = new HardwareTimer(TIM1);
 
