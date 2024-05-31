@@ -124,6 +124,7 @@ void handleModeSelection(Mode mode) {
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
             delay(1000);
+            timer14->resume(); // starting systick timer
             robin_test();
             // Handle Map Maze Mode
             break;
