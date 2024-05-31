@@ -3,7 +3,7 @@
 #include <wiring.h>
 #include "HardwareTimer.h"
 #include "stm32f4xx_hal.h"
-#include <Setup.h>
+#include <Setup\Setup.h>
 #include <display.h>
 
 extern bool encoderTurned;

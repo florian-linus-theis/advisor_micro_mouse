@@ -1,12 +1,15 @@
 //Include Librarys
 #include "Arduino.h"
-#include "wiring.h"
-#include "iostream"
-#include "vector"
 #include "cmath"
+#include "vector"
+#include "string"
 #include "HardwareTimer.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
+#include "HardwareSerial.h"
+#include "iostream"
+#include "wiring.h"
+#include "Wire.h"
+#include "Adafruit_SSD1306.h"
+#include "Adafruit_GFX.h"
 
 
 //Pin Naming
@@ -82,14 +85,22 @@
 #define LED_BLUE        PC3
 
 
-//Function and Variable Initialisation - - - - - - - - - - - - - - - - - - - - -
+
+
+//Object, Function and Variable Declaration - - - - - - - - - - - - - - - - - - - - -
 //Pin_Setup
+extern SPIClass *imu;
+extern Adafruit_SSD1306 *display;
+extern HardwareSerial *ble;
+
 extern void Pin_Setup(void);
 extern void Set_Output(void);
 
 
+
 //Clock_Setup
-extern void Clock_Setup();
+extern void Clock_Setup(void);
+
 
 
 //Timer_Setup
@@ -105,6 +116,7 @@ extern HardwareTimer *timer1;
 extern void Timer_Setup(void);
 
 
+
 //Systick
 extern void Systick_Interrupt(void);
 
@@ -114,10 +126,6 @@ extern void Systick_Interrupt(void);
 extern void ADC_Setup(void);
 
 
-//User-Interface
-//Bluetooth
-extern HardwareSerial *ble;
-
 
 
 //Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -125,14 +133,32 @@ extern HardwareSerial *ble;
 extern void Timer6_Interrupt(void);
 
 extern void Distanz_Messung_Sensoren(void);
-
+extern void Distanz_Messung_Blind(void);
+extern void Distanz_Messung_Hell(void);
 extern void Distanz_Mid_Sensor(void);
 extern void printDistanzSensoren(void);
+
+extern int Channel_Emitter[];
+extern int Channel_Sensoren[];
+extern int Distance_Sensor[];
+extern int calibration_sensor[];
+
 extern int Distance_Sensor_Mid_MM;
+extern double Abs_Sensor_Calibration;
+
+extern int interrupt_counter;
+extern int Flag_Mid;
 
 
-//Motors
 
-
-//Move
-extern void Forward(int dutyCycle);
+//User-Interface (display.cpp)
+extern void handleModeSelection(void);
+extern void updateEncoderState(void);
+extern void display_print(std::string, int);
+extern void handleEncoderTurn(void);
+extern void handleEncoderButton(void);
+extern int current_option;
+extern int selected_option;
+extern bool optionSelected;
+extern bool encoderTurned;
+extern bool confirmationPending;
