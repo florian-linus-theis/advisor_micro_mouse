@@ -135,15 +135,3 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 void Timer1_Setup() {       //Buzzer PWM TImer
 
 }
-
-void Systick_Interrupt() {
-
-  //Alle Steuerungsfunktionen, Messungen und sonstige Regelsystem-Funktionen werden hier untergebracht
-
-  //Encoder Values lese;
-
-  //Distanz_Messung_Sensoren();
-
-  //Regelungssysteme;
-
-}
