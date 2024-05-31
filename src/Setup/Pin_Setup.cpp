@@ -2,6 +2,7 @@
 
 
 SPIClass *imu = nullptr;
+Adafruit_SSD1306 *display = nullptr;
 HardwareSerial *ble = nullptr;
 
 
@@ -89,6 +90,25 @@ void Pin_Setup(void) {  //Pinmode Declaration and Communication Port Initializat
 //OLED Display -> I2C #2
   pinMode(OLED_SCL, OUTPUT);
   pinMode(OLED_SCL, OUTPUT);
+  // Initialize the I2C bus for Display communication with wire library
+  Wire.setSCL(OLED_SCL);
+  Wire.setSDA(OLED_SDA);
+  Wire.begin();
+
+  // Define screen dimensions
+  #define SCREEN_WIDTH 128
+  #define SCREEN_HEIGHT 32
+  
+  // Initialize the OLED display using the Wire library -> I2C
+  display = new Adafruit_SSD1306(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);;
+
+  if (!display->begin(SSD1306_SWITCHCAPVCC, 0x3C)) {   // Address 0x3C for 128x32
+      Serial.println(F("SSD1306 allocation failed"));
+      for (;;); // Don't proceed, loop forever
+  }
+
+  // Clear the buffer
+  display->clearDisplay();
   
   
 
@@ -120,7 +140,11 @@ void Pin_Setup(void) {  //Pinmode Declaration and Communication Port Initializat
   pinMode(LED_GREEN, OUTPUT_OPEN_DRAIN);
   pinMode(LED_BLUE, OUTPUT_OPEN_DRAIN);
 
-  
+  attachInterrupt(digitalPinToInterrupt(UI_ENCODER_A), handleEncoderTurn, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(UI_ENCODER_B), handleEncoderTurn, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(UI_BUTTON), handleEncoderButton, FALLING);
+
+
 //Set normally HIGH Outputs
   Set_Output();
 }

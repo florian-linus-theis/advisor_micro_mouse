@@ -90,6 +90,7 @@
 //Object, Function and Variable Declaration - - - - - - - - - - - - - - - - - - - - -
 //Pin_Setup
 extern SPIClass *imu;
+extern Adafruit_SSD1306 *display;
 extern HardwareSerial *ble;
 
 extern void Pin_Setup(void);
@@ -153,7 +154,12 @@ extern int Flag_Mid;
 
 
 
-//User-Interface
+//User-Interface (display.cpp)
+extern void handleModeSelection(void);
+extern void updateEncoderState(void);
+extern void display_print(std::string, int);
+extern void handleEncoderTurn(void);
+extern void handleEncoderButton(void);
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;

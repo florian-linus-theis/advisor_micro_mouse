@@ -4,7 +4,6 @@
 //Include Librarys in Setup.h !!!
 
 #include "algorithms.h"
-#include "display.h"
 #include <robin.h>
 #include <ballgrabber.h>
 
@@ -20,14 +19,13 @@ bool confirmationPending = false;
 
 
 void setup() {
-    //Setup
     //Clock_Setup();  //not sure if working correctly!!!
     Pin_Setup();
     Timer_Setup();
     ADC_Setup();
     maze_setup(); // setting up the maze file
-    display_setup();
 
+    // Setup Complete
     // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
 
