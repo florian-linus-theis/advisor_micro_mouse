@@ -1,10 +1,7 @@
-#pragma once
-#include <Arduino.h>
-#include <wiring.h>
+
 #include "HardwareTimer.h"
 #include "stm32f4xx_hal.h"
 #include <Setup.h>
-#include <display.h>
 
 extern bool encoderTurned;
 
@@ -34,6 +31,7 @@ void printDistanzSensoren(void);
 void Mid_Sensor_Interrupt(void);
 void Mid_Sensor_Setup(void);
 void Distanz_Mid_Sensor(void);
+void robin_test(void);
 
 // void Timer3_Setup(void);
 // void Timer4_Setup(void);

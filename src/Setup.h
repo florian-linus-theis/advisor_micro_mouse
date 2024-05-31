@@ -127,6 +127,10 @@ extern HardwareSerial *ble;
 extern void Timer6_Interrupt(void);
 extern void Timer7_Interrupt(void);
 
+extern void Timer2_Setup(void);
+extern void Timer5_Setup(void);
+extern void robin_test(void);
+
 extern void Distanz_Messung_Sensoren(void);
 
 extern void Distanz_Mid_Sensor(void);
