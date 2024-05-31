@@ -1,16 +1,15 @@
 #include "Setup.h"
 
-//unused Timers 8,9,11,12,13
-HardwareTimer *timer14 = new HardwareTimer(TIM14);
-HardwareTimer *timer3 = new HardwareTimer(TIM3);
-HardwareTimer *timer4 = new HardwareTimer(TIM4);
-HardwareTimer *timer2 = new HardwareTimer(TIM2);
-HardwareTimer *timer5 = new HardwareTimer(TIM5);
-HardwareTimer *timer6 = new HardwareTimer(TIM6);
+//unused Timers 7,8,9,11,12,13
+HardwareTimer *timer1 = new HardwareTimer(TIM1);        //Buzzer PWM
+HardwareTimer *timer2 = new HardwareTimer(TIM2);        //Encoder LEFT
+HardwareTimer *timer3 = new HardwareTimer(TIM3);        //Motor PWM LEFT
+HardwareTimer *timer4 = new HardwareTimer(TIM4);        //Motor PWM RIGHT
+HardwareTimer *timer5 = new HardwareTimer(TIM5);        //Motor Encoder Rechts
+HardwareTimer *timer6 = new HardwareTimer(TIM6);        //Sensor Messung
 HardwareTimer *timer7 = new HardwareTimer(TIM7);
-HardwareTimer *timer10 = new HardwareTimer(TIM10);
-HardwareTimer *timer1 = new HardwareTimer(TIM1);
-
+HardwareTimer *timer10 = new HardwareTimer(TIM10);      //Servo1 PWM 
+HardwareTimer *timer14 = new HardwareTimer(TIM14);      //Systick_Interrupt
 
 
 void Systick_Setup();
@@ -39,10 +38,10 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     //Timer7_Setup(); //Mid Sensor Interrupt Timer
 
 //Servo1 PWM Timer
-    //Timer10_Setup();                        //TO-DO
+    //Timer10_Setup();  //Servo1 PWM                      //TO-DO
 
 //Buzzer PWM Timer
-    Timer1_Setup();                         //TO-DO
+    //Timer1_Setup();                         //TO-DO
 }
 
 
