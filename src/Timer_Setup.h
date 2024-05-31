@@ -123,5 +123,13 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 
 
 void Timer1_Setup() {       //Buzzer PWM TImer
-
+    timer1->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, BUZZER);
+    timer1->setPrescaleFactor(4200);    // Set prescaler so that 1 tick equals 1us
+    //freq = 1/T = 1/(Overflow*1us)
+    //Overflow = 1/(freq*1us) = 100000/freq
+    int freq = 2000;
+    timer1->setOverflow(1000/freq);
+    timer1->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
+    timer1->refresh();
+    timer1->pause();
 }

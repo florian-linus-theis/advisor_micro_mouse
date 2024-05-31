@@ -186,3 +186,18 @@ void display_setup() {
     // Display the initial options
     displayOptions(static_cast<Mode>(current_option), false);
 }
+
+
+void Buzzer_beep(u_int8_t freq, u_int8_t beeps) {  //Frequency and Number of beeps
+    int overflow = 1000/freq;
+    timer1->setOverflow(overflow);
+    timer1->setCaptureCompare(1, overflow/2, PERCENT_COMPARE_FORMAT);
+    timer1->refresh();
+
+    for(int i=0; i<beeps; i++) {
+        timer1->resume();
+        delay(200);
+        timer1->pause();
+        delay(200);
+    }
+}
