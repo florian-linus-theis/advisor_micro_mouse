@@ -1,9 +1,10 @@
-#include "Setup\Setup.h"
+#include "Setup.h"
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS, IR_EMITTER_MID};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS, IR_SENSOR_MID};
 int Distance_Sensor[7] = {};
-int calibration_sensor[7] = {165,185,181 ,174,238,161, 0};
+int calibration_sensor[7] = {165,185,181 ,174,238,161, 0};    //Kalibierung fehlt
+bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
 double Abs_Sensor_Calibration;
@@ -25,6 +26,15 @@ void Distanz_Messung_Blind(void){
 void Distanz_Messung_Sensoren(void){
   Distanz_Messung_Blind();
   Distanz_Messung_Hell();
+
+  for(int i = 0; i < 7; i++){
+    if (Distance_Sensor[i] > 0){
+      Distance_Sensor[i] = 'flase';       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
+    }
+    else{
+      Distance_Sensor[i] = 'true';
+    }
+  }
 }
 
 
@@ -64,12 +74,10 @@ void Timer6_Interrupt(void) {
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 void printDistanzSensoren(void) {
   ble->println("Messung_Hell Messwerte:");
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 7; i++) {
     ble->print("Sensor ");
     ble->print(i);
     ble->print(": ");
     ble->println(Distance_Sensor[i]);
   }
-  ble->print("Distanz_Sensor Mitte:");
-  ble->println(Distance_Sensor_Mid_MM);
 }
