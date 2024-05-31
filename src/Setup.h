@@ -99,7 +99,6 @@ extern HardwareTimer *timer4;
 extern HardwareTimer *timer2;
 extern HardwareTimer *timer5;
 extern HardwareTimer *timer6;
-extern HardwareTimer *timer7;
 extern HardwareTimer *timer10;
 extern HardwareTimer *timer1;
 
@@ -125,7 +124,6 @@ extern HardwareSerial *ble;
 //Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //Sensors
 extern void Timer6_Interrupt(void);
-extern void Timer7_Interrupt(void);
 
 extern void Distanz_Messung_Sensoren(void);
 
