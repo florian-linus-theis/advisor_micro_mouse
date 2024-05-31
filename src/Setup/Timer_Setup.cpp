@@ -122,7 +122,7 @@ void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
 
 
 void Timer10_Setup() {      //Servo1 PWM TImer
-    timer10->setMode(TIM_CHANNEL_ALL, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1);
+    // timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1); -- broken as fuck
     timer10->setPrescaleFactor(26); // Set prescaler to 26
     timer10->setOverflow(64615); // Set overflow to 64615
     timer10->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);

@@ -33,8 +33,9 @@ void writeServo(int angle) {
     }
 
     // Update the PWM duty cycle
-    timer10->setCaptureCompare(TIM_CHANNEL_ALL, decimal, TICK_COMPARE_FORMAT);
+    timer10->setCaptureCompare(1, decimal, TICK_COMPARE_FORMAT);
     timer10->refresh();
+    timer10->resume();
 }
 
 

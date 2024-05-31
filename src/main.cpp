@@ -19,7 +19,7 @@ bool confirmationPending = false;
 
 
 void setup() {
-    //Clock_Setup();  //not sure if working correctly!!!
+    //Clock_Setup();  //not sure if working correctly!!! ARSCH NICHT REINMACHEN
     Pin_Setup();
     Timer_Setup();
     ADC_Setup();
