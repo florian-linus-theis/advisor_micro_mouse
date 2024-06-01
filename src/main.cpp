@@ -44,26 +44,20 @@ void setup() {
 
 void loop() {
     // Check if the encoder was turned
-    // if (encoderTurned) {
-    //     encoderTurned = false;
-    //     updateEncoderState(); 
-    //     displayOptions(static_cast<Mode>(selected_option), confirmationPending);
-    // }
-    // if (optionSelected) {
-    //     optionSelected = false;
-    //     if (confirmationPending) {
-    //         confirmationPending = false;
-    //         current_option = selected_option;
-    //         handleModeSelection(static_cast<Mode>(current_option));
-    //     } else {
-    //         confirmationPending = true;
-    //         displayOptions(static_cast<Mode>(selected_option), confirmationPending);
-    //     }
-    // }
-    
-    // digitalWrite(LED_RED, LOW);
-    
-
-    // Sleep to reduce CPU usage (adjust as necessary)
-    //delay(100);
+    if (encoderTurned) {
+        encoderTurned = false;
+        updateEncoderState(); 
+        displayOptions(static_cast<Mode>(selected_option), confirmationPending);
+    }
+    if (optionSelected) {
+        optionSelected = false;
+        if (confirmationPending) {
+            confirmationPending = false;
+            current_option = selected_option;
+            handleModeSelection(static_cast<Mode>(current_option));
+        } else {
+            confirmationPending = true;
+            displayOptions(static_cast<Mode>(selected_option), confirmationPending);
+        }
+    }
 }
