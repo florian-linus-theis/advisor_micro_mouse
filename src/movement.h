@@ -3,6 +3,7 @@
 #include <cmath> // abs()
 #include <vector>
 #include <robin.h>
+#include "Setup\Setup.h"
 
 #define DUTY_SLOW 20
 #define DUTY_SLOW_ROTATION 10
@@ -25,7 +26,7 @@ int encoder_L = 0;
 int encoder_R = 0;
 
 // tick variables: [distance / (2,2cm * pi)] * 5 * 2048 Ticks
-int tick_forward = 26668;
+int tick_forward = 26668 * 2;
 int tick_start = 6889;
 int tick_rotate = 7460;
 int tick_accelerate = 13355;
@@ -75,21 +76,30 @@ void move_actual(int duty_cycle){
 
 // Middle layer function to move forwards
 // Stay in this function until we have reached a multiple of one tick forward (square center to square center)
-void move_forward_low_level(int duty_cycle, float squares = 1.0){
-    int desired_distance = round(squares * tick_forward);
+void move_forward_middle_level(int duty_cycle, float squares = 1.0){
+    int desired_distance = static_cast<int>(round(squares * tick_forward));
 
     // Until we have reached the desired distance, keep moving at given duty cycle
+    ble->println("Moving forward");
+    ble->println(desired_distance);
+    ble->println(avg_distance_traveled);
+    move_actual(duty_cycle);
+    encoder_L = 0; 
+    encoder_R = 0;
     while (avg_distance_traveled < desired_distance){
-        move_actual(duty_cycle);
+        delay(1); // TODO: improve this
     }
+    ble->println("Reached destination");
+    ble->print("Avg distance traveled to this point: ");
+    ble->println(avg_distance_traveled);
 
     // stops to scan when mapping
-    if (duty_cycle == DUTY_SLOW){
-        duty_cycle = 0;
-        move_actual(duty_cycle);
-        scan_walls();
-    }
-    reset_distance_traveled();
+    // if (duty_cycle == DUTY_SLOW){
+    //     duty_cycle = 0;
+    //     move_actual(duty_cycle);
+    //     scan_walls();
+    // }
+    // reset_distance_traveled();
 }
 
 // mapping movement

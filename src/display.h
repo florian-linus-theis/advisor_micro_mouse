@@ -1,5 +1,5 @@
 #pragma once
-#include <Setup\Setup.h>
+#include "Setup\Setup.h"
 #include <robin.h>
 #include <ballgrabber.h>
 
@@ -112,9 +112,13 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
+            timer14->resume(); // starting systick timer
             delay(1000);
-            handle_ballgrabber(); // Function to handle the ball grabber 
-            // Handle Soft Reset Mode
+            // ForwardBoth(10);
+            move_forward_middle_level(10, 1);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            delay(1000);
+            //timer14->pause(); // stopping systick timer
             break;
         case MODE_SHOW_DATA:
             // display_print("Data Mode selected");
@@ -127,9 +131,14 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
-            //timer14->resume(); // starting systick timer
-            robin_test();
+            // timer14->resume(); // starting systick timer
+            move_forward_middle_level(15, 2);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            timer14->pause(); // stopping systick timer
+            delay(200);
+            // ble->println(avg_distance_traveled);
             // Handle Map Maze Mode
             break;
         case MODE_BFS:

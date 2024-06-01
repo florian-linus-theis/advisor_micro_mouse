@@ -124,7 +124,17 @@ extern void set_Interrupt_Priority(void);
 
 //Systick
 extern void Systick_Interrupt(void);
+extern int Systick_Counter;
+// Global variables updated during systick 
+extern int encoder_right_total; 
+extern int encoder_left_total;
+extern int distance_traveled_L; // TODO: evtl float
+extern int distance_traveled_R; // TODO: evtl float
+extern int avg_distance_traveled; // TODO: evtl float
 
+
+// Drive Motors
+extern void move_forward_middle_level(int, float);
 
 
 //ADC_Setup
