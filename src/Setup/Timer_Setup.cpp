@@ -210,6 +210,10 @@ void Timer1_Setup() {       //Buzzer PWM TImer
     timer1->pause();
 }
 
+
+
+// ----------------------------------------------------------------
+// Interrupt Priorities 
 void setInterruptPriority(IRQn_Type irq, uint32_t preemptPriority, uint32_t subPriority) {
     HAL_NVIC_SetPriority(irq, preemptPriority, subPriority);
 }
