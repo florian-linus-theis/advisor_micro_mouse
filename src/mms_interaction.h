@@ -6,6 +6,7 @@
 #include <ballgrabber.h>
 #include "display.h"
 #include <movement.h>
+#include "Setup\Setup.h"
 
 
 // For tracking current global direction
@@ -69,7 +70,7 @@ void move_forward(int squares = 1) {
     if (current_option == MODE_BFS || current_option == MODE_ASTAR) {
         duty_cycle = DUTY_FAST;
     }
-    move_forward_low_level(duty_cycle, squares);  // Move forward in maze
+    move_forward_middle_level(duty_cycle, squares);  // Move forward in maze
     update_position();  // Update current position
 }
 

@@ -26,7 +26,7 @@ void setup() {
     maze_setup(); // setting up the maze file
     set_Interrupt_Priority();
 
-    //Start Systick Timer
+    //Start Systick Timer (manually enable when in drive mode to speed up rest)
     timer14->resume();
 
     // Setup Complete

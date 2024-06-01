@@ -65,8 +65,8 @@ void robin_test() {
             encoderTurned = false;
             break;
         }
-        BackwardBoth(10);
-        delay(1000);
+        // BackwardBoth(10);
+        // delay(1000);
         if (encoderTurned) {
             encoderTurned = false;
             break;
