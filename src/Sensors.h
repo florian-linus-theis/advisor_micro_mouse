@@ -1,4 +1,5 @@
-#include "Setup.h"
+#pragma once
+#include "Setup\Setup.h"
 
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS, IR_EMITTER_MID};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS, IR_SENSOR_MID};
@@ -29,10 +30,10 @@ void Distanz_Messung_Sensoren(void){
 
   for(int i = 0; i < 7; i++){
     if (Distance_Sensor[i] > 0){
-      Distance_Sensor[i] = 'flase';       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
+      Walls_Flag[i] = false;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
     }
     else{
-      Distance_Sensor[i] = 'true';
+      Walls_Flag[i] = true;
     }
   }
 }

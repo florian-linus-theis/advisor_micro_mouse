@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "Setup/Setup.h"
 
 //unused Timers 8,9,11,12,13
 HardwareTimer *timer14 = new HardwareTimer(TIM14);
@@ -28,8 +28,8 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
    //Systick_Setup();
 
 //Motor Timers
-    //Timer3_Setup(); //PWM Timer Left        //TO-DO
-    //Timer4_Setup(); //PWM Timer Right       //TO-DO
+    Timer3_Setup(); //PWM Timer Left        //TO-DO
+    Timer4_Setup(); //PWM Timer Right       //TO-DO
     // Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
     // Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
 

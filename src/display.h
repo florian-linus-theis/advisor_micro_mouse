@@ -124,7 +124,7 @@ void handleModeSelection(Mode mode) {
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
             delay(1000);
-            timer14->resume(); // starting systick timer
+            //timer14->resume(); // starting systick timer
             robin_test();
             // Handle Map Maze Mode
             break;
@@ -137,6 +137,7 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected");
             delay(1000);
+            alex_test();
             // Handle A* Mode
             break;
         default:

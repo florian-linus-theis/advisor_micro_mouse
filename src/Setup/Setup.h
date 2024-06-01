@@ -10,6 +10,8 @@
 #include "Wire.h"
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
+//#include "Sensors.h"
+#include "PID_Klasse.h"
 
 
 //Pin Naming
