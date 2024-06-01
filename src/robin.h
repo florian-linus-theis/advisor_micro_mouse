@@ -3,7 +3,7 @@
 #include <wiring.h>
 #include "HardwareTimer.h"
 #include "stm32f4xx_hal.h"
-#include <Setup.h>
+#include <Setup\Setup.h>
 #include <display.h>
 
 extern bool encoderTurned;
@@ -29,7 +29,6 @@ HardwareSerial Serial1(BLUETOOTH_RX, BLUETOOTH_TX);
 void Distanz_Messung_Hell(void);
 void Sensor_Interrupt(void);
 void Sensor_Sync_Setup(void);
-void printDistanzSensoren(void);
 
 void Mid_Sensor_Interrupt(void);
 void Mid_Sensor_Setup(void);
@@ -82,17 +81,18 @@ void BackwardBoth(int dutyCycle) {
 
 
 void robin_test() {
-    while(1) {
+    digitalWrite(MOTOR_ENABLE, LOW); // turn motors on (if not already on) 
+    for(int i = 0; i < 2; i++){
         // Wait for the encoder to be turned
         digitalWrite(MOTOR_ENABLE, LOW);
         ForwardBoth(10);
-        delay(3000);
+        delay(1000);
         if (encoderTurned) {
             encoderTurned = false;
             break;
         }
         BackwardBoth(10);
-        delay(3000);
+        delay(1000);
         if (encoderTurned) {
             encoderTurned = false;
             break;
@@ -100,7 +100,28 @@ void robin_test() {
     }
     // Stop the motors
     digitalWrite(MOTOR_ENABLE, HIGH);
-        // Other sensor or distance measuring code
+}
+
+
+
+void test_encoders(){
+    display->clearDisplay();
+    display->println("Testing Encoders2");
+    for (int i = 0; i < 10; i++) {
+        // display->clearDisplay();
+        display->clearDisplay();
+        int encoder_right = TIM5->CNT;
+        int encoder_left = TIM2->CNT;
+        ble->print("Encoder Right: ");
+        ble->println(encoder_right);
+        ble->print("Encoder Left: ");
+        ble->println(encoder_left);
+        display->print("Encoder R: ");
+        display->println(encoder_right);
+        display->print("Encoder L: ");
+        display->println(encoder_left); 
+        delay(1000);
+    }
 }
 
 

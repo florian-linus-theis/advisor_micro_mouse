@@ -1,19 +1,7 @@
-#pragma once 
-#include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <string>
+#pragma once
+#include <Setup\Setup.h>
 #include <robin.h>
-#include <Setup.h>
 #include <ballgrabber.h>
-
-
-// Define screen dimensions
-#define SCREEN_WIDTH 128
-#define SCREEN_HEIGHT 32
-
-// Initialize the OLED display using the Wire library -> I2C
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 // Define an enum for all modes
@@ -27,16 +15,10 @@ enum Mode {
     MODE_MAX // This can be used to determine the number of modes
 };
 
-// declaring Global variables from main file 
-extern int current_option;
-extern int selected_option;
-extern bool optionSelected;
-extern bool encoderTurned;
-extern bool confirmationPending;
-
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
+
 
 // Functions
 // Interrupt Service Routine (ISR) for rotary encoder turn
@@ -51,10 +33,12 @@ void handleEncoderTurn() {
     }
 }
 
+
 // Interrupt Service Routine (ISR) for rotary encoder button press
 void handleEncoderButton() {
     optionSelected = true;
 }
+
 
 // Update the encoder state
 void updateEncoderState() {
@@ -70,53 +54,56 @@ void updateEncoderState() {
     }
 }
 
+
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
     const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(SSD1306_WHITE);
-    display.setRotation(2); 
-    display.display();
+    display->clearDisplay();
+    display->setTextSize(1);
+    display->setTextColor(SSD1306_WHITE);
+    display->setRotation(2); 
+    display->display();
 
-    display.setCursor(0, 0);
+    display->setCursor(0, 0);
     if (confirmation) {
-        display.println("Press to Confirm:");
+        display->println("Press to Confirm:");
     } else {
-        display.println("Available Modes:");
+        display->println("Available Modes:");
     }
 
     for (int i = 0; i < numOptions; ++i) {
         if (i == currentMode) {
-            display.print(" >");
+            display->print(" >");
         } else {
-            display.print(" ");
+            display->print(" ");
         }
-        display.print(options[i]);
-        display.print(" ");
+        display->print(options[i]);
+        display->print(" ");
         if (i == 2) {
-            display.println();
+            display->println();
         }
     }
     // Display the buffer on the screen
-    display.display();
+    display->display();
 }
 
+
 void display_print(std::string text, int text_size = 1){
-    display.clearDisplay();
-    display.setTextSize(text_size);
-    display.setTextColor(SSD1306_WHITE);
-    display.setCursor(0, 0);
-    display.println(text.c_str());
-    display.display();
+    display->clearDisplay();
+    display->setTextSize(text_size);
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(0, 0);
+    display->println(text.c_str());
+    display->display();
 }
+
 
 // Function to handle the selected mode
 void handleModeSelection(Mode mode) {
-    display.clearDisplay();
+    display->clearDisplay();
     switch (mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
@@ -130,24 +117,55 @@ void handleModeSelection(Mode mode) {
             // Handle Soft Reset Mode
             break;
         case MODE_SHOW_DATA:
-            display_print("Data Mode selected");
-            delay(1000);
+            // display_print("Data Mode selected");
+            // // delay(1000);
+            // display_print("Testing Encoders"); 
+            display->clearDisplay();
+            display->println("Test");
+            test_encoders();
             // Handle Hard Reset Mode
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
             delay(1000);
+            timer14->resume(); // starting systick timer
             robin_test();
             // Handle Map Maze Mode
             break;
         case MODE_BFS:
             display_print("BFS Mode selected");
             delay(1000);
+            Buzzer_beep(2000, 4);
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
             display_print("A* Mode selected");
+            digitalWrite(SERVO_ENABLE, LOW);
+
+            // Code doesnt work YET
+            // Timer4_Setup_Motor(); 
+            ble->println("motor setup done");
+            // delay(2000);
+            robin_test();
+            delay(500);
+            ble->println("robin test done");
+            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            Timer4_Setup_Servo();
+            digitalWrite(SERVO_ENABLE, HIGH);
+            delay(500); // delay to allow the user to read the message
+            ble->println("servo setup done");
+            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
+            // timer4->refresh();
             delay(1000);
+            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
+            // delay(2000);
+            delay(750);
+            digitalWrite(SERVO_ENABLE, LOW);
+            ble->println("ballgrabber done");
+            Timer4_Setup_Motor();
+            // // delay(1000);
+            ble->println("motor setup done");
+            robin_test();
             // Handle A* Mode
             break;
         default:
@@ -156,48 +174,16 @@ void handleModeSelection(Mode mode) {
     }
 }
 
-void display_setup() {
-    // Initialize serial communication
-    Serial.begin(9600);
-
-    // So that Mouse does not turn off
-    pinMode(PC10, OUTPUT);
-    digitalWrite(PC10, HIGH);
-
-    // Initialize the I2C bus for Display communication with wire library
-    Wire.setSCL(OLED_SCL);
-    Wire.setSDA(OLED_SDA);
-    Wire.begin();
-
-    // Initialize the OLED display
-    if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) { // Address 0x3C for 128x32
-        Serial.println(F("SSD1306 allocation failed"));
-        for (;;); // Don't proceed, loop forever
-    }
-
-    // Clear the buffer
-    display.clearDisplay();
-
-    // Attach interrupts
-    attachInterrupt(digitalPinToInterrupt(UI_ENCODER_A), handleEncoderTurn, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(UI_ENCODER_B), handleEncoderTurn, CHANGE);
-    attachInterrupt(digitalPinToInterrupt(UI_BUTTON), handleEncoderButton, FALLING);
-
-    // Display the initial options
-    displayOptions(static_cast<Mode>(current_option), false);
-}
-
-
-void Buzzer_beep(u_int8_t freq, u_int8_t beeps) {  //Frequency and Number of beeps
-    int overflow = 1000/freq;
+void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
+    int overflow = 1000000/freq;
     timer1->setOverflow(overflow);
-    timer1->setCaptureCompare(1, overflow/2, PERCENT_COMPARE_FORMAT);
+    timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
     timer1->refresh();
 
     for(int i=0; i<beeps; i++) {
         timer1->resume();
-        delay(200);
+        delay(100);
         timer1->pause();
-        delay(200);
+        delay(100);
     }
 }

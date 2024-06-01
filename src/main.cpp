@@ -1,25 +1,13 @@
-//#pragma once
 //Include Header Files
-#include "Setup.h"
+#include "Setup\Setup.h"
 
-//Include C-Files
+//Include Librarys in Setup.h !!!
+
 #include "algorithms.h"
-#include "display.h"
 #include <robin.h>
 #include <ballgrabber.h>
-#include <Clock_Setup.h>
-
-//Library-Include in Setup.h Header File
 
 
-// put external variable declarations here:
-/*
-extern int current_option;
-extern int selected_option;
-extern bool optionSelected;
-extern bool encoderTurned;
-extern bool confirmationPending;
-*/
 
 // Global variables 
 int current_option = MODE_STANDBY;
@@ -30,31 +18,23 @@ bool confirmationPending = false;
 
 
 
-// put function declarations in Header Files
-
-
-
-
 void setup() {
-    //Setup  
+    //Clock_Setup();  //not sure if working correctly!!! ARSCH NICHT REINMACHEN
     Pin_Setup();
-    Clock_Setup();
     Timer_Setup();
-    // ADC_Setup();
+    ADC_Setup();
     maze_setup(); // setting up the maze file
-    display_setup();
+    set_Interrupt_Priority();
 
+    // Setup Complete
     // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
 
     //Start Systick Timer
     timer14->resume();
-  
-  // Robin's Code
-//   Sensor_Sync_Setup();
-    analogReadResolution(12);
-//   Mid_Sensor_Setup();
-    // ble->println("test1");
+    
+    //   Mid_Sensor_Setup();
+    ble->println("test1");
     // Timer2_Setup();
     // Timer3_Setup();
     // Timer4_Setup();
@@ -80,7 +60,4 @@ void loop() {
             displayOptions(static_cast<Mode>(selected_option), confirmationPending);
         }
     }
-
-    // Sleep to reduce CPU usage (adjust as necessary)
-    //delay(100);
 }
