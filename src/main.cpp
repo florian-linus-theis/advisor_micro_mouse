@@ -1,4 +1,5 @@
 //Include Header Files
+//#pragma once
 #include "Setup\Setup.h"
 
 //Include Librarys in Setup.h !!!

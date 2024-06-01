@@ -1,9 +1,6 @@
-#include <vector>
-#include <iostream>
-#include <stdlib.h>
+#pragma once
+#include "Setup\Setup.h"
 using namespace std;
-
-vector<double> SensorInput;
 
 class PID
 {
@@ -11,50 +8,51 @@ class PID
         vector<double> errorVec{0,0,0,0,0,0}, tempOut{0,0,0,0,0,0}, previousErrorVec{0,0,0}, errorDivideVec{0,0,0}, OutputWeight{1,1,1};
         double kp, ki, kd, dt;
         double last_time=0;
-        double integral, output_G = 0;
-        double setpoint = 255;
-        double accepted_error;
-        double rotation_output, x_output, y_output;
-        double out_L, out_R;
-        double rotation_error, x_error, y_error;
+        int integral, output_G = 0;
+        int setpoint = 255;
+        int accepted_error;
+        signed int rotation_output, x_output, y_output;
+        signed int out_L, out_R;
+        signed int rotation_error, x_error, y_error;
 
         //Wertebereiche Sensor-Input.
         //Zuordnung: Outer_Left, Inner_Left, Front_Left, Front_Right, Inner_Right, Outer_Right
-        vector<int> upperBoundarys{0,0,0,0,0,0};
-        vector<int> lowerBoundarys{1024,1024,1024,1024,1024,1024};
-        vector<double> NeutralSensorValues{4.12 , 4.47 , 5.27 , 5.27 , 4.47 , 4.12 };
+        std::vector<int> upperBoundarys{0,0,0,0,0,0};
+        std::vector<int> lowerBoundarys{1024,1024,1024,1024,1024,1024};
+        std::vector<int> NeutralSensorValues = {100,100,100,100,100,100,100};
 
     public:
-        PID(double kp=0.8, double ki=1.0, double kd=0.0001, double dt=1.0){
+        PID(double kp=0.8, double ki=1.0, double kd=0.0001){
             this->kp = kp;
             this->ki = ki;
             this->kd = kd;
-            this->dt = dt;
         }
 
         double applyPID(double previous, double error)
         {
+            double now = millis();
+            dt = (now - last_time) / 1000;
+            last_time = now;
+
             double proportional = error;
             integral += error * dt;
             double derivative = (error - previous) / dt;
-            previous = error;
             double output = (kp * proportional) + (ki * integral) + (kd * derivative);
             return output;
         }
 
-        vector<double> calcErrors(vector<double> SensorInput, vector<bool> walls){
+        vector<int> calcErrors(int *SensorInput, vector<bool> walls){
             //error-Werte für jeden Sensor berechnen
             for(int i=0; i<6; i++){
                 errorVec[i] = SensorInput[i]-NeutralSensorValues[i];
-                cout << errorVec[i] << endl;
             }
 
             //walls[0] = Wand links, Wall[1] = Wand vorne, Walls[2] = Wand rechts
             //True = Wand erkannt, False = Keine Wand erkannt
 
             if(walls[0]==true){
-                rotation_error = (errorVec[0]-errorVec[1]);
-                x_error += errorVec[1] + errorVec[0];
+                rotation_error = (errorVec[0]+errorVec[1]);
+                x_error += -errorVec[1] - errorVec[0];
                 y_error += 0;
 
                 errorDivideVec[0] += 2; //Anzahl der Sensoren, die Signal beitragen zählen --> Später zum Durchschnitt bilden benötigt
@@ -63,9 +61,9 @@ class PID
             }
 
             if(walls[1] == true){
-                rotation_error += (errorVec[2]-errorVec[3]);
+                rotation_error += (-errorVec[2]+errorVec[3]);
                 x_error += 0;
-                y_error += (errorVec[2]+errorVec[3]);
+                y_error += (-errorVec[2]-errorVec[3]);
 
                 errorDivideVec[0] += 2;
                 errorDivideVec[1] += 0;
@@ -73,8 +71,8 @@ class PID
             }
 
             if(walls[2] == true){
-                rotation_error += (errorVec[4]-errorVec[5]);
-                x_error += -errorVec[4] - errorVec[5];
+                rotation_error += (-errorVec[4]-errorVec[5]);
+                x_error += errorVec[4] + errorVec[5];
                 y_error += 0;
 
                 errorDivideVec[0] += 2;
@@ -96,15 +94,14 @@ class PID
             } else {
                 y_error = y_error/(errorDivideVec[2]);
             }
-            cout << rotation_error << " -- " << x_error << " -- " << y_error << endl;
 
             return {rotation_error,x_error,y_error};
         }
 
 
-        vector<double> calcOutput(vector<double> SensorInput, vector<bool> walls){
+        vector<int> calcOutput(int *SensorInput, vector<bool> walls){
             //Error-Werte berechnen lassen
-            vector<double> ErrorInputVec = calcErrors(SensorInput, walls);
+            vector<int> ErrorInputVec = calcErrors(SensorInput, walls);
 
             //Checken ob ein Rotation_error mit den ggb. Daten ausrechenbar ist
             if(walls[0] == true || walls[1] == true || walls[2] == true){
@@ -139,7 +136,9 @@ class PID
             out_L = -OutputWeight[0]*rotation_output + OutputWeight[0]*x_output + OutputWeight[2]*y_output;
             out_R = OutputWeight[0]*rotation_output - OutputWeight[0]*x_output + OutputWeight[2]*y_output;
 
-            return {out_L,out_R};
+            vector<int> out_G{out_L, out_R};
+
+            return out_G;
         }
 };
 
