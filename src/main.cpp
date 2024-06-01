@@ -19,26 +19,21 @@ bool confirmationPending = false;
 
 
 void setup() {
-    //Clock_Setup();  //not sure if working correctly!!! ARSCH NICHT REINMACHEN
     Pin_Setup();
     Timer_Setup();
     ADC_Setup();
     maze_setup(); // setting up the maze file
     set_Interrupt_Priority();
 
+    //Start Systick Timer
+    timer14->resume();
+
     // Setup Complete
     // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
 
-    //Start Systick Timer
-    timer14->resume();
-    
-    //   Mid_Sensor_Setup();
-    ble->println("test1");
-    // Timer2_Setup();
-    // Timer3_Setup();
-    // Timer4_Setup();
-    // ble->println("test2");
+    // Test Bluetooth
+    ble->println("test bluetooth");
 }
 
 
