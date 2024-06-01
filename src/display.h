@@ -117,8 +117,12 @@ void handleModeSelection(Mode mode) {
             // Handle Soft Reset Mode
             break;
         case MODE_SHOW_DATA:
-            display_print("Data Mode selected");
-            delay(1000);
+            // display_print("Data Mode selected");
+            // // delay(1000);
+            // display_print("Testing Encoders"); 
+            display->clearDisplay();
+            display->println("Test");
+            test_encoders();
             // Handle Hard Reset Mode
             break;
         case MODE_MAP_MAZE:
@@ -136,8 +140,32 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_ASTAR:
             display_print("A* Mode selected");
+            digitalWrite(SERVO_ENABLE, LOW);
+
+            // Code doesnt work YET
+            // Timer4_Setup_Motor(); 
+            ble->println("motor setup done");
+            // delay(2000);
+            robin_test();
+            delay(500);
+            ble->println("robin test done");
+            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            Timer4_Setup_Servo();
+            digitalWrite(SERVO_ENABLE, HIGH);
+            delay(500); // delay to allow the user to read the message
+            ble->println("servo setup done");
+            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
+            // timer4->refresh();
             delay(1000);
-            alex_test();
+            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
+            // delay(2000);
+            delay(750);
+            digitalWrite(SERVO_ENABLE, LOW);
+            ble->println("ballgrabber done");
+            Timer4_Setup_Motor();
+            // // delay(1000);
+            ble->println("motor setup done");
+            robin_test();
             // Handle A* Mode
             break;
         default:

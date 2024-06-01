@@ -1,20 +1,19 @@
 #pragma once
 #include <Setup\Setup.h>
 
-// const int minPulseWidth = 500;  // Minimum pulse width in microseconds
-// const int maxPulseWidth = 2500; // Maximum pulse width in microseconds
-// const int servoFrequency = 50;  // Servo PWM frequency in Hz
+// Für Servo 
+#define TIMER_FREQUENCY 142000000 // 168 MHz
+
+// Servo pulse widths (in microseconds)
+const uint16_t PULSE_WIDTH_0 = 500; // 0.5 ms
+const uint16_t PULSE_WIDTH_90 = 1500; // 1.5 ms
+const uint16_t PULSE_WIDTH_180 = 1950; // ~2 ms (not exactly 180 degrees (rather 150) but angle we need for MM)
+
+// Timer calculations
+const uint16_t PRESCALER = 1680 - 1; // Prescaler to get 100 kHz timer frequency
+const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
 
 
-
-//Function to write an angle to the servo
-// void writeServo(int angle) {
-//     // Map the angle to the pulse width
-//     int pulseWidth = map(angle, 0, 180, minPulseWidth, maxPulseWidth);
-//     // Calculate the duty cycle for the desired pulse width
-//     int dutyCycle = (pulseWidth * 4096) / (1000000 / servoFrequency);
-//     analogWrite(SERVO_PWM_1, dutyCycle);
-// }
 
 
 void writeServo(int angle) {
@@ -40,45 +39,23 @@ void writeServo(int angle) {
 
 
 
-// Function to move the ball grabber forward
+// Function to move the ball grabber forward (in front of robot)
 void move_ballgrabber_forward() {
-    writeServo(180);
+    timer4->setCaptureCompare(3, PULSE_WIDTH_0, MICROSEC_COMPARE_FORMAT); // 0 degrees
+    timer4->refresh();
+    timer4->resume();
 }
 
-// Function to move the ball grabber backward
+// Function to move the ball grabber backward (above robot)
 void move_ballgrabber_backward() {
-    writeServo(0);
+    timer4->setCaptureCompare(3, PULSE_WIDTH_180, MICROSEC_COMPARE_FORMAT); // 180 degrees
+    timer4->refresh();
 }
-
-// Function to move the ball grabber to the middle position
-void move_ballgrabber_middle() {
-    writeServo(90);
-}
-
 
 
 void handle_ballgrabber(){
-    digitalWrite(LED_GREEN, LOW);
-
     move_ballgrabber_forward();
-    delay(2000);
-    move_ballgrabber_middle();
-    delay(2000);
+    ble->print("ballgrabber forward");
+    delay(1000);
     move_ballgrabber_backward();
-    delay(2000);
-
-    digitalWrite(LED_RED, LOW);
-    digitalWrite(LED_GREEN, HIGH);
-
-    // while (true) {
-    //     // // Sweep the servo back and forth
-    //     // for (int angle = 0; angle <= 180; angle += 10) {
-    //     //     writeServo(SERVO_PWM_1, angle);  // Move servo to the current angle
-    //     //     delay(500);  // Wait for the servo to reach the position
-    //     // }
-    //     // for (int angle = 180; angle >= 0; angle -= 10) {
-    //     //     writeServo(SERVO_PWM_1, angle);  // Move servo to the current angle
-    //     //     delay(500);  // Wait for the servo to reach the position
-    //     // }
-    // }
 }

@@ -30,7 +30,6 @@ HardwareSerial Serial1(BLUETOOTH_RX, BLUETOOTH_TX);
 void Distanz_Messung_Hell(void);
 void Sensor_Interrupt(void);
 void Sensor_Sync_Setup(void);
-void printDistanzSensoren(void);
 
 void Mid_Sensor_Interrupt(void);
 void Mid_Sensor_Setup(void);
@@ -83,16 +82,17 @@ void BackwardBoth(int dutyCycle) {
 
 
 void robin_test() {
-    while(1) {
+    digitalWrite(MOTOR_ENABLE, LOW); // turn motors on (if not already on) 
+    for(int i = 0; i < 2; i++){
         // Wait for the encoder to be turned
         digitalWrite(MOTOR_ENABLE, LOW);
-        ForwardBoth(30);
-        delay(500);
-        ForwardBoth(50);
-        delay(500);
-        ForwardBoth(90);
+        ForwardBoth(10);
         delay(1000);
-        ForwardBoth(0);
+        if (encoderTurned) {
+            encoderTurned = false;
+            break;
+        }
+        BackwardBoth(10);
         delay(1000);
         if (encoderTurned) {
             encoderTurned = false;
@@ -101,58 +101,28 @@ void robin_test() {
     }
     // Stop the motors
     digitalWrite(MOTOR_ENABLE, HIGH);
-        // Other sensor or distance measuring code
 }
 
-void alex_test() {
-    while(1) {
-        // Wait for the encoder to be turned
-        //digitalWrite(MOTOR_ENABLE, LOW);
-        PID pid(0.8, 1.0, 0.0001);
-        vector<bool> walls = {false, true, false};
-        vector<int> pid_component{0,0};
-        int test_input[] = {100,100,50,10,100,100};
-        pid_component = pid.calcErrors(test_input, walls);
-        ble->print("Rot: ");
-        ble->println(pid_component[0]);
-        ble->print("X: ");
-        ble->println(pid_component[1]);
-        ble->print("Y: ");
-        ble->println(pid_component[2]);
 
 
-        /* if(pid_component[0] > 0){
-            //ForwardLeft(pid_component[0]);
-            ble->print("Forward left: ");
-            ble->println(pid_component[0]);
-        }
-        else{
-            //BackwardLeft(pid_component[0]);
-            ble->println("Backward left: " + pid_component[0]);
-        }
-        if(pid_component[1] > 0){
-            //ForwardRight(pid_component[1]);
-            ble->println("Forward Right: " + pid_component[1]);
-        }
-        else{
-            //BackwardRight(pid_component[1]);
-            ble->println("Backward Right " + pid_component[1]);
-        } */
-        
-        //ble->println(Distance_Sensor[2]);
-        //ble->println(Distance_Sensor[3]);
-        //display->println(pid_component[1]);
-        delay(500);
-
-
-        if (encoderTurned) {
-            encoderTurned = false;
-            break;
-        }
+void test_encoders(){
+    display->clearDisplay();
+    display->println("Testing Encoders2");
+    for (int i = 0; i < 10; i++) {
+        // display->clearDisplay();
+        display->clearDisplay();
+        int encoder_right = TIM5->CNT;
+        int encoder_left = TIM2->CNT;
+        ble->print("Encoder Right: ");
+        ble->println(encoder_right);
+        ble->print("Encoder Left: ");
+        ble->println(encoder_left);
+        display->print("Encoder R: ");
+        display->println(encoder_right);
+        display->print("Encoder L: ");
+        display->println(encoder_left); 
+        delay(1000);
     }
-    // Stop the motors
-    //digitalWrite(MOTOR_ENABLE, HIGH);
-        // Other sensor or distance measuring code
 }
 
 
