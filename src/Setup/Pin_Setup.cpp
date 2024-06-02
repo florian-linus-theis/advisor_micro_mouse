@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "Setup\Setup.h"
 
 
 SPIClass *imu = nullptr;
@@ -26,9 +26,9 @@ void Pin_Setup(void) {  //Pinmode Declaration and Communication Port Initializat
 
 
 //Servos
-  pinMode(SERVO_ENABLE, OUTPUT);
-  pinMode(SERVO_PWM_1, OUTPUT);   
-  //pinMode(SERVO_PWM_2, OUTPUT); //leave unconfigured as floating Input
+  pinMode(SERVO_PWM_1, OUTPUT);
+  pinMode(SERVO_PWM_2, OUTPUT);
+  pinMode(SERVO_ENABLE, OUTPUT); 
 
 
 //Infrared Emmitter

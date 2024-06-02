@@ -1,5 +1,5 @@
 #pragma once
-#include <Setup\Setup.h>
+#include "Setup\Setup.h"
 #include <robin.h>
 #include <ballgrabber.h>
 
@@ -112,34 +112,87 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
+            timer14->resume(); // starting systick timer
             delay(1000);
-            handle_ballgrabber(); // Function to handle the ball grabber 
-            // Handle Soft Reset Mode
+            // ForwardBoth(10);
+            move_forward_middle_level(10, 1);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            delay(1000);
+            //timer14->pause(); // stopping systick timer
             break;
         case MODE_SHOW_DATA:
-            display_print("Data Mode selected");
-            delay(1000);
+            // display_print("Data Mode selected");
+            // // delay(1000);
+            // display_print("Testing Encoders"); 
+            display->clearDisplay();
+            display->println("Test");
+            test_encoders();
             // Handle Hard Reset Mode
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
-            timer14->resume(); // starting systick timer
-            robin_test();
+            // timer14->resume(); // starting systick timer
+            move_forward_middle_level(15, 2);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            timer14->pause(); // stopping systick timer
+            delay(200);
+            // ble->println(avg_distance_traveled);
             // Handle Map Maze Mode
             break;
         case MODE_BFS:
             display_print("BFS Mode selected");
             delay(1000);
+            Buzzer_beep(2000, 4);
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
             display_print("A* Mode selected");
+            digitalWrite(SERVO_ENABLE, LOW);
+
+            // Code doesnt work YET
+            // Timer4_Setup_Motor(); 
+            ble->println("motor setup done");
+            // delay(2000);
+            robin_test();
+            delay(500);
+            ble->println("robin test done");
+            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            Timer4_Setup_Servo();
+            digitalWrite(SERVO_ENABLE, HIGH);
+            delay(500); // delay to allow the user to read the message
+            ble->println("servo setup done");
+            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
+            // timer4->refresh();
             delay(1000);
+            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
+            // delay(2000);
+            delay(750);
+            digitalWrite(SERVO_ENABLE, LOW);
+            ble->println("ballgrabber done");
+            Timer4_Setup_Motor();
+            // // delay(1000);
+            ble->println("motor setup done");
+            robin_test();
             // Handle A* Mode
             break;
         default:
             display_print("Invalid mode");
             break;
+    }
+}
+
+void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
+    int overflow = 1000000/freq;
+    timer1->setOverflow(overflow);
+    timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
+    timer1->refresh();
+
+    for(int i=0; i<beeps; i++) {
+        timer1->resume();
+        delay(100);
+        timer1->pause();
+        delay(100);
     }
 }

@@ -1,4 +1,4 @@
-#include "Setup.h"
+#include "Setup\Setup.h"
 
 /*
 Clock Overview:
@@ -9,41 +9,41 @@ Clock Overview:
 
 
 void Clock_Setup() {
-    RCC->APB1ENR |= RCC_APB1ENR_PWREN;
+    // RCC->APB1ENR |= RCC_APB1ENR_PWREN;
 
-    // Set voltage scaling to Scale 1 mode
-    PWR->CR |= PWR_CR_VOS;
+    // // Set voltage scaling to Scale 1 mode
+    // PWR->CR |= PWR_CR_VOS;
 
-    // Enable HSI oscillator
-    RCC->CR |= RCC_CR_HSION;
-    while ((RCC->CR & RCC_CR_HSIRDY) == 0);
+    // // Enable HSI oscillator
+    // RCC->CR |= RCC_CR_HSION;
+    // while ((RCC->CR & RCC_CR_HSIRDY) == 0);
 
-    // Configure the PLL
-    RCC->PLLCFGR = RCC_PLLCFGR_PLLSRC_HSI |  // HSI oscillator is the PLL source
-                    (8 << RCC_PLLCFGR_PLLM_Pos) |  // PLLM = 8
-                    (168 << RCC_PLLCFGR_PLLN_Pos) |  // PLLN = 168
-                    (0 << RCC_PLLCFGR_PLLP_Pos) |  // PLLP = 2 (00 -> PLLP = 2)
-                    (4 << RCC_PLLCFGR_PLLQ_Pos);  // PLLQ = 4
+    // // Configure the PLL
+    // RCC->PLLCFGR = RCC_PLLCFGR_PLLSRC_HSI |  // HSI oscillator is the PLL source
+    //                 (8 << RCC_PLLCFGR_PLLM_Pos) |  // PLLM = 8
+    //                 (168 << RCC_PLLCFGR_PLLN_Pos) |  // PLLN = 168
+    //                 (0 << RCC_PLLCFGR_PLLP_Pos) |  // PLLP = 2 (00 -> PLLP = 2)
+    //                 (4 << RCC_PLLCFGR_PLLQ_Pos);  // PLLQ = 4
 
-    // Enable the PLL
-    RCC->CR |= RCC_CR_PLLON;
-    while ((RCC->CR & RCC_CR_PLLRDY) == 0);
+    // // Enable the PLL
+    // RCC->CR |= RCC_CR_PLLON;
+    // while ((RCC->CR & RCC_CR_PLLRDY) == 0);
 
-    // Configure Flash prefetch, Instruction cache, Data cache and wait state
-    FLASH->ACR = FLASH_ACR_ICEN | FLASH_ACR_DCEN | FLASH_ACR_PRFTEN | FLASH_ACR_LATENCY_5WS;
+    // // Configure Flash prefetch, Instruction cache, Data cache and wait state
+    // FLASH->ACR = FLASH_ACR_ICEN | FLASH_ACR_DCEN | FLASH_ACR_PRFTEN | FLASH_ACR_LATENCY_5WS;
 
-    // Select the PLL as system clock source
-    RCC->CFGR |= RCC_CFGR_SW_PLL;
-    while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
+    // // Select the PLL as system clock source
+    // RCC->CFGR |= RCC_CFGR_SW_PLL;
+    // while ((RCC->CFGR & RCC_CFGR_SWS) != RCC_CFGR_SWS_PLL);
 
-    // Set HCLK (AHB) prescaler
-    RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
+    // // Set HCLK (AHB) prescaler
+    // RCC->CFGR |= RCC_CFGR_HPRE_DIV1;
 
-    // Set PCLK1 (APB1) prescaler
-    RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;
+    // // Set PCLK1 (APB1) prescaler
+    // RCC->CFGR |= RCC_CFGR_PPRE1_DIV4;
 
-    // Set PCLK2 (APB2) prescaler
-    RCC->CFGR |= RCC_CFGR_PPRE2_DIV4;
+    // // Set PCLK2 (APB2) prescaler
+    // RCC->CFGR |= RCC_CFGR_PPRE2_DIV4;
 }
 
 

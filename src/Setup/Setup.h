@@ -10,6 +10,8 @@
 #include "Wire.h"
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
+//#include "Sensors.h"
+#include "PID_Klasse.h"
 
 
 //Pin Naming
@@ -114,13 +116,25 @@ extern HardwareTimer *timer10;
 extern HardwareTimer *timer1;
 
 extern void Timer_Setup(void);
+extern void Timer4_Setup_Motor(void); // needed for manual resetting of the motor timers after ballgrabbing
+extern void Timer4_Setup_Servo(void); // needed for manual setting of the servo timer after driving to the ball
 extern void set_Interrupt_Priority(void);
 
 
 
 //Systick
 extern void Systick_Interrupt(void);
+extern int Systick_Counter;
+// Global variables updated during systick 
+extern int encoder_right_total; 
+extern int encoder_left_total;
+extern int distance_traveled_L; // TODO: evtl float
+extern int distance_traveled_R; // TODO: evtl float
+extern int avg_distance_traveled; // TODO: evtl float
 
+
+// Drive Motors
+extern void move_forward_middle_level(int, float);
 
 
 //ADC_Setup
@@ -163,3 +177,5 @@ extern int selected_option;
 extern bool optionSelected;
 extern bool encoderTurned;
 extern bool confirmationPending;
+
+extern void Buzzer_beep(int, int);
