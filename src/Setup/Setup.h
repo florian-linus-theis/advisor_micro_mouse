@@ -146,7 +146,6 @@ extern void ADC_Setup(void);
 //Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //Sensors
 extern void Timer6_Interrupt(void);
-extern void Timer7_Interrupt(void); // @Hannes habe den hier mal so eingefügt, damit der im Timer_Setup file nicht motzt 
 
 extern void Distanz_Messung_Sensoren(void);
 extern void Distanz_Messung_Blind(void);

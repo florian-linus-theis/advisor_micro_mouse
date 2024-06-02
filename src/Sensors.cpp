@@ -3,7 +3,7 @@
 int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER_RF, IR_EMITTER_RD, IR_EMITTER_RS, IR_EMITTER_MID};
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS, IR_SENSOR_MID};
 int Distance_Sensor[7] = {};
-int calibration_sensor[7] = {165,185,181 ,174,238,161, 351};    //Kalibierung fehlt
+int calibration_sensor[7] = {137,221,168,175,241,182,337};    //Kalibierung fehlt
 bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector

@@ -12,16 +12,15 @@ void Systick_Interrupt() {
   static int counter = 0; 
   update_encoders();
   if (counter % 500 == 0) {
-    print_encoders();
+    print_encoders(); // print_encoders(); just for test purposes
   }
-  // print_encoders(); just for test purposes
+  
 
   // then read sensor values
   Distanz_Messung_Sensoren();
-
+  
   // lastly update the PID controller 
   counter++; 
-
 }
 
 
