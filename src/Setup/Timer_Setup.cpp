@@ -1,13 +1,12 @@
 #include "Setup.h"
 
-//unused Timers 8,9,11,12,13
+//unused Timers 7,8,9,11,12,13
 HardwareTimer *timer14 = new HardwareTimer(TIM14);
 HardwareTimer *timer3 = new HardwareTimer(TIM3);
 HardwareTimer *timer4 = new HardwareTimer(TIM4);
 HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer5 = new HardwareTimer(TIM5);
 HardwareTimer *timer6 = new HardwareTimer(TIM6);
-HardwareTimer *timer7 = new HardwareTimer(TIM7);
 HardwareTimer *timer10 = new HardwareTimer(TIM10);
 HardwareTimer *timer1 = new HardwareTimer(TIM1);
 
@@ -109,15 +108,6 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6->attachInterrupt(Timer6_Interrupt);
     timer6->refresh();
     timer6->pause();
-}
-
-void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
-    // Configure timer
-    timer7->setPrescaleFactor(50);              // Set prescaler to 50
-    timer7->setOverflow(16);                     // Set overflow to 16 = 50us intervals
-    timer7->attachInterrupt(Timer7_Interrupt);
-    timer7->refresh();
-    timer7->pause();
 }
 
 
