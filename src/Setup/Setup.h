@@ -89,6 +89,15 @@
 
 
 
+// ---------------------------------------
+// Driving constants 
+#define DUTY_SLOW 150
+#define DUTY_SLOW_ROTATION 50
+#define DUTY_FAST 400
+#define TICKS_INNER_WHEEL 8600 * 4
+#define TICKS_OUTER_WHEEL 18105 * 4
+
+
 //Object, Function and Variable Declaration - - - - - - - - - - - - - - - - - - - - -
 //Pin_Setup
 extern SPIClass *imu;
@@ -135,6 +144,11 @@ extern int avg_distance_traveled; // TODO: evtl float
 
 // Drive Motors
 extern void move_forward_middle_level(int, float);
+extern void stop(); 
+extern void accelerate();
+extern void decelerate();
+extern void left_curve(int);
+extern void right_curve(int);
 
 
 //ADC_Setup

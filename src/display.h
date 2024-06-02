@@ -134,9 +134,12 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
             // timer14->resume(); // starting systick timer
-            move_forward_middle_level(15, 2);
+            move_forward_middle_level(DUTY_FAST, 1);
+            // decelerate();
+            // right_curve(DUTY_SLOW);
+            // stop();
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            timer14->pause(); // stopping systick timer
+            // timer14->pause(); // stopping systick timer
             delay(200);
             // ble->println(avg_distance_traveled);
             // Handle Map Maze Mode

@@ -5,11 +5,6 @@
 #include <robin.h>
 #include "Setup\Setup.h"
 
-#define DUTY_SLOW 20
-#define DUTY_SLOW_ROTATION 10
-#define DUTY_FAST 60
-#define TICKS_INNER_WHEEL 8600
-#define TICKS_OUTER_WHEEL 18105
 
 // declarations
 // int duty_cycle; // fraction of max speed (0-100)
@@ -26,10 +21,10 @@ int encoder_L = 0;
 int encoder_R = 0;
 
 // tick variables: [distance / (2,2cm * pi)] * 5 * 2048 Ticks
-int tick_forward = 26668 * 2;
-int tick_start = 6889;
-int tick_rotate = 7460;
-int tick_accelerate = 13355;
+int tick_forward = 26668 * 4;
+int tick_start = 6889 * 4;
+int tick_rotate = 7460 * 4;
+int tick_accelerate = 13355 * 4;
 
 // placeholder for sensor values
 int sensor_LA, sensor_LI, sensor_LV, sensor_RV, sensor_RA, sensor_RI;
@@ -42,7 +37,7 @@ void precompute_duty_intervals(){
 }
 
 void compute_avg_distance_traveled(){
-    avg_distance_traveled = (abs(distance_traveled_L) + abs(distance_traveled_R)) * 2;
+    avg_distance_traveled = (abs(distance_traveled_L) + abs(distance_traveled_R)) / 2;
 }
 
 void reset_distance_traveled(){
@@ -71,7 +66,16 @@ void move_actual(int duty_cycle){
     // std::vector<int> PIDvec = pid.calcOutput(/*sensor values*/);
     // duty_L = duty_cycle + PIDvec[0];
     // duty_R = duty_cycle + PIDvec[1];
-    ForwardBoth(duty_cycle); // set actual motor speed
+    //ForwardBoth(duty_cycle); // set actual motor speed
+    int correction = duty_cycle * (4.0/ 150.0);
+    ForwardLeft(duty_cycle + correction);
+    ForwardRight(duty_cycle);
+}
+
+void stop(){
+    ForwardLeft(0);
+    ForwardRight(0);
+    delay(1000);
 }
 
 // Middle layer function to move forwards
@@ -84,8 +88,7 @@ void move_forward_middle_level(int duty_cycle, float squares = 1.0){
     ble->println(desired_distance);
     ble->println(avg_distance_traveled);
     move_actual(duty_cycle);
-    encoder_L = 0; 
-    encoder_R = 0;
+    reset_distance_traveled();
     while (avg_distance_traveled < desired_distance){
         delay(1); // TODO: improve this
     }
@@ -94,12 +97,12 @@ void move_forward_middle_level(int duty_cycle, float squares = 1.0){
     ble->println(avg_distance_traveled);
 
     // stops to scan when mapping
-    // if (duty_cycle == DUTY_SLOW){
-    //     duty_cycle = 0;
-    //     move_actual(duty_cycle);
-    //     scan_walls();
-    // }
-    // reset_distance_traveled();
+    if (duty_cycle == DUTY_SLOW){
+        duty_cycle = 0;
+        stop(); // stop motors
+    }
+    stop();
+    reset_distance_traveled();
 }
 
 // mapping movement
@@ -151,11 +154,13 @@ void left_curve(int duty_cycle){
 }
 
 void right_curve(int duty_cycle){
-    duty_L = duty_cycle;
-    duty_R = round(duty_cycle * 0.475); // curve speed ratio
+    int correction = static_cast<int>(static_cast<double>(duty_cycle) * (4.0/ 150.0));
+    duty_L = duty_cycle + correction;
+    duty_R = static_cast<int>((static_cast<double>(duty_cycle) * 0.475)); // curve speed ratio
+    ForwardRight(duty_R);
+    ForwardLeft(duty_L);
     while(distance_traveled_L < TICKS_OUTER_WHEEL || distance_traveled_R < TICKS_INNER_WHEEL){
-        ForwardRight(duty_R);
-        ForwardLeft(duty_L);
+        delay(1);
     }
     reset_distance_traveled();
 }
@@ -174,14 +179,15 @@ void accelerate(){
     reset_distance_traveled();
 }
 
-void decelerate(){
+void decelerate(int start_duty_cycle, int end_duty_cycle){
+    
     while(avg_distance_traveled < tick_accelerate){
-        int duty_cycle = DUTY_FAST;
+        int duty_cycle = start_duty_cycle;
         for(int n = 1; n < 4; n++){
-             duty_cycle -= duty_interval;      // stepwise deceleration
+            duty_cycle -= duty_interval;      // stepwise deceleration
             int start_time = millis();
             move_actual(duty_cycle);
-            delay(50); // TODO: improve this
+            delay(4); // TODO: improve this
         }
         move_actual(DUTY_SLOW);
     }

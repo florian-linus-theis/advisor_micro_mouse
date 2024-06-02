@@ -63,8 +63,8 @@ void Timer3_Setup() {   // Motor PWM Left
     timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
     timer3->setPrescaleFactor(8);
     timer3->setOverflow(1000);
-    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+    timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, 0, TICK_COMPARE_FORMAT);
     timer3->refresh();
     timer3->resume();
 }
