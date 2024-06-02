@@ -38,17 +38,17 @@ void update_encoders() {
 }
 
 void print_encoders() {
-  ble->print("Encoder Right: ");
-  ble->println(encoder_right);
-  ble->print("Encoder Left: ");
-  ble->println(encoder_left);
-  ble->print("Distance Traveled Left: ");
-  ble->println(distance_traveled_L);
-  ble->print("Distance Traveled Right: ");
-  ble->println(distance_traveled_R);
-  ble->print("Average Distance Traveled: ");
-  ble->println(avg_distance_traveled);
-  ble->println(); // empty line
+  // ble->print("Encoder Right: ");
+  // ble->println(encoder_right);
+  // ble->print("Encoder Left: ");
+  // ble->println(encoder_left);
+  // ble->print("Distance Traveled Left: ");
+  // ble->println(distance_traveled_L);
+  // ble->print("Distance Traveled Right: ");
+  // ble->println(distance_traveled_R);
+  // ble->print("Average Distance Traveled: ");
+  // ble->println(avg_distance_traveled);
+  // ble->println(); // empty line
 }
 
 
