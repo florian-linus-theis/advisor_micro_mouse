@@ -22,16 +22,16 @@ void BackwardLeft(int dutyCycle) {
 void ForwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();
-    timer3->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, dutyCycle, PERCENT_COMPARE_FORMAT);
+    timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, dutyCycle, TICK_COMPARE_FORMAT);
     timer3->refresh();
 }
 
 void ForwardRight(int dutyCycle) {
     timer4->setCount(0);
     timer4->resume();
-    timer4->setCaptureCompare(1, dutyCycle, PERCENT_COMPARE_FORMAT);
-    timer4->setCaptureCompare(2, 0, PERCENT_COMPARE_FORMAT);
+    timer4->setCaptureCompare(1, dutyCycle, TICK_COMPARE_FORMAT);
+    timer4->setCaptureCompare(2, 0, TICK_COMPARE_FORMAT);
     timer4->refresh();
 }
 
