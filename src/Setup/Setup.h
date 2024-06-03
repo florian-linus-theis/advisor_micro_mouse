@@ -13,7 +13,7 @@
 #include "Adafruit_GFX.h"
 #include "./location.h"
 //#include "Sensors.h"
-#include "PID_Klasse.h"
+
 
 
 //Pin Naming
@@ -165,6 +165,7 @@ extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
 extern int current_speed; 
+
 
 // Drive Motors
 extern void ForwardLeft(int);
