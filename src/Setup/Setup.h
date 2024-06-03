@@ -131,6 +131,8 @@ extern int encoder_left_total;
 extern int distance_traveled_L; // TODO: evtl float
 extern int distance_traveled_R; // TODO: evtl float
 extern int avg_distance_traveled; // TODO: evtl float
+#define TICKS_INNER_WHEEL 8600
+#define TICKS_OUTER_WHEEL 18105
 
 
 // Drive Motors

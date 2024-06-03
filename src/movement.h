@@ -8,8 +8,6 @@
 #define DUTY_SLOW 20
 #define DUTY_SLOW_ROTATION 10
 #define DUTY_FAST 60
-#define TICKS_INNER_WHEEL 8600
-#define TICKS_OUTER_WHEEL 18105
 
 // declarations
 // int duty_cycle; // fraction of max speed (0-100)
