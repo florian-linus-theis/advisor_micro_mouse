@@ -81,15 +81,15 @@ void move_actual(int duty_cycle){
     // duty_L = duty_cycle + PIDvec[0];
     // duty_R = duty_cycle + PIDvec[1];
     //ForwardBoth(duty_cycle); // set actual motor speed
-    int correction = duty_cycle * (4.0/ 150.0);
-    ForwardLeft(duty_cycle + correction);
+    // int correction = duty_cycle * (4.0/ 150.0);
+    ForwardLeft(duty_cycle);
     ForwardRight(duty_cycle);
 }
 
 void stop(){
     ForwardLeft(0);
     ForwardRight(0);
-    delay(1000);
+    delay(1); // added small delay here such that the values have time to settle before the robot starts next move
 }
 
 // Middle layer function to move forwards
@@ -191,7 +191,7 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
         int braking_distance = calc_braking_distance(end_duty_cycle); 
         printer_debugger(current_speed, avg_distance_traveled, distance_remaining, braking_distance); // debugging
         if (distance_remaining > braking_distance){
-            if (current_speed < duty_to_speed(desired_max_duty_cycle)){
+            if (current_duty_cycle < desired_max_duty_cycle){
                 accelerate_different(desired_max_duty_cycle);
             }
             // else if (current_speed > desired_max_speed){
@@ -213,56 +213,93 @@ void go_to_start(int duty_cycle){
 }
 
 void rotate_left(){
-    // while we have not turned a quarter of a circle
-    while(avg_distance_traveled < tick_rotate){
-        ForwardRight(DUTY_SLOW_ROTATION);  // continue moving wheels in opposite directions
+    ForwardRight(DUTY_SLOW_ROTATION); // start moving wheels in opposite directions (turning left
+    BackwardLeft(DUTY_SLOW_ROTATION);
+    int last_distance_traveled_right = 0;
+    // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the left wheel)
+    while(abs(distance_traveled_L) < tick_rotate || distance_traveled_R < tick_rotate) {
+        if (last_distance_traveled_right == distance_traveled_R) continue; // if the systick has not updated our values, do not update pwm values etc.
+        ForwardRight(DUTY_SLOW_ROTATION);  // TODO: add PID values here
         BackwardLeft(DUTY_SLOW_ROTATION);
+        current_duty_cycle = DUTY_SLOW_ROTATION;
+        last_distance_traveled_right = distance_traveled_R; // update the last distance traveled (here just using the right wheel because avg distance cancels out)
     }
     reset_distance_traveled();
 }
 
 void rotate_right(){
-    // while we have not turned a quarter of a circle
-    while(avg_distance_traveled < tick_rotate){
-        BackwardRight(DUTY_SLOW_ROTATION); // continue moving wheels in opposite directions
+    BackwardRight(DUTY_SLOW_ROTATION); // start moving wheels in opposite directions (turning right)
+    ForwardLeft(DUTY_SLOW_ROTATION);
+    int last_distance_traveled_left = 0;
+    // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
+    while(abs(distance_traveled_R) < tick_rotate || distance_traveled_L < tick_rotate){
+        if (last_distance_traveled_left == distance_traveled_L) continue; // if the systick has not updated our values, do not update pwm values etc.
+        BackwardRight(DUTY_SLOW_ROTATION); // TODO: add PID values here
         ForwardLeft(DUTY_SLOW_ROTATION);
+        current_duty_cycle = DUTY_SLOW_ROTATION;
+        last_distance_traveled_left = distance_traveled_L; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
     }
+    stop();
+    current_duty_cycle = 0;
     reset_distance_traveled();
 }
 
 void turn_around(){
+    ForwardRight (DUTY_SLOW_ROTATION); 
+    BackwardLeft(DUTY_SLOW_ROTATION);
+    int last_distance_traveled = 0;
     while(avg_distance_traveled < (tick_rotate * 2)){
         // basically turning left left two times 
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         ForwardRight(DUTY_SLOW_ROTATION); 
         BackwardLeft(DUTY_SLOW_ROTATION); 
+        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
     }
+    stop();
+    current_duty_cycle = 0;
     reset_distance_traveled();
 }
 
-// fast-run movement
+
+
+
+// ------------------------------------------------------------------------------------
+// fast-run movement curves 
 
 void left_curve(int duty_cycle){
-    duty_L = round(duty_cycle * 0.475); // curve speed ratio
+    duty_L = static_cast<int>(round(0.475 * duty_cycle)); // curve speed ratio
     duty_R = duty_cycle;
+    ForwardRight(duty_R);
+    ForwardLeft(duty_L);
+    int last_distance_traveled = 0;
     while(distance_traveled_L < TICKS_INNER_WHEEL || distance_traveled_R < TICKS_OUTER_WHEEL){
-        ForwardLeft(duty_L);
-        ForwardRight(duty_R);
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        ForwardRight(duty_L);  // TODO: add PID values here
+        BackwardLeft(duty_R);  // 
+        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
     }
     reset_distance_traveled();
 }
 
 void right_curve(int duty_cycle){
     int correction = static_cast<int>(static_cast<double>(duty_cycle) * (4.0/ 150.0));
-    duty_L = duty_cycle + correction;
-    duty_R = static_cast<int>((static_cast<double>(duty_cycle) * 0.475)); // curve speed ratio
+    duty_L = duty_cycle; 
+    duty_R = static_cast<int>(round(0.475 * duty_cycle)); // curve speed ratio
     ForwardRight(duty_R);
     ForwardLeft(duty_L);
+    int last_distance_traveled = 0;
     while(distance_traveled_L < TICKS_OUTER_WHEEL || distance_traveled_R < TICKS_INNER_WHEEL){
-        delay(1);
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        ForwardRight(duty_L);  // TODO: add PID values here
+        BackwardLeft(duty_R);  //
+        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
     }
     reset_distance_traveled();
 }
 
+
+// VERALTET
+// ----------------------------------------------------------------------------------------------------
 void accelerate(){ 
     while(avg_distance_traveled < tick_accelerate){
         int duty_cycle = DUTY_SLOW;
