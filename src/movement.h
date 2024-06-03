@@ -6,14 +6,18 @@
 #include "Setup\Setup.h"
 
 
+int precompute_duty_intervals();
+
 // declarations
 // int duty_cycle; // fraction of max speed (0-100)
-int duty_interval; // for stepwise acceleration
-int duty_L;
-int duty_R;
+int duty_interval = precompute_duty_intervals(); // for stepwise acceleration
+int duty_L = 0;
+int duty_R = 0;
 int distance_traveled_L = 0; // TODO: evtl float
 int distance_traveled_R = 0; // TODO: evtl float
 int avg_distance_traveled = 0; // TODO: evtl float
+int current_speed = 0;
+int current_duty_cycle = 0;
 enum state{slow, fast};
 
 // placeholder for encoder values
@@ -32,8 +36,8 @@ int threshhold; // for wall detection missing
 
 std::array<bool, 4> current_walls = {false, false, false, false}; // [N, E, S, W]
 
-void precompute_duty_intervals(){
-    duty_interval = (DUTY_FAST - DUTY_SLOW) / 4;
+int precompute_duty_intervals(){
+    return (DUTY_FAST - DUTY_SLOW) / 4;
 }
 
 void compute_avg_distance_traveled(){
@@ -45,6 +49,16 @@ void reset_distance_traveled(){
     distance_traveled_R = 0;
 }
 
+
+// convert speed to duty cycle
+double duty_to_speed(int duty_cycle){
+    return  SPEED_TO_DUTY_FACTOR * duty_cycle;
+}
+
+// convert duty cycle to speed
+int speed_to_duty(double speed){
+    return static_cast<int>(speed / SPEED_TO_DUTY_FACTOR);
+}
 
 // running wall-array overwrites values of each cell every few ticks
 void scan_walls(){
@@ -103,6 +117,88 @@ void move_forward_middle_level(int duty_cycle, float squares = 1.0){
     }
     stop();
     reset_distance_traveled();
+}
+
+int calc_braking_distance(int end_duty_cycle){
+    // Check if the desired duty cycle is higher than the current duty cycle
+    if (end_duty_cycle > current_duty_cycle) {
+        return -1; // No braking distance if the desired duty cycle is higher
+    }
+    // If the end duty cycle is the same as the current, no braking distance is needed
+    if (end_duty_cycle == current_duty_cycle) {
+        return 0;
+    }
+
+    // Calculate the scaling factors based on the squares of the duty cycles
+    double start_duty_cycle_square = static_cast<double>(current_duty_cycle * current_duty_cycle);
+    double end_duty_cycle_square = static_cast<double>(end_duty_cycle * end_duty_cycle);
+    double duty_slow_square = static_cast<double>(DUTY_SLOW * DUTY_SLOW);
+
+    // Calculate the braking distance using the known distance and the scaling factors
+    double braking_distance = KNOWN_BRAKE_DIST_AT_DUTY_SLOW * (start_duty_cycle_square - end_duty_cycle_square) / duty_slow_square;
+
+    return static_cast<int>(std::round(braking_distance));
+}
+
+void accelerate_different(int desired_duty_cycle){
+    // Function to accelerate the motor to roughly 2/3 of the desired duty cycle (to avoid overshooting) -> after 7 calls we should be at the desired duty cycle
+    int target_duty_cycle = current_duty_cycle + static_cast<int>(std::round((desired_duty_cycle - current_duty_cycle) * 2.0 / 3.0));
+    ForwardBoth(target_duty_cycle); // Update motors to the new duty cycle
+    ble->print("Accelerating to: ");
+    ble->println(target_duty_cycle);
+    current_duty_cycle = target_duty_cycle; // update current duty cycle
+}
+
+void decelerate_different(int end_duty_cycle, int remaining_distance_ticks){
+    // If we are close to the end, stop the motors
+    if (remaining_distance_ticks <= DISTANCE_DUTY_MIN_TO_ZERO && end_duty_cycle == 0) {
+        ble->println("Stopping motors");
+        stop();
+    }
+    // Decelerate to 2/3 of the difference between current and desired duty cycles
+    int target_duty_cycle = current_duty_cycle - static_cast<int>(std::round((current_duty_cycle - end_duty_cycle) * 2.0 / 3.0));
+    // ensuring that we do not go below the minimum duty cycle so that we continue cruising
+    if (target_duty_cycle < MINIMUM_DUTY) {
+        target_duty_cycle = MINIMUM_DUTY;
+    }
+    ForwardBoth(target_duty_cycle);
+    ble->print("Decelerating to: ");
+    ble->println(target_duty_cycle);
+    current_duty_cycle = target_duty_cycle;
+}
+
+void printer_debugger(int current_speed, int average_distance_travelled, int distance_remaining, int braking_distance){
+    ble->print("Current speed: ");
+    ble->println(current_speed);
+    ble->print("Last distance traveled: ");
+    ble->println(average_distance_travelled);
+    ble->print("Distance remaining: ");
+    ble->println(distance_remaining);
+    ble->print("Braking distance: ");
+    ble->println(braking_distance);
+}
+
+
+void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, float squares){
+    // first reset distances
+    reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
+    int desired_distance = static_cast<int>(round(squares * tick_forward));
+    int last_distance_traveled = 0;	
+    while(avg_distance_traveled < desired_distance){
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        int distance_remaining = desired_distance - avg_distance_traveled;
+        int braking_distance = calc_braking_distance(end_duty_cycle); 
+        printer_debugger(current_speed, avg_distance_traveled, distance_remaining, braking_distance); // debugging
+        if (distance_remaining > braking_distance){
+            if (current_speed < duty_to_speed(desired_max_duty_cycle)){
+                accelerate_different(desired_max_duty_cycle);
+            }
+            // else if (current_speed > desired_max_speed){
+        } else {
+            decelerate_different(end_duty_cycle, distance_remaining);
+        }
+        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
+    }
 }
 
 // mapping movement
@@ -180,7 +276,7 @@ void accelerate(){
 }
 
 void decelerate(int start_duty_cycle, int end_duty_cycle){
-    
+
     while(avg_distance_traveled < tick_accelerate){
         int duty_cycle = start_duty_cycle;
         for(int n = 1; n < 4; n++){
@@ -193,21 +289,3 @@ void decelerate(int start_duty_cycle, int end_duty_cycle){
     }
     reset_distance_traveled();
 }
-
-// void calc_next_move(std::vector<std::string> moves, int state){
-//     if(state == slow && moves[2] == "Forward"){
-//         accelerate();
-//         state = fast;
-//     } else if(state == slow && moves[2] == "Turn"){
-//         move_forward_low_level(30);
-//         state = slow;
-//     } else if(state == fast && moves[2] == "Forward"){
-//         move_forward_low_level(70);
-//         state = slow;    
-//     } else if(state == fast && moves[2] == "Turn"){
-//         decelerate();
-//         state = slow;    
-//     } else if(moves[0] = "Turn" && moves[2] == "Turn"){
-//         state = slow;    
-//     }
-// }

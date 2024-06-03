@@ -115,10 +115,15 @@ void handleModeSelection(Mode mode) {
             timer14->resume(); // starting systick timer
             delay(1000);
             // ForwardBoth(10);
-            move_forward_middle_level(10, 1);
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            move_actual(100);
+            delay(2000);
+            ForwardRight(0);
+            ForwardLeft(0);
+            //stop();
             delay(1000);
-            //timer14->pause(); // stopping systick timer
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            timer14->pause(); // stopping systick timer
+            delay(1000);
             break;
         case MODE_SHOW_DATA:
             // display_print("Data Mode selected");
@@ -134,12 +139,12 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
             // timer14->resume(); // starting systick timer
-            move_forward_middle_level(DUTY_FAST, 1);
+            move_forward_middle_level(200, 3);
             // decelerate();
             // right_curve(DUTY_SLOW);
             // stop();
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            // timer14->pause(); // stopping systick timer
+            timer14->pause(); // stopping systick timer
             delay(200);
             // ble->println(avg_distance_traveled);
             // Handle Map Maze Mode
