@@ -2,6 +2,7 @@
 #include "Arduino.h"
 #include "cmath"
 #include "vector"
+#include "tuple"
 #include "string"
 #include "HardwareTimer.h"
 #include "HardwareSerial.h"
@@ -10,6 +11,7 @@
 #include "Wire.h"
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
+#include "./location.h"
 //#include "Sensors.h"
 #include "PID_Klasse.h"
 
@@ -89,6 +91,34 @@
 
 
 
+// ---------------------------------------
+// Driving constants 
+#define DUTY_SLOW 100
+#define DUTY_SLOW_ROTATION 50
+#define DUTY_FAST 400
+#define DUTY_FAST_CURVE 200
+#define MINIMUM_DUTY 50
+#define TICKS_INNER_WHEEL 8600 * 4
+#define TICKS_OUTER_WHEEL 18105 * 4
+#define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
+#define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
+#define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
+
+
+
+// ---------------------------------------
+// Algorithm constants
+// Initializing maze size with constexpr to set them up as compile-time-constants rather than runtime constants
+#define MAZE_WIDTH 16
+#define MAZE_HEIGHT 16
+extern std::vector<std::vector<Location>> maze; // Global variable to store the maze
+extern bool BALLGREIFER = true; // Control Variable to check if the ballgreifer is present
+extern std::vector<int> POSSIBLE_GOAL_POS_ONE; 
+extern std::vector<int> POSSIBLE_GOAL_POS_TWO;
+extern std::vector<int> POSSIBLE_GOAL_POS_THREE;
+extern std::vector<int> POSSIBLE_GOAL_POS_FOUR;
+
+
 //Object, Function and Variable Declaration - - - - - - - - - - - - - - - - - - - - -
 //Pin_Setup
 extern SPIClass *imu;
@@ -131,10 +161,26 @@ extern int encoder_left_total;
 extern int distance_traveled_L; // TODO: evtl float
 extern int distance_traveled_R; // TODO: evtl float
 extern int avg_distance_traveled; // TODO: evtl float
-
+extern int current_duty_cycle;
+extern int duty_L;
+extern int duty_R;
+extern int current_speed; 
 
 // Drive Motors
+extern void ForwardLeft(int);
+extern void ForwardRight(int);
+extern void BackwardLeft(int);
+extern void BackwardRight(int);
 extern void move_forward_middle_level(int, float);
+extern void stop(); 
+extern void accelerate();
+extern void decelerate();
+extern void left_curve(int);
+extern void right_curve(int);
+extern void move_actual(int);
+extern void move_forward_different(int, int, float);
+extern void accelerate_different(int, int);
+extern void decelerate_different(int, int);
 
 
 //ADC_Setup
