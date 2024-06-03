@@ -1,11 +1,8 @@
 #pragma once
+#include "Setup/Setup.h"
 #include <vector>
 #include <iostream>
 #include "location.h" // importing location class;
-
-// Initializing maze size with constexpr to set them up as compile-time-constants rather than runtime constants
-constexpr int MAZE_WIDTH = 16;
-constexpr int MAZE_HEIGHT = 16;
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
@@ -56,4 +53,13 @@ void initialize_maze_with_ballgreifer(){
     maze[2][2].set_visited(true);
     maze[2][2].set_walls({true, true, false, false});
     maze[2][2].set_ballgreifer(true);
+}
+
+
+void maze_setup(){
+    // display_print("Setting up maze...");
+    initialize_maze(); //initializing maze
+    if (BALLGREIFER == true) {
+        initialize_maze_with_ballgreifer();
+    }
 }

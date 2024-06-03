@@ -57,9 +57,9 @@ class State {
     // Check if the state is a goal state
     // Todo: make this relative for testing purposes
     bool is_goal() {
-        return (location->position == std::vector<int>{7, 7} ||
-                location->position == std::vector<int>{7, 8} ||
-                location->position == std::vector<int>{8, 7} ||
-                location->position == std::vector<int>{8, 8});
+        return (location->position == POSSIBLE_GOAL_POS_ONE ||
+                location->position ==  POSSIBLE_GOAL_POS_TWO ||
+                location->position == POSSIBLE_GOAL_POS_THREE ||
+                location->position == POSSIBLE_GOAL_POS_FOUR );
     }
 };

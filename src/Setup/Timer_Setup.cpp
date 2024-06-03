@@ -1,13 +1,12 @@
 #include "Setup\Setup.h"
 
-//unused Timers 8,9,11,12,13
+//unused Timers 7,8,9,11,12,13
 HardwareTimer *timer14 = new HardwareTimer(TIM14);
 HardwareTimer *timer3 = new HardwareTimer(TIM3);
 HardwareTimer *timer4 = new HardwareTimer(TIM4);
 HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer5 = new HardwareTimer(TIM5);
 HardwareTimer *timer6 = new HardwareTimer(TIM6);
-HardwareTimer *timer7 = new HardwareTimer(TIM7);
 HardwareTimer *timer10 = new HardwareTimer(TIM10);
 HardwareTimer *timer1 = new HardwareTimer(TIM1);
 
@@ -50,7 +49,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
 
 
 void Systick_Setup(void) {  //Systick Timer Setup
-    timer14->setPrescaleFactor(10);          // Set prescaler to 122000
+    timer14->setPrescaleFactor(30);          // Set prescaler to 122000
     timer14->setOverflow(32535);                 // Set overflow to 65535 = 2 ms intervals
     timer14->attachInterrupt(Systick_Interrupt);  
     timer14->refresh();
@@ -60,11 +59,11 @@ void Systick_Setup(void) {  //Systick Timer Setup
 
 
 void Timer3_Setup() {   // Motor PWM Left
-    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_1);
-    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
+    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_LEFT_PWM_1);
+    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_LEFT_PWM_2);
     timer3->setPrescaleFactor(8);
     timer3->setOverflow(1000);
-    timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
+    timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);           
     timer3->setCaptureCompare(2, 0, TICK_COMPARE_FORMAT);
     timer3->refresh();
     timer3->resume();
@@ -78,11 +77,11 @@ const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
 // Timer 4 setup for motor PWM Right
 void Timer4_Setup_Motor() {   // Motor PWM Right
     timer4->pause(); // Pause the timer while (re-)configuring
-    timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
-    timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
+    timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_RIGHT_PWM_1);
+    timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_RIGHT_PWM_2);
     timer4->setPrescaleFactor(8);
     timer4->setOverflow(1000);
-    timer4->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
+    timer4->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);           
     timer4->setCaptureCompare(2, 0, TICK_COMPARE_FORMAT);
     timer4->refresh();
     timer4->resume();
@@ -172,19 +171,10 @@ void Timer5_Setup(void) {                // Konfiguration für PA0 und PA1
 
 void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6->setPrescaleFactor(50);               // Set prescaler to 50
-    timer6->setOverflow(16);                     // Set overflow to 16 = 50us intervals
+    timer6->setOverflow(160);                     // Set overflow to 16 = 50us intervals
     timer6->attachInterrupt(Timer6_Interrupt);
     timer6->refresh();
     timer6->pause();
-}
-
-void Timer7_Setup(void) {   //Mid Infrared Sensor Interrupt Timer
-    // Configure timer
-    timer7->setPrescaleFactor(50);              // Set prescaler to 50
-    timer7->setOverflow(16);                     // Set overflow to 16 = 50us intervals
-    timer7->attachInterrupt(Timer7_Interrupt);
-    timer7->refresh();
-    timer7->pause();
 }
 
 
