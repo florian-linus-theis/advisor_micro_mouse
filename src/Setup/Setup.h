@@ -112,7 +112,7 @@
 #define MAZE_WIDTH 16
 #define MAZE_HEIGHT 16
 extern std::vector<std::vector<Location>> maze; // Global variable to store the maze
-extern bool BALLGREIFER = true; // Control Variable to check if the ballgreifer is present
+extern bool BALLGREIFER; // Control Variable to check if the ballgreifer is present
 extern std::vector<int> POSSIBLE_GOAL_POS_ONE; 
 extern std::vector<int> POSSIBLE_GOAL_POS_TWO;
 extern std::vector<int> POSSIBLE_GOAL_POS_THREE;

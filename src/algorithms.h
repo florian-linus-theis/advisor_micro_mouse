@@ -9,9 +9,10 @@
 #include "a_star_nodes.h" // importing a_star_node class
 #include "a_star_algorithm.h" // importing AStarAlgorithm class
 #include "display.h"
+#include "Setup/Setup.h"
 
 
-constexpr bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
+bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
 std::vector<int> POSSIBLE_GOAL_POS_ONE = {7,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8, 8}; 
