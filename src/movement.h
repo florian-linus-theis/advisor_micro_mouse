@@ -154,6 +154,7 @@ void decelerate_different(int end_duty_cycle, int remaining_distance_ticks){
     if (remaining_distance_ticks <= DISTANCE_DUTY_MIN_TO_ZERO && end_duty_cycle == 0) {
         ble->println("Stopping motors");
         stop();
+        return; 
     }
     // Decelerate to 2/3 of the difference between current and desired duty cycles
     int target_duty_cycle = current_duty_cycle - static_cast<int>(std::round((current_duty_cycle - end_duty_cycle) * 2.0 / 3.0));
@@ -199,6 +200,7 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
         }
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
     }
+    reset_distance_traveled();
 }
 
 // mapping movement
