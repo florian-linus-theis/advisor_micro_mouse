@@ -1,12 +1,12 @@
 #pragma once
 #include "Setup/Setup.h"
 
-const int FORWARD = 0;
-const int RIGHT = 1;        // turns right, then forward - confusing
-const int LEFT = 3;         // turns left, then forward - confusing
-const int ACCELERATE = 4;
-const int DECELERATE = 5;
-const int STOP = 6;
+constexpr int FORWARD = 0;
+constexpr int RIGHT = 1;        // turns right, then forward - confusing
+constexpr int LEFT = 3;         // turns left, then forward - confusing
+constexpr int ACCELERATE = 4;
+constexpr int DECELERATE = 5;
+constexpr int STOP = 6;
 
 
 // function to translate the actions of the algorithm into movement
