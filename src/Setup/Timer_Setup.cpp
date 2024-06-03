@@ -49,7 +49,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
 
 
 void Systick_Setup(void) {  //Systick Timer Setup
-    timer14->setPrescaleFactor(10);          // Set prescaler to 122000
+    timer14->setPrescaleFactor(30);          // Set prescaler to 122000
     timer14->setOverflow(32535);                 // Set overflow to 65535 = 2 ms intervals
     timer14->attachInterrupt(Systick_Interrupt);  
     timer14->refresh();
@@ -171,7 +171,7 @@ void Timer5_Setup(void) {                // Konfiguration für PA0 und PA1
 
 void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6->setPrescaleFactor(50);               // Set prescaler to 50
-    timer6->setOverflow(16);                     // Set overflow to 16 = 50us intervals
+    timer6->setOverflow(160);                     // Set overflow to 16 = 50us intervals
     timer6->attachInterrupt(Timer6_Interrupt);
     timer6->refresh();
     timer6->pause();

@@ -55,8 +55,7 @@ void Distanz_Messung_Hell(void) {
 }
 
 void Timer6_Interrupt(void) { 
-  Messuring1 = analogRead(Channel_Sensoren[interrupt_counter]);     //2. Messung soll Rauschenminimieren und die Genauigkeit der Sensoren erhöhen
-  Distance_Sensor[interrupt_counter] =  (Messuring1 + analogRead(Channel_Sensoren[interrupt_counter])) % 2 - Distance_Sensor[interrupt_counter] - calibration_sensor[interrupt_counter]; // Read Sensor Values
+  Distance_Sensor[interrupt_counter] =  analogRead(Channel_Sensoren[interrupt_counter]) - Distance_Sensor[interrupt_counter] - calibration_sensor[interrupt_counter]; // Read Sensor Values
   if(Distance_Sensor[interrupt_counter] < 0){
     Distance_Sensor[interrupt_counter] = 0;         //Allow only positive Values
   }
@@ -67,7 +66,6 @@ void Timer6_Interrupt(void) {
   if (interrupt_counter < 7) {      	  // Turn on the next emitter
     digitalWrite(Channel_Emitter[interrupt_counter], HIGH);
   } else if (interrupt_counter >= 7){   // All emitters processed
-    digitalWrite(Channel_Emitter[interrupt_counter], LOW);
     timer6->pause();
   }
 }
@@ -75,9 +73,7 @@ void Timer6_Interrupt(void) {
 
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 void printDistanzSensoren(void) {
-  ble->println("Messung_Hell Messwerte:");
   for (int i = 0; i < 7; i++) {
-    ble->print("Sensor ");
     ble->print(i);
     ble->print(": ");
     ble->println(Distance_Sensor[i]);
