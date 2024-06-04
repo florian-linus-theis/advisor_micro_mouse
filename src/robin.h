@@ -17,10 +17,11 @@ void BackwardLeft(int dutyCycle) {
 }
 
 void ForwardLeft(int dutyCycle) {
+    int correction = round(dutyCycle * 0.037);
     timer3->setCount(0);
     timer3->resume();
     timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, dutyCycle, TICK_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, dutyCycle + correction, TICK_COMPARE_FORMAT);
     timer3->refresh();
 }
 
@@ -41,8 +42,7 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    int correction = round(dutyCycle * 0.04);
-    ForwardLeft(dutyCycle + correction);
+    ForwardLeft(dutyCycle);
     ForwardRight(dutyCycle);
     current_duty_cycle = dutyCycle;
 }
