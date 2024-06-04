@@ -8,9 +8,6 @@
 
 extern bool encoderTurned;
 
-// HardwareTimer timer8(TIM8);
-// HardwareTimer timer9(TIM9);
-
 void BackwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();
@@ -44,13 +41,16 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    ForwardLeft(dutyCycle);
+    int correction = round(dutyCycle * 0.04);
+    ForwardLeft(dutyCycle + correction);
     ForwardRight(dutyCycle);
+    current_duty_cycle = dutyCycle;
 }
 
 void BackwardBoth(int dutyCycle) {
     BackwardLeft(dutyCycle);
     BackwardRight(dutyCycle);
+    current_duty_cycle = dutyCycle;
 }
 
 
