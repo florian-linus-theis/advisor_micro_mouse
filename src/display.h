@@ -65,7 +65,7 @@ void displayOptions(Mode currentMode, bool confirmation) {
     display->clearDisplay();
     display->setTextSize(1);
     display->setTextColor(SSD1306_WHITE);
-    display->setRotation(2); 
+    display->setRotation(2);
     display->display();
 
     display->setCursor(0, 0);
@@ -129,11 +129,41 @@ void handleModeSelection(Mode mode) {
         case MODE_SHOW_DATA:
             // display_print("Data Mode selected");
             // // delay(1000);
-            // display_print("Testing Encoders"); 
+            // display_print("Testing Encoders");
+            timer14->resume(); // starting systick timer
+            delay(1000);
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            delay(1000);
+            move_forward_different(100, 0, 1.5);
+            delay(100);
+            rotate_right();
+            move_forward_different(100, 0, 1);
+            //handling ballgrabber
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            // delay(500);
+            Timer4_Setup_Servo();
+            digitalWrite(SERVO_ENABLE, HIGH);
+            delay(1000); // delay to allow the user to read the message
+            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
+            delay(1000);
+            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
+            delay(1000);
+            digitalWrite(SERVO_ENABLE, LOW);
+            Timer4_Setup_Motor();
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            // delay(1000);
+            // ballgrabber done
+            rotate_right();
+            rotate_right();
+            move_forward_different(100, 0, 1);
+            rotate_right();
+            move_forward_different(100, 0, 1.5);
+            timer14->pause();
             display->clearDisplay();
-            display->println("Test");
-            test_encoders();
+            delay(100);
+            display->println("Test Servo");
             // Handle Hard Reset Mode
+            delay(100);
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
@@ -164,7 +194,7 @@ void handleModeSelection(Mode mode) {
             digitalWrite(SERVO_ENABLE, LOW);
 
             // Code doesnt work YET
-            // Timer4_Setup_Motor(); 
+            // Timer4_Setup_Motor();
             ble->println("motor setup done");
             // delay(2000);
             robin_test();

@@ -59,8 +59,8 @@ void Systick_Setup(void) {  //Systick Timer Setup
 
 
 void Timer3_Setup() {   // Motor PWM Left
-    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_LEFT_PWM_1);
-    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_LEFT_PWM_2);
+    timer3->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_1);
+    timer3->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_LEFT_PWM_2);
     timer3->setPrescaleFactor(8);
     timer3->setOverflow(1000);
     timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);           
@@ -77,8 +77,8 @@ const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
 // Timer 4 setup for motor PWM Right
 void Timer4_Setup_Motor() {   // Motor PWM Right
     timer4->pause(); // Pause the timer while (re-)configuring
-    timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_RIGHT_PWM_1);
-    timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, MOTOR_RIGHT_PWM_2);
+    timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
+    timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
     timer4->setPrescaleFactor(8);
     timer4->setOverflow(1000);
     timer4->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);           
