@@ -156,13 +156,11 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             timer14->resume(); // starting systick timer
             delay(1000);
-            move_forward_different(100, 0, 1);
-            delay(1000);
-            rotate_left();
-            delay(1000);
-            rotate_left();
-            delay(1000);
-            turn_around_right();
+            left_curve(100);
+            left_curve(100);
+            left_curve(100);
+            left_curve(100);
+            delay(500);
             // decelerate();
             // right_curve(DUTY_SLOW);
             // stop();

@@ -32,7 +32,7 @@ int encoder_R = 0;
 int tick_forward = 26668 * 4 - 3000;
 int tick_start = 6889 * 4;
 int tick_rotate = 24000; // --> works for us with 90 duty rotate cycle
-int tick_accelerate = 13355 * 4;
+int tick_accelerate = 35000;
 
 
 
@@ -275,8 +275,27 @@ void rotate_left(){
             continue;
         } 
         distance_travelled_left = distance_traveled_L; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
-        ForwardRight(DUTY_SLOW_ROTATION); // TODO: add PID values here
+        double wheel_ratio = static_cast<double>(abs(distance_traveled_L)) / static_cast<double>(abs(distance_traveled_R));
+        if (wheel_ratio > 1){
+            ForwardRight(DUTY_SLOW_ROTATION + static_cast<int>(wheel_ratio * 3.7)); 
+            BackwardLeft(DUTY_SLOW_ROTATION);  // 
+        } else {
+            ForwardRight(DUTY_SLOW_ROTATION - static_cast<int>(1 / wheel_ratio * 3.7)); 
+            BackwardLeft(DUTY_SLOW_ROTATION);  // 
+        }
+    }
+    if (abs(distance_traveled_R) < abs(distance_traveled_R)){
+        ForwardRight(0);
         BackwardLeft(DUTY_SLOW_ROTATION);
+        while (abs(distance_traveled_R) < abs(distance_traveled_L)){
+                delay(1);
+        }
+    } else {
+        ForwardRight(0);
+        BackwardLeft(DUTY_SLOW_ROTATION);
+        while (abs(distance_traveled_L) < abs(distance_traveled_R)){
+                delay(1);
+        }
     }
     stop();
     reset_distance_traveled();
@@ -295,8 +314,29 @@ void rotate_right(){
             continue;
         }; // if the systick has not updated our values, do not update pwm values etc.
         distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
-        BackwardRight(DUTY_SLOW_ROTATION); // TODO: add PID values here
+        
+        // calculate the ratio of the distance traveled by the two wheels and adjust pwm values accordingly
+        double wheel_ratio = static_cast<double>(abs(distance_traveled_L)) / static_cast<double>(abs(distance_traveled_R));
+        if (wheel_ratio > 1){
+            BackwardRight(DUTY_SLOW_ROTATION + static_cast<int>(wheel_ratio * 3.7)); 
+            ForwardLeft(DUTY_SLOW_ROTATION);  // 
+        } else {
+            BackwardRight(DUTY_SLOW_ROTATION - static_cast<int>(1 / wheel_ratio * 3.7)); 
+            ForwardLeft(DUTY_SLOW_ROTATION);  // 
+        }
+    }
+    if (abs(distance_traveled_R) < abs(distance_traveled_R)){
+        ForwardLeft(0);
+        BackwardRight(DUTY_SLOW_ROTATION);
+        while(abs(distance_traveled_R) < abs(distance_traveled_L)){
+                delay(1);
+        }
+    } else {
+        BackwardRight(0);
         ForwardLeft(DUTY_SLOW_ROTATION);
+        while(abs(distance_traveled_L) < abs(distance_traveled_R)){
+                delay(1);
+        }
     }
     stop();
     reset_distance_traveled();
@@ -337,15 +377,29 @@ void turn_around_left(){
 void left_curve(int duty_cycle){
     duty_L = static_cast<int>(round(0.475 * duty_cycle)); // curve speed ratio
     duty_R = duty_cycle;
+    reset_distance_traveled();
     ForwardRight(duty_R);
     ForwardLeft(duty_L);
     int last_distance_traveled = 0;
     while(distance_traveled_L < TICKS_INNER_WHEEL || distance_traveled_R < TICKS_OUTER_WHEEL){
-        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        if (last_distance_traveled == avg_distance_traveled){
+            delay(1);
+            continue; // if the systick has not updated our values, do not update pwm values etc.
+        }
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ForwardRight(duty_L);  // TODO: add PID values here
-        BackwardLeft(duty_R);  // 
+        // calculate the ratio of the distance traveled by the two wheels and adjust pwm values accordingly
+        double wheel_ratio = static_cast<double>(distance_traveled_L) / static_cast<double>(distance_traveled_R);
+        if (wheel_ratio > 0.475){
+            ForwardRight(duty_R + static_cast<int>(round(wheel_ratio - 0.475) * 50));  // TODO: add PID values here
+            ForwardLeft(duty_L);  // 
+        } else {
+            ForwardRight(duty_R + static_cast<int>(round(wheel_ratio - 0.475) * 50));  // TODO: add PID values here
+            ForwardLeft(duty_L);  // 
+        }
     }
+    // After corner is completed set the motor speed of both equal to continue straight
+    ForwardRight(duty_cycle);
+    ForwardLeft(duty_cycle);
     reset_distance_traveled();
 }
 
