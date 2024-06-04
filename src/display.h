@@ -267,9 +267,11 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
     timer1->setOverflow(overflow);
     timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);  // 50% Duty Cycle - square wave
     timer1->refresh();
+    timer1->resume();
 
     buzzer_counter = (beeps * 2) - 2;
     timer7->setOverflow(length);
+    timer7->refresh();
     timer7->resume();
 }
 
