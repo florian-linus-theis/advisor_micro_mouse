@@ -215,7 +215,7 @@ extern int calibration_sensor[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
-extern int interrupt_counter;
+extern volatile int interrupt_counter;
 extern int Flag_Mid;
 
 
