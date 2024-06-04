@@ -15,24 +15,19 @@ void Distanz_Messung_Sensoren(void);
 
 
 //Main Navigation Infrared Sensor Measurement - - - - - - - - - - - - - - - - - - - - - -
-
-void Distanz_Messung_Blind(void){
-  for(int i = 0; i < 7; i++){
-    Distance_Sensor[i] = analogRead(Channel_Sensoren[i]);
-  }
-}
-
 void Distanz_Messung_Sensoren(void){
   Distanz_Messung_Blind();
   Distanz_Messung_Hell();
 
+  for(int i = 0; i < 7; i++){  //Avoids unprecies informations of walls in lay
+      Walls_Flag[i] = Distance_Sensor[i] > 120;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
+  }
+}
+
+
+void Distanz_Messung_Blind(void){
   for(int i = 0; i < 7; i++){
-    if (Distance_Sensor[i] > 120){     //Avoids unprecies informations of walls in lay
-      Walls_Flag[i] = true;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
-    }
-    else{
-      Walls_Flag[i] = false;
-    }
+    Distance_Sensor[i] = analogRead(Channel_Sensoren[i]);
   }
 }
 
