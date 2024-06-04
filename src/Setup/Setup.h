@@ -13,7 +13,6 @@
 #include "Adafruit_GFX.h"
 #include "./location.h"
 
-
 //Pin Naming
 //System
 #define POWER_ENABLE    PC10  //Main Power Latch - enable directly after startup to keep Robot ON
@@ -92,12 +91,12 @@
 // ---------------------------------------
 // Driving constants 
 #define DUTY_SLOW 100
-#define DUTY_SLOW_ROTATION 90
+#define DUTY_SLOW_ROTATION 100 // --> Tested - works with 24000 ticks for rotation
 #define DUTY_FAST 400
-#define DUTY_FAST_CURVE 200
+#define DUTY_FAST_CURVE 100
 #define MINIMUM_DUTY 50
-#define TICKS_INNER_WHEEL 8600 * 4
-#define TICKS_OUTER_WHEEL 18105 * 4
+#define TICKS_INNER_WHEEL 23750
+#define TICKS_OUTER_WHEEL 50000
 #define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
 #define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
 #define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
@@ -169,15 +168,18 @@ extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
 extern int current_speed; 
+extern void reset_distance_traveled(void);
 
 
-// Drive Motors
+// Driving Functions
 extern void ForwardLeft(int);
 extern void ForwardRight(int);
 extern void BackwardLeft(int);
 extern void BackwardRight(int);
 extern void rotate_left();
 extern void rotate_right();
+extern void turn_around_right();
+extern void turn_around_left();
 extern void move_forward_middle_level(int, float);
 extern void stop(); 
 extern void accelerate();
@@ -188,6 +190,9 @@ extern void move_actual(int);
 extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
+
+// Middle Layer Drving Functions
+extern void grab_ball();
 
 
 //ADC_Setup

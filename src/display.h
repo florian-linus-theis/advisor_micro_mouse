@@ -3,6 +3,7 @@
 #include <robin.h>
 #include <ballgrabber.h>
 #include "PID_neu.h"
+#include "Music.h"
 
 
 // Define an enum for all modes
@@ -136,30 +137,7 @@ void handleModeSelection(Mode mode) {
             delay(1000);
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
-            move_forward_different(100, 0, 1.5);
-            delay(100);
-            rotate_right();
-            move_forward_different(100, 0, 1);
-            //handling ballgrabber
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            // delay(500);
-            Timer4_Setup_Servo();
-            digitalWrite(SERVO_ENABLE, HIGH);
-            delay(1000); // delay to allow the user to read the message
-            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
-            delay(1000);
-            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
-            delay(1000);
-            digitalWrite(SERVO_ENABLE, LOW);
-            Timer4_Setup_Motor();
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            // delay(1000);
-            // ballgrabber done
-            rotate_right();
-            rotate_right();
-            move_forward_different(100, 0, 1);
-            rotate_right();
-            move_forward_different(100, 0, 1.5);
+            grab_ball();
             timer14->pause();
             display->clearDisplay();
             delay(100);
@@ -170,9 +148,13 @@ void handleModeSelection(Mode mode) {
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            timer14->resume(); // starting systick timer
             delay(1000);
-            // timer14->resume(); // starting systick timer
-            move_forward_middle_level(200, 3);
+            left_curve(100);
+            left_curve(100);
+            left_curve(100);
+            left_curve(100);
+            delay(500);
             // decelerate();
             // right_curve(DUTY_SLOW);
             // stop();
@@ -185,10 +167,8 @@ void handleModeSelection(Mode mode) {
         case MODE_BFS:
             display_print("BFS Mode selected");
             PID_Test();
-
-
             delay(1000);
-            Buzzer_beep(2000, 4);
+            //Imperial_March();
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
