@@ -233,3 +233,4 @@ extern bool encoderTurned;
 extern bool confirmationPending;
 
 extern void Buzzer_beep(int, int);
+extern void Buzzer_beep(int, int, int);

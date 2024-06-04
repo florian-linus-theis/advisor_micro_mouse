@@ -231,10 +231,30 @@ void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
     timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
     timer1->refresh();
 
-    for(int i=0; i<beeps; i++) {
+    int i = 1;
+    while(true) {
         timer1->resume();
         delay(100);
         timer1->pause();
+        if(i >= beeps) break;
         delay(100);
+        i++;
+    }
+}
+
+void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beeps and Tone Length
+    int overflow = 1000000/freq;
+    timer1->setOverflow(overflow);
+    timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
+    timer1->refresh();
+
+    int i = 1;
+    while(true) {
+        timer1->resume();
+        delay(length);
+        timer1->pause();
+        if(i >= beeps) break;
+        delay(length);
+        i++;
     }
 }
