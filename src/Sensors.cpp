@@ -8,8 +8,7 @@ bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
 
-int interrupt_counter;
-volatile int Messuring1;
+volatile int interrupt_counter;
 
 void Distanz_Messung_Hell(void);
 void Distanz_Messung_Sensoren(void);
@@ -72,8 +71,6 @@ void Timer6_Interrupt(void) {
 // Print Measured Sensor Values to Bluetooth Module - - - - - - - - - - -
 void printDistanzSensoren(void) {
   for (int i = 0; i < 7; i++) {
-    ble->print(i);
-    ble->print(": ");
-    ble->println(Distance_Sensor[i] - 100);   //Userfriendly read
+    ble->println(String(i) + ":" + String(Distance_Sensor[i] - 100));   //Userfriendly read
   }
 }
