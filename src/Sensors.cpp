@@ -12,7 +12,7 @@ bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
 
-volatile int interrupt_counter;
+int interrupt_counter;
 
 void Distanz_Messung_Hell(void);
 void Distanz_Messung_Sensoren(void);
@@ -43,6 +43,7 @@ void Distanz_Messung_Hell(void) {
   digitalWrite(Channel_Emitter[0], HIGH);
 
   // Enable the interrupt to start the measurement process
+  timer6->pause();
   timer6->setCount(0);
   timer6->refresh();
   timer6->resume();
