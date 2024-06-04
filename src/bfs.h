@@ -90,40 +90,20 @@ public:
         return -1; // If no solution is found
     }
 
-    void execute_shortest_path(int solution_position) {
+
+    std::vector<int> return_action_vector_bfs_path(int solution_position) {
         if (solution_position == -1) {  // If no solution was found
             display_print("could not execute");
             delay(1000);
             display_print("No solution found");
-            return;
+            return {-1}; // Return -1 to indicate no solution was found
         }
         State state = state_vector[solution_position]; // Get the goal state
         while (state.action != -1) {   // While I have not reached the home position
             act_vector.push_back(state.action);  // Push action to vector
             state = state_vector[state.parent];    // Traverse up to parent
         }
-        int counter = act_vector.size() - 1;
-
-        // Accounting for the fact that we might have to grab the ball first
-        if (BALLGREIFER == true) {
-            grab_ball();
-            counter -= 2; // So that we skip the first two actions
-        }
-
-        // Execute the actions in the maze
-        while (counter >= 0) {    // start at the back of actions (at origin) and execute them in the maze until we are at the first action
-            if (current_option == 0) { // If we have an external interrupt triggered by the rotation of the rotary encoder
-                return; // return to main loop
-            }
-            int act = act_vector[counter]; // Get action from vector
-            if (act == 1) {
-                fast_turn_right();
-            } else if (act == 3) {
-                fast_turn_left();
-            }
-            move_forward();
-            counter--;
-        }
-        display_print("Execution complete");
+        reverse(act_vector.begin(), act_vector.end());
+        return act_vector;
     }
 };

@@ -60,7 +60,7 @@ std::vector<std::tuple<int, float>> translate_actions_into_movement(std::vector<
 
 // function to execute the translated actions of the algorithm into actual movement
 // calls middle_layer_functions that work together with the hardware
-void execute_movement(const std::vector<std::tuple<int, int>>& movement) {
+void execute_movements(const std::vector<std::tuple<int, float>>& movement) {
     for (int i = 0; i < movement.size(); ++i) {
         switch (std::get<0>(movement[i])) {
             case FORWARD:

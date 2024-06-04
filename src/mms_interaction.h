@@ -64,7 +64,7 @@ std::vector<bool> get_walls() {
 
 
 // Function to take all actions to move forward and update belief state
-void move_forward(int squares = 1) {
+void move_forward_fast(int squares = 1) {
     if(current_option == MODE_STANDBY) return;
     int duty_cycle = DUTY_SLOW;
     if (current_option == MODE_BFS || current_option == MODE_ASTAR) {
@@ -74,15 +74,20 @@ void move_forward(int squares = 1) {
     update_position();  // Update current position
 }
 
+void move_forward_mapping(int squares = 1){
+    move_forward_different(DUTY_SLOW, 0, squares);
+    update_position();
+}
+
 // Function to take all actions to turn left and update belief state
 void fast_turn_left() {
-    API::turnLeft();
+    left_curve(DUTY_FAST_CURVE);
     update_direction(-1);  // We are turning left
 }
 
 // Function to take all actions to turn right and update belief state
 void fast_turn_right() {
-    API::turnRight();
+    right_curve(DUTY_FAST_CURVE);
     update_direction(+1);  // We are turning right
 }
 
@@ -96,7 +101,7 @@ void set_dir(int _dir) {
         return;
     }
     if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
-        turn_around();
+        turn_around_right();
         return;
     }
     rotate_left();  // If need to turn left once
@@ -124,15 +129,14 @@ void turn_toward(Location loc) {
 
 
 void grab_ball(){
-    // Drive to the ball
-    go_to_start(DUTY_FAST);
-    move_forward();
-    fast_turn_right();
-    move_ballgrabber_forward();
-    move_forward(0.75); 
-    delay(500); 
-    move_ballgrabber_backward();
-    turn_around();
-    move_forward(0.75);
-    fast_turn_right(); 
+    reset_distance_traveled(); // reset distance to zero 
+    move_forward_different(100, 0, 1.75); // move forward from very back to ball
+    delay(100); // wait for wheels to really stop
+    rotate_right(); // rotate right to face ball
+    move_forward_different(100, 0, 1);  // move forward to ball
+    handle_ballgrabber(); // grab the ball
+    turn_around_right(); // turn around to face the opposite direction
+    move_forward_different(100, 0, 1); // move forward to the middle of the cell
+    rotate_right(); // rotate right to face the exit of starting area
+    move_forward_different(100, 0, 1); // move to the exit of starting area
 } 

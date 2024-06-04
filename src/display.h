@@ -134,16 +134,7 @@ void handleModeSelection(Mode mode) {
             delay(1000);
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
-            reset_distance_traveled();
-            move_forward_different(100, 0, 1.5);
-            delay(100);
-            rotate_right();
-            move_forward_different(100, 0, 1);
-            handle_ballgrabber();
-            turn_around_right();
-            move_forward_different(100, 0, 1);
-            rotate_right();
-            move_forward_different(100, 0, 1.5);
+            grab_ball();
             timer14->pause();
             display->clearDisplay();
             delay(100);

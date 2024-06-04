@@ -173,7 +173,7 @@ extern int current_speed;
 extern void reset_distance_traveled(void);
 
 
-// Drive Motors
+// Driving Functions
 extern void ForwardLeft(int);
 extern void ForwardRight(int);
 extern void BackwardLeft(int);
@@ -192,6 +192,9 @@ extern void move_actual(int);
 extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
+
+// Middle Layer Drving Functions
+extern void grab_ball();
 
 
 //ADC_Setup
