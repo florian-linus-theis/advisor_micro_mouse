@@ -9,7 +9,7 @@
 #include "a_star_nodes.h" // importing a_star_node class
 #include "a_star_algorithm.h" // importing AStarAlgorithm class
 #include "display.h"
-#include "Setup/Setup.h"
+#include "Setup\Setup.h"
 
 
 bool BALLGREIFER = false; // Using the Ballgreifer Version or not?

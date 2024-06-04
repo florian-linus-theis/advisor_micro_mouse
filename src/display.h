@@ -3,6 +3,7 @@
 #include <robin.h>
 #include <ballgrabber.h>
 #include "PID_neu.h"
+#include "Music.h"
 
 
 // Define an enum for all modes
@@ -153,10 +154,8 @@ void handleModeSelection(Mode mode) {
         case MODE_BFS:
             display_print("BFS Mode selected");
             PID_Test();
-
-
             delay(1000);
-            Buzzer_beep(2000, 4);
+            //Imperial_March();
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
