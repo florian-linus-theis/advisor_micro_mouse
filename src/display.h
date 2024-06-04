@@ -20,6 +20,8 @@ enum Mode {
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 
+volatile int buzzer_counter;
+
 
 // Functions
 // Interrupt Service Routine (ISR) for rotary encoder turn
@@ -242,7 +244,7 @@ void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
     }
 }
 
-void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beeps and Tone Length
+void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beeps and Tone Length in ms
     int overflow = 1000000/freq;
     timer1->setOverflow(overflow);
     timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
@@ -257,4 +259,28 @@ void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beep
         delay(length);
         i++;
     }
+}
+
+
+void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, Number of beeps and Tone Length in ms
+    int overflow = 1000000/freq;
+    timer1->setOverflow(overflow);
+    timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);  // 50% Duty Cycle - square wave
+    timer1->refresh();
+
+    buzzer_counter = (beeps * 2) - 2;
+    timer7->setOverflow(length);
+    timer7->resume();
+}
+
+
+void Timer7_Interrupt(void) { 
+    if ((buzzer_counter)%2 == 0) {
+        timer1->pause();
+        if(buzzer_counter == 0) timer7->pause();
+    }
+    else {
+        timer1->resume();
+    }
+    buzzer_counter--;
 }
