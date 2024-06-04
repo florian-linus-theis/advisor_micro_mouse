@@ -10,6 +10,7 @@
 #include "a_star_algorithm.h" // importing AStarAlgorithm class
 #include "display.h"
 #include "Setup\Setup.h"
+#include "algorithms_to_movement.h"
 
 
 bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
@@ -34,6 +35,7 @@ void dfs_mapping(){
     dfs_map_maze(); // Mapping the maze using depth-first search 
     set_dir(0); // Reset heading to north
     display->clearDisplay();
+    delay(1000);
     display->print("Mapping complete");
     return;
 }
@@ -49,10 +51,17 @@ void bfs_algorithm(){
     if (current_option == 0) {
         return; // if we have triggered external reset 
     }
-    bfs.execute_shortest_path(solution_position); // Execute the shortest path found by the BFS algorithm
+    // calculate the shortest path
+    std::vector<int> action_vector = bfs.return_action_vector_bfs_path(solution_position);
+    // translate the actions into actual movements in maze
+    std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
+    // execute the movements
+    execute_movements(movements);
+    // display completion message
     display->clearDisplay();
-    display->print("BFS complete");
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion
+    display->print("BFS complete");
+    delay(1000);
     return;
 }
 
@@ -60,23 +69,35 @@ void a_star_algorithm(){
     if (MAPPING_COMPLETE == false) {
         display->clearDisplay();
         display->print("Maze not mapped");
+        Buzzer_beep(2000, 5); // Beep 4 times to indicate completion
         return;
     }
     if (GOAL_POSITION[0] == -1 && GOAL_POSITION[1] == -1) {
         display->clearDisplay();
+        delay(1000);
         display->print("Goal not found yet");
         BFSAlgorithm bfs(&maze, &GOAL_POSITION, BALLGREIFER); // Initialize BFS algorithm
         bfs.find_bfs_shortest_path(); 
-        return;
+        display->clearDisplay();
+        delay(1000);
+        display->print("Goal Position found");
     }
     AStarAlgorithm a_star_algorithm(&maze, GOAL_POSITION, BALLGREIFER); // Initialize A* algorithm
     A_star_node* solution_a_star = a_star_algorithm.prioritize_straight_paths(); // Find the shortest path using A* algorithm
     if (current_option == 0) {
         return; // if we have triggered external reset 
     }
-    a_star_algorithm.execute_shortest_path_psp(solution_a_star); // Execute the shortest path found by the A* algorithm
+    // calculate the shortest path
+    std::vector<int> action_vector = a_star_algorithm.return_action_vector_shortest_path_psp(solution_a_star);
+    // translate the actions into actual movements in maze
+    std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
+    // execute the movements
+    execute_movements(movements);
+    
+    // display completion message
     display->clearDisplay();
-    display->print("A* complete");
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion
+    display->print("A* complete");
+    delay(1000);
     return;
 }

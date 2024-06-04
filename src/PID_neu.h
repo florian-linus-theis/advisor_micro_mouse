@@ -162,7 +162,7 @@ std::vector<int> calc_correction(int PID_case){
     {
     case ROT_ERROR:
         break;
-
+        
     case X_ERROR:
         max_correction_speed = default_max_correction_speed;
         output_G = applyPID(calcError(X_ERROR),4,0,0.01); //<-- Case Specific kp,ki,kd-values can be defined here

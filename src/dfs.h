@@ -68,7 +68,7 @@ void dfs_map_maze() {
             if (!(cur_position == std::vector<int>{0, 0})) {
                 set_dir((dir_stack.top() + 2) % 4); // Turn around and follow direction stack in reverse order
                 dir_stack.pop(); // Remove top element (added)
-                move_forward();
+                move_forward_mapping();
                 dfs_map_maze(); // Try to move again, recursive
             }
             return;
@@ -84,12 +84,12 @@ void dfs_map_maze() {
     if (cur_loc.can_move_to(next_loc)) {
         turn_toward(next_loc);
         dir_stack.push(cur_direction); // Save current direction for backtracking on the direction stack
-        move_forward();
+        move_forward_mapping();
     } else { // Put the target location back on the loc_stack, back up one square, then try again
         loc_stack.push(next_loc);
         set_dir((dir_stack.top() + 2) % 4); // Turn toward last position
         dir_stack.pop(); // Remove top element (added)
-        move_forward();
+        move_forward_mapping();
     }
     dfs_map_maze(); // Try to move again
 }

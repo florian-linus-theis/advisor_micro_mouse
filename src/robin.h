@@ -8,9 +8,6 @@
 
 extern bool encoderTurned;
 
-// HardwareTimer timer8(TIM8);
-// HardwareTimer timer9(TIM9);
-
 void BackwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();
@@ -20,10 +17,11 @@ void BackwardLeft(int dutyCycle) {
 }
 
 void ForwardLeft(int dutyCycle) {
+    int correction = round(dutyCycle * 0.037);
     timer3->setCount(0);
     timer3->resume();
     timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, dutyCycle, TICK_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, dutyCycle + correction, TICK_COMPARE_FORMAT);
     timer3->refresh();
 }
 
@@ -46,11 +44,13 @@ void BackwardRight(int dutyCycle) {
 void ForwardBoth(int dutyCycle) {
     ForwardLeft(dutyCycle);
     ForwardRight(dutyCycle);
+    current_duty_cycle = dutyCycle;
 }
 
 void BackwardBoth(int dutyCycle) {
     BackwardLeft(dutyCycle);
     BackwardRight(dutyCycle);
+    current_duty_cycle = dutyCycle;
 }
 
 
