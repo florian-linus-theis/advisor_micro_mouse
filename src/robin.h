@@ -41,7 +41,7 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    int correction = round(dutyCycle * 0.04);
+    int correction = round(dutyCycle * 0.037);
     ForwardLeft(dutyCycle + correction);
     ForwardRight(dutyCycle);
     current_duty_cycle = dutyCycle;

@@ -24,10 +24,17 @@ int encoder_L = 0;
 int encoder_R = 0;
 
 // tick variables: [distance / (2,2cm * pi)] * 5 * 2048 Ticks
-int tick_forward = 26668 * 4;
+// int tick_forward = 26668 * 4 ;
+// int tick_start = 6889 * 4;
+// int tick_rotate = 7460 * 4;
+// int tick_accelerate = 13355 * 4;
+
+int tick_forward = 26668 * 4 - 3000;
 int tick_start = 6889 * 4;
-int tick_rotate = 7460 * 3;
+int tick_rotate = 24000; // --> works for us with 90 duty rotate cycle
 int tick_accelerate = 13355 * 4;
+
+
 
 // placeholder for sensor values
 int sensor_LA, sensor_LI, sensor_LV, sensor_RV, sensor_RA, sensor_RI;
@@ -215,12 +222,12 @@ void printer_debugger(int average_distance_travelled, int distance_remaining, in
 
 void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, float squares){
     // first reset distances
-    reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
     int desired_distance = static_cast<int>(round(squares * tick_forward));
     int last_distance_traveled = 1;	// setting the distance to one so that we can enter the loop and not skip first iteration
     int counter = 0; 
     ble->println("Moving forward");
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
+    reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
     while(avg_distance_traveled < desired_distance){ 
         counter++;
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
@@ -254,38 +261,42 @@ void go_to_start(int duty_cycle){
 }
 
 void rotate_left(){
-    reset_distance_traveled();
     // start moving wheels in opposite directions (turning left)
     ForwardRight(DUTY_SLOW_ROTATION); 
     BackwardLeft(DUTY_SLOW_ROTATION);
-    int distance_travelled_left = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
+    volatile int distance_travelled_left = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
     current_duty_cycle = DUTY_SLOW_ROTATION;
+    reset_distance_traveled();
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the left wheel)
     while(abs(distance_traveled_L) < tick_rotate && abs(distance_traveled_R) < tick_rotate) {
-        if (distance_travelled_left == distance_traveled_L) continue; // if the systick has not updated our values, do not update pwm values etc.
+        // if the systick has not updated our values, do not update pwm values etc.
+        if (distance_travelled_left == distance_traveled_L){
+            delay(1);
+            continue;
+        } 
         distance_travelled_left = distance_traveled_L; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
-        BackwardRight(DUTY_SLOW_ROTATION); // TODO: add PID values here
-        ForwardLeft(DUTY_SLOW_ROTATION);
-        ble->println(tick_rotate);
-        ble->println();
+        ForwardRight(DUTY_SLOW_ROTATION); // TODO: add PID values here
+        BackwardLeft(DUTY_SLOW_ROTATION);
     }
+    stop();
     reset_distance_traveled();
 }
 
 void rotate_right(){
-    reset_distance_traveled();
     BackwardRight(DUTY_SLOW_ROTATION); // start moving wheels in opposite directions (turning right)
     ForwardLeft(DUTY_SLOW_ROTATION);
-    int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
+    volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
     current_duty_cycle = DUTY_SLOW_ROTATION;
+    reset_distance_traveled();
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
     while(abs(distance_traveled_R) < tick_rotate && abs(distance_traveled_L) < tick_rotate){
-        if (distance_travelled_right == distance_traveled_R) continue; // if the systick has not updated our values, do not update pwm values etc.
+        if (distance_travelled_right == distance_traveled_R) {
+            delay(1);
+            continue;
+        }; // if the systick has not updated our values, do not update pwm values etc.
         distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
         BackwardRight(DUTY_SLOW_ROTATION); // TODO: add PID values here
         ForwardLeft(DUTY_SLOW_ROTATION);
-        ble->println(tick_rotate);
-        ble->println();
     }
     stop();
     reset_distance_traveled();
@@ -307,7 +318,17 @@ void turn_around(){
     reset_distance_traveled();
 }
 
+void turn_around_right(){
+    rotate_right();
+    // delay(500);
+    rotate_right();
+}
 
+
+void turn_around_left(){
+    rotate_left();
+    rotate_left();
+}   
 
 
 // ------------------------------------------------------------------------------------

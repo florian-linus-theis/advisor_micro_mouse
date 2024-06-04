@@ -94,7 +94,7 @@
 // ---------------------------------------
 // Driving constants 
 #define DUTY_SLOW 100
-#define DUTY_SLOW_ROTATION 90
+#define DUTY_SLOW_ROTATION 100 // --> Tested - works with 24000 ticks for rotation
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 200
 #define MINIMUM_DUTY 50
@@ -170,6 +170,7 @@ extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
 extern int current_speed; 
+extern void reset_distance_traveled(void);
 
 
 // Drive Motors
@@ -179,6 +180,8 @@ extern void BackwardLeft(int);
 extern void BackwardRight(int);
 extern void rotate_left();
 extern void rotate_right();
+extern void turn_around_right();
+extern void turn_around_left();
 extern void move_forward_middle_level(int, float);
 extern void stop(); 
 extern void accelerate();
