@@ -87,7 +87,6 @@
 
 
 
-
 // ---------------------------------------
 // Driving constants 
 #define DUTY_SLOW 100
@@ -100,6 +99,10 @@
 #define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
 #define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
 #define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
+
+
+// Global Variables 
+extern bool SETUP_COMPLETE;
 
 
 // ---------------------------------------
@@ -219,7 +222,7 @@ extern int calibration_sensor[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
-extern int interrupt_counter;
+extern volatile int interrupt_counter;
 extern int Flag_Mid;
 
 

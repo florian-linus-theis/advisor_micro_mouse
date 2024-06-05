@@ -26,8 +26,6 @@ void Timer7_Setup();
 
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
-    // Enable Systick Timer
-    Systick_Setup();
 
     //Motor Timers
     Timer3_Setup();         //PWM Timer Left        
@@ -46,6 +44,9 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     //Buzzer PWM and Delay Timer
     Timer1_Setup();
     Timer7_Setup();
+
+    // Enable Systick Timer
+    Systick_Setup();
 }
 
 
@@ -182,7 +183,7 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6->setPrescaleFactor(50);               // Set prescaler to 50
     timer6->setOverflow(160);                     // Set overflow to 16 = 50us intervals
     timer6->attachInterrupt(Timer6_Interrupt);
-    timer6->refresh();
+    // timer6->refresh();
     timer6->pause();
 }
 

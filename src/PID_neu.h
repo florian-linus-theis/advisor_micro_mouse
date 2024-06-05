@@ -312,6 +312,7 @@ std::vector<int> determine_state(){
         current_state = BLIND;
         return calc_correction(BLIND);
     }
+    return {0,0}; // default
 }
 
 

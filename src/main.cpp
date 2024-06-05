@@ -16,15 +16,16 @@ int selected_option = MODE_STANDBY;
 bool optionSelected = false;
 bool encoderTurned = false;
 bool confirmationPending = false;
+bool SETUP_COMPLETE = false;
 
 
 
 void setup() {
     Pin_Setup();
     Timer_Setup();
+    set_Interrupt_Priority();
     ADC_Setup();
     maze_setup(); // setting up the maze file
-    set_Interrupt_Priority();
 
     //Start Systick Timer (manually enable when in drive mode to speed up rest)
     timer14->resume();
@@ -35,6 +36,8 @@ void setup() {
 
     // Test Bluetooth
     ble->println("test bluetooth");
+    SETUP_COMPLETE = true;
+
 }
 
 
