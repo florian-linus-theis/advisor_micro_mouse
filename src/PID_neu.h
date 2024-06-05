@@ -11,6 +11,7 @@ int default_max_correction_speed = 200;
 int max_correction_speed = 200;
 int current_state;
 int toggle_drive;
+int LAST_CASE_PID = -1;
 
 enum{
     ROT_ERROR = 0,
@@ -133,6 +134,10 @@ int calcError(int PID_case){
 }
 
 int applyPID(signed int error, double kp = 3, double ki = 0.0001, double kd = 0.002){
+    if(CURRENT_CASE_PID != LAST_CASE_PID){
+        kd = 0;    
+    }
+    LAST_CASE_PID = CURRENT_CASE_PID;
     error = give_percent(error);
     proportional = error;
     

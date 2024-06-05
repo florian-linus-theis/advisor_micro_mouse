@@ -36,7 +36,7 @@ void setup() {
     SETUP_COMPLETE = true;
   
     //Start Systick Timer (manually enable when in drive mode to speed up rest)
-    timer14->resume();
+    // timer14->resume();
 }
 
 

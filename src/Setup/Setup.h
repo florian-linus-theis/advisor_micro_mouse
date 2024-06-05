@@ -220,6 +220,8 @@ extern void Distanz_Messung_Blind(void);
 extern void Distanz_Messung_Hell(void);
 extern void Distanz_Mid_Sensor(void);
 extern void printDistanzSensoren(void);
+extern void calibrate_sensors(int, int);
+extern bool SENSOR_CALIBRATED;
 
 extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
