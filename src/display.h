@@ -114,7 +114,13 @@ void handleModeSelection(Mode mode) {
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
             calibrate_sensors(10, 10);
-            // Handle Stand By Mode
+            ble->println("Calibration done");
+            ble->println("Calibration values: ");
+            ble->println("1: " + String(calibration_sensor[0]) + " 2: " + String(calibration_sensor[1]) + " 3: " + String(calibration_sensor[2]) + " 4: " + String(calibration_sensor[3]) + " 5: " + String(calibration_sensor[4]) + " 6: " + String(calibration_sensor[5]) + " 7: " + String(calibration_sensor[6]));
+            ble->println("Neutral values: ");
+            ble->println("1: " + String(NeutralSensorValues[0]) + " 2: " + String(NeutralSensorValues[1]) + " 3: " + String(NeutralSensorValues[2]) + " 4: " + String(NeutralSensorValues[3]) + " 5: " + String(NeutralSensorValues[4]) + " 6: " + String(NeutralSensorValues[5]) + " 7: " + String(NeutralSensorValues[6]));
+            // always keep this last
+            displayOptions(MODE_STANDBY, false);
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
@@ -129,7 +135,8 @@ void handleModeSelection(Mode mode) {
             delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
-            delay(1000);
+            // always keep this last
+            displayOptions(MODE_SOFT_RESET, false);
             break;
         case MODE_SHOW_DATA:
             // display_print("Data Mode selected");
@@ -143,9 +150,9 @@ void handleModeSelection(Mode mode) {
             timer14->pause();
             display->clearDisplay();
             delay(100);
-            display->println("Test Servo");
             // Handle Hard Reset Mode
-            delay(100);
+            // always keep this last
+            displayOptions(MODE_SHOW_DATA, false);
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
@@ -165,6 +172,8 @@ void handleModeSelection(Mode mode) {
             delay(200);
             // ble->println(avg_distance_traveled);
             // Handle Map Maze Mode
+            // always keep this last
+            displayOptions(MODE_MAP_MAZE, false);
             break;
         case MODE_BFS:
             timer14->resume(); // starting systick timer
@@ -173,27 +182,30 @@ void handleModeSelection(Mode mode) {
             timer14->pause();
             delay(1000);
             //Imperial_March();
-            // Handle BFS Mode
+            // always keep this last
+            displayOptions(MODE_BFS, false);
             break;
         case MODE_ASTAR:
-            delay(1000);
-            timer14->resume(); // starting systick timer
+            display_print("A* Mode selected wait for Finger");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            display_print("A* Mode selected");
+            start(); // wait for finger
+            timer14->resume(); // starting systick timer
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
             // Handle A* Mode
-            move_forward_different(200, 0, 4);
-            delay(500);
-            rotate_right();
-            delay(500);
-            rotate_right();
-            delay(500);
-            move_forward_different(200, 0, 4);
+            while(1){
+                move_forward_different(100, 0, 2);
+                delay(500);
+                rotate_left();
+                delay(500);
+                if(encoderTurned) break;
+            }
             timer14->pause();
             display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            // always keep this last
+            displayOptions(MODE_ASTAR, false);
             break;
         default:
             display_print("Invalid mode");
@@ -263,57 +275,23 @@ void Timer7_Interrupt(void) {
 
 
 
-// calibrate the sensors - first in the air, then in the maze start cell.
-void calibrate_sensors(int measurements_air, int measurements_maze){
-    int air_values[7];
-    int maze_values[7];
 
-    digitalWrite(LED_GREEN, LOW);
-    Buzzer_beep(3000, 3, 100);
-
-
-    //meassure in the air and add up to array
-    for (int i=0; i<measurements_air; i++){
-        Distanz_Messung_Sensoren();
-        for(int i=0; i<7; i++) {
-            air_values[i] += Distance_Sensor[i];
-        }
-    }
-    digitalWrite(LED_GREEN, LOW);
-
-    start();
-
-    //meassure in the maze and add up to array
-    for (int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        for(int i=0; i<7; i++) {
-            maze_values[i] += Distance_Sensor[i];
-        }
-    }
-
-    // calculate average by dividing through # of meassurements
-    for(int i=0 ; i<7 ; i++){
-        calibration_sensor[i] = static_cast<int>(std::round(static_cast<double>(air_values[i]) / measurements_maze));
-        NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(maze_values[i]) / measurements_maze));
-    }
-}
-
-
-
+// Function to start all driving modes 
+// Waits for finger to be in front of the sensor (front right), then starts the driving mode
 void start(){
-    while(Distance_Sensor[5] <= 1500){   //SENSOR_RD
+    while(Distance_Sensor[5] <= 1250){   //SENSOR_RD
         Distanz_Messung_Sensoren();
         delay(50);
     }
 
     digitalWrite(LED_GREEN, LOW);       //SENSOR_RD
-    while(Distance_Sensor[5] > 1500){
+    while(Distance_Sensor[5] > 1250){
         Distanz_Messung_Sensoren();
         delay(50);
     }
 
-    delay(200);
-    Buzzer_beep(3000, 3, 100);
+    delay(1000);
+    Buzzer_beep(4000, 2, 50);
     digitalWrite(LED_GREEN, HIGH);
 
     //timer14->resume();
