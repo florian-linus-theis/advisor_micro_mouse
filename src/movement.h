@@ -237,7 +237,10 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
             if (current_duty_cycle < desired_max_duty_cycle){
                 accelerate_different(desired_max_duty_cycle);
             }
-            // else just remain at the desired max duty cycle
+            else {
+                ForwardBoth(current_duty_cycle); // just normal driving with PID
+            }
+        
         } else {
             if (decelerate_different(end_duty_cycle, distance_remaining) == 0){
                 break;

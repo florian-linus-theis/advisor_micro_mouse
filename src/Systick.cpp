@@ -4,9 +4,12 @@ int encoder_right = 0;
 int encoder_left = 0;
 int encoder_right_last_time = 0;
 int encoder_left_last_time = 0;
+std::vector<int> PID_values = {0, 0};
 
 void update_encoders();
 void print_encoders();
+void print_sensors();
+void print_pid();
 
 
 void Systick_Interrupt() {
@@ -16,14 +19,17 @@ void Systick_Interrupt() {
   // first read encoder values 
   static int counter = 0; 
   update_encoders();
-  if (counter % 10 == 0) {
-    print_encoders(); // print_encoders(); just for test purposes
-  }
   
   // then read sensor values
   Distanz_Messung_Sensoren();
+  // print_sensors(); // just for test purposes
   
   // lastly update the PID controller 
+  CURRENT_CASE_PID = determine_PID_case(); 
+  PID_values = calc_correction(CURRENT_CASE_PID);
+  // if (counter % 50 == 0) {
+  //   print_pid(); // print_encoders(); just for test purposes
+  // }
   
 
   counter++; 
@@ -61,6 +67,20 @@ void print_encoders() {
     ble->println("Current Duty Cycle: " + String(current_duty_cycle) + "\n" +
            " Avg distance travelled up to this point: " + String(avg_distance_traveled) + "\n" +
            " Current Time in millis: " + String(millis()) + "\n");
+}
+
+void print_sensors(){
+  ble->println("S0: " + String(Distance_Sensor[0]) + "\n" +
+                "S1: " + String(Distance_Sensor[1]) + "\n" +
+                "S2: " + String(Distance_Sensor[2]) + "\n" +
+                "S3: " + String(Distance_Sensor[3]) + "\n" +
+                "S4: " + String(Distance_Sensor[4]) + "\n" +
+                "S5: " + String(Distance_Sensor[5]) + "\n" +
+                "S6: " + String(Distance_Sensor[6]) + "\n");
+}
+
+void print_pid(){
+  ble->println("PID: " + String(PID_values[0]) + " " + String(PID_values[1]));
 }
 
 

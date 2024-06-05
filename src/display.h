@@ -41,6 +41,7 @@ void handleEncoderTurn() {
 // Interrupt Service Routine (ISR) for rotary encoder button press
 void handleEncoderButton() {
     optionSelected = true;
+    Buzzer_beep_noBlock(1000, 1, 100);
 }
 
 
@@ -112,6 +113,9 @@ void handleModeSelection(Mode mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
+            timer14->resume(); // starting systick timer
+            delay(1000); // Delay to allow the user to read the message
+            timer14->pause(); // stopping systick timer
             // Handle Stand By Mode
             break;
         case MODE_SOFT_RESET:
@@ -165,22 +169,33 @@ void handleModeSelection(Mode mode) {
             // Handle Map Maze Mode
             break;
         case MODE_BFS:
+            timer14->resume(); // starting systick timer
             display_print("BFS Mode selected");
             PID_Test();
+            timer14->pause();
             delay(1000);
             //Imperial_March();
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
+            delay(1000);
             timer14->resume(); // starting systick timer
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             display_print("A* Mode selected");
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
+            reset_PID_values();
             // Handle A* Mode
-            move_forward_different(100, 0, 4);
+            move_forward_different(200, 0, 4);
+            delay(500);
+            rotate_right();
+            delay(500);
+            rotate_right();
+            delay(500);
+            move_forward_different(200, 0, 4);
             timer14->pause();
             display_print("A* Mode completed");
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             break;
         default:
             display_print("Invalid mode");
