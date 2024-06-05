@@ -41,6 +41,7 @@ void handleEncoderTurn() {
 // Interrupt Service Routine (ISR) for rotary encoder button press
 void handleEncoderButton() {
     optionSelected = true;
+    Buzzer_beep_noBlock(1000, 1, 100);
 }
 
 
@@ -166,41 +167,33 @@ void handleModeSelection(Mode mode) {
             // Handle Map Maze Mode
             break;
         case MODE_BFS:
+            timer14->resume(); // starting systick timer
             display_print("BFS Mode selected");
             PID_Test();
+            timer14->pause();
             delay(1000);
             //Imperial_March();
             // Handle BFS Mode
             break;
         case MODE_ASTAR:
-            display_print("A* Mode selected");
-            digitalWrite(SERVO_ENABLE, LOW);
-
-            // Code doesnt work YET
-            // Timer4_Setup_Motor();
-            ble->println("motor setup done");
-            // delay(2000);
-            robin_test();
-            delay(500);
-            ble->println("robin test done");
-            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            Timer4_Setup_Servo();
-            digitalWrite(SERVO_ENABLE, HIGH);
-            delay(500); // delay to allow the user to read the message
-            ble->println("servo setup done");
-            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
-            // timer4->refresh();
             delay(1000);
-            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
-            // delay(2000);
-            delay(750);
-            digitalWrite(SERVO_ENABLE, LOW);
-            ble->println("ballgrabber done");
-            Timer4_Setup_Motor();
-            // // delay(1000);
-            ble->println("motor setup done");
-            robin_test();
+            timer14->resume(); // starting systick timer
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            display_print("A* Mode selected");
+            // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
+            reset_encoders();
+            reset_PID_values();
             // Handle A* Mode
+            move_forward_different(200, 0, 4);
+            delay(500);
+            rotate_right();
+            delay(500);
+            rotate_right();
+            delay(500);
+            move_forward_different(200, 0, 4);
+            timer14->pause();
+            display_print("A* Mode completed");
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             break;
         default:
             display_print("Invalid mode");

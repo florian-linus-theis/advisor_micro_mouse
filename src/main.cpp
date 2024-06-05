@@ -25,7 +25,7 @@ void setup() {
     Timer_Setup();
     set_Interrupt_Priority();
     maze_setup(); // setting up the maze file
-
+  
     // Setup Complete
     // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
@@ -34,7 +34,7 @@ void setup() {
     ble->println("test bluetooth");
 
     SETUP_COMPLETE = true;
-
+  
     //Start Systick Timer (manually enable when in drive mode to speed up rest)
     timer14->resume();
 }

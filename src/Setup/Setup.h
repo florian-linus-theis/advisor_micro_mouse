@@ -110,7 +110,14 @@ extern bool SETUP_COMPLETE;
 // PID 
 extern std::vector<int> NeutralSensorValues;
 extern std::vector<int> PID_constants; // Global variable to store the PID constants
-
+extern std::vector<int> PID_values; 
+extern std::vector<int> calc_correction(int);
+extern void reset_PID_values();
+extern int determine_PID_case();
+extern double differential;
+extern double integral;
+extern double proportional; 
+extern int CURRENT_CASE_PID; 
 
 
 // ---------------------------------------
@@ -164,14 +171,15 @@ extern int Systick_Counter;
 // Global variables updated during systick 
 extern int encoder_right_total; 
 extern int encoder_left_total;
-extern int distance_traveled_L; // TODO: evtl float
-extern int distance_traveled_R; // TODO: evtl float
-extern int avg_distance_traveled; // TODO: evtl float
+extern volatile int distance_traveled_L; // TODO: evtl float
+extern volatile int distance_traveled_R; // TODO: evtl float
+extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
 extern int current_speed; 
 extern void reset_distance_traveled(void);
+extern void reset_encoders(void);
 
 
 

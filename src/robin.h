@@ -38,8 +38,22 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    ForwardLeft(dutyCycle);
-    ForwardRight(dutyCycle);
+    // double factor = dutyCycle / 100.0;
+    // int correctionL = static_cast<int>(round(dutyCycle + (PID_values[0] * factor)));
+    // int correctionR = static_cast<int>(round(dutyCycle + (PID_values[1] * factor)));
+    if(dutyCycle + PID_values[0] > 0){
+        ForwardLeft(dutyCycle + PID_values[0]);
+    }
+    else if(dutyCycle + PID_values[0] <= 0){
+        ForwardLeft(0);
+    }
+
+    if(dutyCycle + PID_values[1] > 0){
+        ForwardRight(dutyCycle + PID_values[1]);
+    }
+    else if(dutyCycle + PID_values[1] <= 0){
+        ForwardRight(0);
+    }
     current_duty_cycle = dutyCycle;
 }
 
