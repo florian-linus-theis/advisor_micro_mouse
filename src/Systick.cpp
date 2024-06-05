@@ -8,9 +8,8 @@ void print_encoders();
 
 
 void Systick_Interrupt() {
-  if (!SETUP_COMPLETE) {
-    return;
-  }
+  if (!SETUP_COMPLETE) {return;}
+
   // first read encoder values 
   static int counter = 0; 
   update_encoders();
@@ -42,15 +41,15 @@ void update_encoders() {
 }
 
 void print_encoders() {
-  ble->print("Encoder Right: ");
+  ble->print("Enc R: ");
   ble->println(encoder_right);
-  ble->print("Encoder Left: ");
+  ble->print("Enc L: ");
   ble->println(encoder_left);
-  ble->print("Distance Traveled Left: ");
+  ble->print("Distance L: ");
   ble->println(distance_traveled_L);
-  ble->print("Distance Traveled Right: ");
+  ble->print("Distance R: ");
   ble->println(distance_traveled_R);
-  ble->print("Average Distance Traveled: ");
+  ble->print("Avg Distance: ");
   ble->println(avg_distance_traveled);
   ble->println(); // empty line
 }

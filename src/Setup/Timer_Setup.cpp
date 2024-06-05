@@ -1,6 +1,15 @@
 #include "Setup\Setup.h"
 
-//unused Timers 7,8,9,11,12,13
+/*
+Clock Overview:
+    Processor Core Clock: 168MHz
+    APB1 Timer Clock:     84MHz     Timers: 2, 3, 4, 5, 6, 7, 12, 13, 14
+    APB2 Timer Clock:     168MHz    Timers: 1, 8, 9, 10, 11
+*/
+
+
+//unused Timers 8,9,11,12,13
+
 HardwareTimer *timer14 = new HardwareTimer(TIM14);
 HardwareTimer *timer3 = new HardwareTimer(TIM3);
 HardwareTimer *timer4 = new HardwareTimer(TIM4);
@@ -200,7 +209,7 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 
 void Timer1_Setup() {       //Buzzer PWM TImer
     timer1->setMode(4, TIMER_OUTPUT_COMPARE_PWM1, BUZZER);
-    timer1->setPrescaleFactor(84);    // Set prescaler so that 1 tick equals 1us
+    timer1->setPrescaleFactor(168);    // Set prescaler so that 1 tick equals 1us
     //freq = 1/T = 1/(Overflow*1us)
     //Overflow = 1/(freq*1us) = 100000/freq
     int freq = 2000;

@@ -112,6 +112,7 @@ void handleModeSelection(Mode mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
+            calibrate_sensors(10, 10);
             // Handle Stand By Mode
             break;
         case MODE_SOFT_RESET:
@@ -265,4 +266,63 @@ void Timer7_Interrupt(void) {
         timer1->resume();
     }
     buzzer_counter--;
+}
+
+
+
+// calibrate the sensors - first in the air, then in the maze start cell.
+void calibrate_sensors(int measurements_air, int measurements_maze){
+    int air_values[7];
+    int maze_values[7];
+
+    digitalWrite(LED_GREEN, LOW);
+    Buzzer_beep(3000, 3, 100);
+
+
+    //meassure in the air and add up to array
+    for (int i=0; i<measurements_air; i++){
+        Distanz_Messung_Sensoren();
+        for(int i=0; i<7; i++) {
+            air_values[i] += Distance_Sensor[i];
+        }
+    }
+    digitalWrite(LED_GREEN, LOW);
+
+    start();
+
+    //meassure in the maze and add up to array
+    for (int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        for(int i=0; i<7; i++) {
+            maze_values[i] += Distance_Sensor[i];
+        }
+    }
+
+    // calculate average by dividing through # of meassurements
+    for(int i=0 ; i<7 ; i++){
+        calibration_sensor[i] = static_cast<int>(std::round(static_cast<double>(air_values[i]) / measurements_maze));
+        NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(maze_values[i]) / measurements_maze));
+    }
+}
+
+
+
+void start(){
+    while(Distance_Sensor[5] <= 1500){   //SENSOR_RD
+        Distanz_Messung_Sensoren();
+        delay(50);
+    }
+
+    digitalWrite(LED_GREEN, LOW);       //SENSOR_RD
+    while(Distance_Sensor[5] > 1500){
+        Distanz_Messung_Sensoren();
+        delay(50);
+    }
+
+    delay(200);
+    Buzzer_beep(3000, 3, 100);
+    digitalWrite(LED_GREEN, HIGH);
+
+    //timer14->resume();
+    //move_forward_different(100, 100, 0.5);
 }

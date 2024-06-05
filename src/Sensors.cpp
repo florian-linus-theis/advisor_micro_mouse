@@ -53,9 +53,7 @@ void Distanz_Messung_Hell(void) {
 
 void Timer6_Interrupt(void) { 
   // return if setup is not complete
-  if (!SETUP_COMPLETE) {
-    return;
-  }
+  if (!SETUP_COMPLETE) {return;}
   
   Distance_Sensor[interrupt_counter] =  100 + analogRead(Channel_Sensoren[interrupt_counter]) - Distance_Sensor[interrupt_counter] - calibration_sensor[interrupt_counter]; // Read Sensor Values
   //10 is new level of calibrated sensors. 100 +. Negative Values are avoided
