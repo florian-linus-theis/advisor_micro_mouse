@@ -12,7 +12,7 @@ bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
 
-int interrupt_counter;
+volatile int interrupt_counter = 0;
 
 void Distanz_Messung_Hell(void);
 void Distanz_Messung_Sensoren(void);
@@ -23,7 +23,7 @@ void Distanz_Messung_Sensoren(void){
   Distanz_Messung_Blind();
   Distanz_Messung_Hell();
 
-  for(int i = 0; i < 7; i++){  //Avoids unprecies informations of walls in lay
+  for(int i = 0; i < 7; i++){ 
       Walls_Flag[i] = Distance_Sensor[i] > 120;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
   }
 }
@@ -43,7 +43,6 @@ void Distanz_Messung_Hell(void) {
   digitalWrite(Channel_Emitter[0], HIGH);
 
   // Enable the interrupt to start the measurement process
-  timer6->pause();
   timer6->setCount(0);
   timer6->refresh();
   timer6->resume();
@@ -53,6 +52,11 @@ void Distanz_Messung_Hell(void) {
 }
 
 void Timer6_Interrupt(void) { 
+  // return if setup is not complete
+  if (!SETUP_COMPLETE) {
+    return;
+  }
+  
   Distance_Sensor[interrupt_counter] =  100 + analogRead(Channel_Sensoren[interrupt_counter]) - Distance_Sensor[interrupt_counter] - calibration_sensor[interrupt_counter]; // Read Sensor Values
   //10 is new level of calibrated sensors. 100 +. Negative Values are avoided
 
