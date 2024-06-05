@@ -1,8 +1,4 @@
 #pragma once
-#include <Arduino.h>
-#include <wiring.h>
-#include "HardwareTimer.h"
-#include "stm32f4xx_hal.h"
 #include "Setup\Setup.h"
 #include <display.h>
 

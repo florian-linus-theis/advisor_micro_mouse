@@ -13,9 +13,8 @@ void print_pid();
 
 
 void Systick_Interrupt() {
-  if (!SETUP_COMPLETE) {
-    return;
-  }
+  if (!SETUP_COMPLETE) {return;}
+
   // first read encoder values 
   static int counter = 0; 
   update_encoders();
