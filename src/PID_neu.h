@@ -7,24 +7,28 @@ double dt, kp_default=2, ki_default=0, kd_default=0.001;
 double proportional, integral, differential;
 signed int previous=0;
 int base_speed = 100;
-int default_max_correction_speed = 130, max_correction_speed;
+int default_max_correction_speed = 200; 
+int max_correction_speed = 200;
 int current_state;
 int toggle_drive;
 
 enum{
     ROT_ERROR = 0,
     X_ERROR = 1,
-    Y_ERROR = 2,
-    CURVE_LEFT_ERROR = 3,
-    CURVE_RIGHT_ERROR = 4,
-    X_ERROR_LEFT_WALL_ONLY = 5,
-    X_ERROR_RIGHT_WALL_ONLY = 6,
-    BLIND = 7
+    X_ERROR_LEFT_WALL_ONLY = 2,
+    X_ERROR_RIGHT_WALL_ONLY = 3,
+    Y_ERROR = 4,
+    ROTATE_LEFT = 5,
+    ROTATE_RIGHT = 6,
+    CURVE_LEFT_ERROR = 7,
+    CURVE_RIGHT_ERROR = 8,
+    BLIND = 9
 };
 
-//std::vector<int> NeutralSensorValues {150,78,330,230,60,144};
-std::vector<int> NeutralSensorValues {237, 110, 340, 407, 510, 171};
-std::vector<signed int> ErrorSensorsVec {0,0,0,0,0,0};
+int CURRENT_CASE_PID = X_ERROR_LEFT_WALL_ONLY;
+
+std::vector<int> NeutralSensorValues {532, 470, 803, 678, 672, 475, 1423};
+std::vector<int> ErrorSensorsVec {0,0,0,0,0,0};
 
  void debug_print(){
     // ble->print(": ");
@@ -58,6 +62,7 @@ double calc_dt(){
     return dt;
 }
 
+//Calculate offset from neutral sensor values
 void calc_Sensor_Errors(){
     for(int i=0;i<6;i++){
         ErrorSensorsVec[i] = Distance_Sensor[i]-NeutralSensorValues[i];
@@ -69,10 +74,10 @@ void calc_Sensor_Errors(){
 
 //adjust possible correction according to speed
 double give_percent(double value) {
-	//return -100 + (100 - (-100)) * ((value - (-5000)) / (5000 - (-5000)));
     return -100 + 200 * ((value +5000) / 10000);
 }
 
+//Calculate error for PID (dependent on current case)
 int calcError(int PID_case){
     int error, desired_distance_L, desired_distance_R;
     switch (PID_case)
@@ -86,21 +91,6 @@ int calcError(int PID_case){
         error = error/4;
         break;
 
-    case Y_ERROR:
-        error = (ErrorSensorsVec[2]+ErrorSensorsVec[3]);
-        error = error/2;
-        break;
-
-    case CURVE_LEFT_ERROR:
-        desired_distance_L = (TICKS_INNER_WHEEL/TICKS_OUTER_WHEEL)*distance_traveled_R;
-        error = distance_traveled_L - desired_distance_L;
-        break;  
-
-    case CURVE_RIGHT_ERROR:
-        desired_distance_R = (TICKS_INNER_WHEEL/TICKS_OUTER_WHEEL)*distance_traveled_L;
-        error = distance_traveled_R - desired_distance_R;
-        break;
-
     case X_ERROR_LEFT_WALL_ONLY:
         error = (ErrorSensorsVec[0]+ErrorSensorsVec[1]);
         error = error/2;
@@ -109,6 +99,29 @@ int calcError(int PID_case){
     case X_ERROR_RIGHT_WALL_ONLY:
         error = -(ErrorSensorsVec[4]+ErrorSensorsVec[5]);
         error = error/2;
+        break;
+
+    case Y_ERROR:
+        error = (ErrorSensorsVec[2]+ErrorSensorsVec[3]);
+        error = error/2;
+        break;
+
+    case ROTATE_LEFT:
+        error = 0;
+        break;
+
+    case ROTATE_RIGHT:
+        error = 0;
+        break;
+
+    case CURVE_LEFT_ERROR:
+        desired_distance_L = 0.475 * distance_traveled_R;
+        error = distance_traveled_L - desired_distance_L;
+        break;  
+
+    case CURVE_RIGHT_ERROR:
+        desired_distance_R = (TICKS_INNER_WHEEL/TICKS_OUTER_WHEEL)*distance_traveled_L;
+        error = distance_traveled_R - desired_distance_R;
         break;
 
     default:
@@ -122,10 +135,10 @@ int calcError(int PID_case){
 int applyPID(signed int error, double kp = 3, double ki = 0.0001, double kd = 0.002){
     error = give_percent(error);
     proportional = error;
+    
     if(abs(integral) < 100000){
         integral += error * dt;
     }
-    double output;
     // if((abs(integral*ki) < 7 && ki > 0.001) || abs(error) < 5){
     //     output = 0;
     //     toggle_drive = 0;
@@ -133,7 +146,7 @@ int applyPID(signed int error, double kp = 3, double ki = 0.0001, double kd = 0.
     // }
     // else{
     differential = (error-previous)/dt;
-    output = kp * proportional + ki*integral + kd*differential;
+    double output = kp * proportional + ki*integral + kd*differential;
     // }
     // toggle_drive = 1;
     //ble->println(output);
@@ -143,7 +156,7 @@ int applyPID(signed int error, double kp = 3, double ki = 0.0001, double kd = 0.
 }
 
 //cap max correction speed
-int cap_output(int output_G, int max_correction_speed = default_max_correction_speed){
+int cap_output(int output_G){
     if(output_G > max_correction_speed){
         output_G = max_correction_speed;
     }
@@ -154,6 +167,8 @@ int cap_output(int output_G, int max_correction_speed = default_max_correction_s
 }
 
 std::vector<int> calc_correction(int PID_case){
+    dt = calc_dt();
+    calc_Sensor_Errors();
     signed int correction_left, correction_right;
     std::vector<signed int> correction_output;
     signed int output_G;
@@ -165,8 +180,8 @@ std::vector<int> calc_correction(int PID_case){
         
     case X_ERROR:
         max_correction_speed = default_max_correction_speed;
-        output_G = applyPID(calcError(X_ERROR),4,0,0.01); //<-- Case Specific kp,ki,kd-values can be defined here
-        output_G = cap_output(output_G,max_correction_speed);
+        output_G = applyPID(calcError(X_ERROR),2,0.0001,0.01); //<-- Case Specific kp,ki,kd-values can be defined here
+        output_G = cap_output(output_G);
         correction_left = -output_G;
         correction_right = output_G;
         break;
@@ -174,7 +189,7 @@ std::vector<int> calc_correction(int PID_case){
     case Y_ERROR:
         max_correction_speed = default_max_correction_speed; 
         output_G = applyPID(calcError(Y_ERROR),2,0.0001,0.01);
-        output_G = cap_output(output_G,max_correction_speed);
+        output_G = cap_output(output_G);
         correction_left = -output_G;
         correction_right = -output_G;
         break;
@@ -182,7 +197,7 @@ std::vector<int> calc_correction(int PID_case){
     case CURVE_LEFT_ERROR:
         max_correction_speed = default_max_correction_speed; 
         output_G = applyPID(calcError(CURVE_LEFT_ERROR));
-        output_G = cap_output(output_G,max_correction_speed);
+        output_G = cap_output(output_G);
         correction_left = output_G;
         correction_right = 0;
         break;
@@ -190,23 +205,23 @@ std::vector<int> calc_correction(int PID_case){
     case CURVE_RIGHT_ERROR:
         max_correction_speed = default_max_correction_speed;
         output_G = applyPID(calcError(CURVE_RIGHT_ERROR));
-        output_G = cap_output(output_G,max_correction_speed);
+        output_G = cap_output(output_G);
         correction_left = 0;
         correction_right = output_G;
         break;
 
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed;
-        output_G = applyPID(calcError(X_ERROR_LEFT_WALL_ONLY),12,0.0001,0.02);
-        output_G = cap_output(output_G,max_correction_speed);
+        output_G = applyPID(calcError(X_ERROR_LEFT_WALL_ONLY),12,0.0001,0.01);
+        output_G = cap_output(output_G);
         correction_left = output_G;
         correction_right = -output_G;
         break;
 
     case X_ERROR_RIGHT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed;
-        output_G = applyPID(calcError(X_ERROR_RIGHT_WALL_ONLY),12,0.0001,0.02);
-        output_G = cap_output(output_G,max_correction_speed);
+        output_G = applyPID(calcError(X_ERROR_RIGHT_WALL_ONLY),12,0.0001,0.01);
+        output_G = cap_output(output_G);
         correction_left = output_G;
         correction_right = -output_G;
         break;
@@ -237,111 +252,90 @@ void pid_move_function(std::vector<int> correction){
     // ForwardRight(base_speed + correction[1]);
 
 
-    if(correction[0] + base_speed > 0){
-        ForwardLeft(base_speed + correction[0]);
+    if(PID_values[0] + base_speed > 0){
+        ForwardLeft(base_speed + PID_values[0]);
     }
-    else if(correction[0] + base_speed < 0){
-        BackwardLeft(base_speed + correction[0]);
+    else if(PID_values[0] + base_speed < 0){
+        BackwardLeft(base_speed + PID_values[0]);
     }
-    else if(correction[0] == 0){
+    else if(PID_values[0] == 0){
         ForwardBoth(0);
     }
 
-    if(correction[1] + base_speed > 0 && correction[0] + base_speed != 0){
-        ForwardRight(base_speed + correction[1]);
+    if(PID_values[1] + base_speed > 0 && PID_values[0] + base_speed != 0){
+        ForwardRight(base_speed + PID_values[1]);
     }
-    else if(correction[1] + base_speed < 0 && correction[0] + base_speed != 0){
-        BackwardRight(base_speed + correction[1]);
+    else if(PID_values[1] + base_speed < 0 && PID_values[0] + base_speed != 0){
+        BackwardRight(base_speed + PID_values[1]);
     }
-    else if(correction[1] == 0){
+    else if(PID_values[1] == 0){
         ForwardBoth(0);
     }
 
 }
 
 std::vector<bool> find_walls(){
-    std::vector<bool> wallsVec2 = {true,true,true};
-    if(Distance_Sensor[0] > 150 || Distance_Sensor[1] > 150){ // 100 und 40
-        wallsVec2[0] = true;
+    std::vector<bool> wallsVec = {false, false, false, false};
+    // Left Wall Sensors
+    if(Distance_Sensor[0] > 300 || Distance_Sensor[1] > 300){ // 100 und 40
+        wallsVec[3] = true;
     }
     else{
-        wallsVec2[0] = false;
+        wallsVec[3] = false;
     }
-
-    if(Distance_Sensor[2] > 150 || Distance_Sensor[3] > 150){
-        wallsVec2[1] = true;
+    
+    // Front Wall
+    if(Distance_Sensor[2] > 300 || Distance_Sensor[3] > 300){
+        wallsVec[0] = true;
     }
     else{
-        wallsVec2[1] = false;
+        wallsVec[0] = false;
     }
 
+    // Right Wall
     if(Distance_Sensor[4] > 300 || Distance_Sensor[5] > 300){ //70 und 150
-        wallsVec2[2] = true;
+        wallsVec[1] = true;
     }
     else{
-        wallsVec2[2] = false;
+        wallsVec[1] = false;
     }
 
-    return wallsVec2;
+    return wallsVec;
 }
 
-std::vector<int> determine_state(){
+int determine_PID_case(){
     std::vector<bool> wallsVec = find_walls();
-    if(wallsVec[0] == true && wallsVec[2] == true){
+    if(wallsVec[1] == true && wallsVec[3] == true){
         ble->println("b");
-        current_state = X_ERROR;
-        return calc_correction(X_ERROR);
+        return X_ERROR;
     }
-    else if(wallsVec[1] == true){
-        ble->println("y");
-        current_state = Y_ERROR;
-        return calc_correction(Y_ERROR);
-    }
-    else if(wallsVec[0] == true && wallsVec[2] == false){
+    // else if(wallsVec[0] == true){
+    //     ble->println("y");
+    //     return Y_ERROR;
+    // }
+    else if(wallsVec[3] == true && wallsVec[1] == false){
         ble->println("l");
-        current_state = X_ERROR_LEFT_WALL_ONLY;
-        return calc_correction(X_ERROR_LEFT_WALL_ONLY);
+        return X_ERROR_LEFT_WALL_ONLY;
     }
-    else if(wallsVec[0] == false && wallsVec[2] == true){
+    else if(wallsVec[3] == false && wallsVec[1] == true){
         ble->println("r");
-        current_state = X_ERROR_RIGHT_WALL_ONLY;
-        return calc_correction(X_ERROR_RIGHT_WALL_ONLY);
+        return X_ERROR_RIGHT_WALL_ONLY;
     }
-    else if(wallsVec[0] == false && wallsVec[2] == false){
+    else if(wallsVec[1] == false && wallsVec[3] == false){
         ble->println("n");
-        current_state = BLIND;
-        return calc_correction(BLIND);
+        return BLIND;
     }
-    return {0,0}; // default
+    return 0; 
 }
 
 
 void PID_Test(){
+    digitalWrite(MOTOR_ENABLE, LOW);
     while(1){
+        delay(1);
+        //debug_print();
 
-        //Enable Motors
-        digitalWrite(MOTOR_ENABLE, LOW);
-
-        //Calculate dt for Integral Component of PID
-        dt = calc_dt();
-
-        //Calculate deviation from NeutralSensorValues (Error = 0 --> Mous is perfectly centered and oriented)
-        calc_Sensor_Errors();
-
-        //Calculate corrections and set motors accordingly
-        // std::vector<int> y_component = calc_correction(Y_ERROR);
-        // std::vector<int> x_component = calc_correction(X_ERROR);
-        // std::vector<int> xy_correction;
-        // xy_correction[0] = x_component[0] + y_component[0];
-        // xy_correction[1] = x_component[1] + y_component[1];
-
-        // pid_move_function(xy_correction);
-
-        debug_print();
-
-        pid_move_function(calc_correction(X_ERROR_RIGHT_WALL_ONLY));
-        
-        delay(10);
+        pid_move_function(calc_correction(X_ERROR_LEFT_WALL_ONLY));
 
         if(encoderTurned){
             // || Distance_Sensor[2] > 500 || Distance_Sensor[3] > 500
@@ -351,4 +345,12 @@ void PID_Test(){
             break;
         }
     }
+}
+
+
+void reset_PID_values(){
+    PID_values = {0,0};
+    integral = 0;
+    differential = 0;
+    proportional = 0;
 }

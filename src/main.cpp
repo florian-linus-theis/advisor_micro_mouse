@@ -27,8 +27,6 @@ void setup() {
     ADC_Setup();
     maze_setup(); // setting up the maze file
 
-    //Start Systick Timer (manually enable when in drive mode to speed up rest)
-    timer14->resume();
 
     // Setup Complete
     // Display the initial options on display
@@ -37,6 +35,8 @@ void setup() {
     // Test Bluetooth
     ble->println("test bluetooth");
     SETUP_COMPLETE = true;
+    //Start Systick Timer (manually enable when in drive mode to speed up rest)
+    // timer14->resume();
 
 }
 
