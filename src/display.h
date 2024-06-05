@@ -178,18 +178,7 @@ void handleModeSelection(Mode mode) {
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             // Handle A* Mode
-            move_forward_different(100, 0, 1);
-            delay(1000);
-            rotate_left();
-            delay(500);
-            rotate_right();
-            delay(500);
-            rotate_left();
-            delay(500);
-            rotate_right();
-            delay(500);
-            move_forward_different(300, 100, 2);
-            stop();
+            move_forward_different(100, 0, 4);
             timer14->pause();
             display_print("A* Mode completed");
             break;
