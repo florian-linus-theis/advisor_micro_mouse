@@ -2,6 +2,8 @@
 
 int encoder_right = 0;
 int encoder_left = 0;
+int encoder_right_last_time = 0;
+int encoder_left_last_time = 0;
 
 void update_encoders();
 void print_encoders();
@@ -30,16 +32,30 @@ void Systick_Interrupt() {
 
 
 void update_encoders() {
-  static int encoder_right_last_time = 0;
-  static int encoder_left_last_time = 0;
   encoder_right = TIM5->CNT;
   encoder_left = TIM2->CNT;
-  distance_traveled_L += encoder_left - abs(encoder_left_last_time);
-  distance_traveled_R += encoder_right - abs(encoder_right_last_time);
+  distance_traveled_L += encoder_left - encoder_left_last_time;
+  distance_traveled_R += encoder_right - encoder_right_last_time;
   avg_distance_traveled = (distance_traveled_L + distance_traveled_R) / 2;
   encoder_left_last_time = encoder_left;
   encoder_right_last_time = encoder_right;
 }
+
+void reset_encoders() {
+  // Reset the encoder counters in the hardware registers
+  TIM5->CNT = 0;
+  TIM2->CNT = 0;
+
+  // Reset all distance and average distance tracking variables
+  distance_traveled_L = 0;
+  distance_traveled_R = 0;
+  avg_distance_traveled = 0;
+
+  // Initialize last encoder readings to zero
+  encoder_right_last_time = 0;
+  encoder_left_last_time = 0;
+}
+
 
 void print_encoders() {
   ble->print("Encoder Right: ");
