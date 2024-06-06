@@ -8,7 +8,7 @@ bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
 
-volatile int interrupt_counter;
+int interrupt_counter;
 
 void Distanz_Messung_Hell(void);
 void Distanz_Messung_Sensoren(void);
@@ -19,9 +19,9 @@ void Distanz_Messung_Sensoren(void){
   Distanz_Messung_Blind();
   Distanz_Messung_Hell();
 
-  for(int i = 0; i < 7; i++){  //Avoids unprecies informations of walls in lay
-      Walls_Flag[i] = Distance_Sensor[i] > 120;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
-  }
+   for(int i = 0; i < 7; i++){  //Avoids unprecies informations of walls in lay
+       Walls_Flag[i] = Distance_Sensor[i] > 120;       //Platzhalter für Linearisierte Sensorwerte und Auswertung in MM
+   }
 }
 
 
