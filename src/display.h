@@ -186,7 +186,9 @@ void handleModeSelection(Mode mode) {
             timer14->resume();
             reset_encoders();
             reset_PID_values();
-            
+            start();
+            dfs_mapping();
+            delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             //Imperial_March();

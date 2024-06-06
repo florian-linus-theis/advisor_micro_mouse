@@ -103,6 +103,10 @@
 // Global Variables 
 extern bool SETUP_COMPLETE;
 
+// Algorithms
+extern void dfs_mapping();
+extern void bfs_algorithm();
+extern void a_star_algorithm();
 
 // ---------------------------------------
 // PID 

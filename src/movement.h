@@ -228,6 +228,7 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
     ble->println("Moving forward");
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
+    reset_PID_values();
     while(avg_distance_traveled < desired_distance){ 
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled;
@@ -321,21 +322,21 @@ void rotate_right(){
     reset_distance_traveled();
 }
 
-void turn_around(){
-    ForwardRight (DUTY_SLOW_ROTATION); 
-    BackwardLeft(DUTY_SLOW_ROTATION);
-    int last_distance_traveled = 0;
-    while(avg_distance_traveled < (tick_rotate * 2)){
-        // basically turning left left two times 
-        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
-        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ForwardRight(DUTY_SLOW_ROTATION); 
-        BackwardLeft(DUTY_SLOW_ROTATION); 
-    }
-    stop();
-    current_duty_cycle = 0;
-    reset_distance_traveled();
-}
+// void turn_around(){
+//     ForwardRight (DUTY_SLOW_ROTATION); 
+//     BackwardLeft(DUTY_SLOW_ROTATION);
+//     int last_distance_traveled = 0;
+//     while(avg_distance_traveled < (tick_rotate * 2)){
+//         // basically turning left left two times 
+//         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+//         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
+//         ForwardRight(DUTY_SLOW_ROTATION); 
+//         BackwardLeft(DUTY_SLOW_ROTATION); 
+//     }
+//     stop();
+//     current_duty_cycle = 0;
+//     reset_distance_traveled();
+// }
 
 void turn_around_right(){
     rotate_right();

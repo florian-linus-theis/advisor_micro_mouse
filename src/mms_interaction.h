@@ -92,20 +92,36 @@ void fast_turn_right() {
     update_direction(+1);  // We are turning right
 }
 
+void turn_right(){
+    rotate_right();
+    update_direction(+1);
+
+}
+
+void turn_left(){
+    rotate_left();
+    update_direction(-1);
+}
+
+void turn_around(){
+    turn_around_right();
+    update_direction(+2);
+}
+
 // Function to change current direction to a specific direction
 void set_dir(int _dir) {
     if (_dir == cur_direction) {  // If already facing the correct direction
         return;
     }
     if (_dir == (cur_direction + 1) % 4) {  // If need to turn right once
-        rotate_right();
+        turn_right();
         return;
     }
     if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
-        turn_around_right();
+        turn_around();
         return;
     }
-    rotate_left();  // If need to turn left once
+    turn_left();  // If need to turn left once
 }
 
 // Function to turn toward an adjacent location object

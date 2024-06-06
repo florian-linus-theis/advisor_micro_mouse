@@ -240,16 +240,16 @@ std::vector<int> calc_correction(int PID_case){
 std::vector<bool> find_walls(){
     std::vector<bool> wallsVec = {false, false, false, false};
     // Left Wall Sensors
-    if(Distance_Sensor[0] > 300 ){ // 100 und 40
+    if(Distance_Sensor[0] > NeutralSensorValues[0] * 0.6 ){ // 100 und 40
         wallsVec[3] = true;
     }
     // Front Wall
-    if(Distance_Sensor[2] > 300 || Distance_Sensor[3] > 300 || Distance_Sensor[6] > 500){
+    if(Distance_Sensor[2] > NeutralSensorValues[2] * 0.6 || Distance_Sensor[3] > NeutralSensorValues[3] * 0.6 || Distance_Sensor[6] > NeutralSensorValues[6] * 0.6){
         wallsVec[0] = true;
     }
 
     // Right Wall
-    if(Distance_Sensor[5] > 300){ //70 und 150
+    if(Distance_Sensor[5] > NeutralSensorValues[5] * 0.6){ //70 und 150
         wallsVec[1] = true;
     }
 

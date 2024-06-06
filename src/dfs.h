@@ -29,10 +29,11 @@ std::stack<int> dir_stack;
 
 void dfs_map_maze() {
     Location& cur_loc = maze[cur_position[0]][cur_position[1]]; // Create a reference to the current location object for easier reference (added)
-
+    ble->println("in dfs");
     if (!cur_loc.visited) { // If current location has not been visited
         cur_loc.set_visited(true); // Mark location as visited
         cur_loc.set_walls(get_walls()); // Set wall locations
+        ble->println("Current Walls: " + String(cur_loc.walls[0]) + ", " + String(cur_loc.walls[1]) + ", " + String(cur_loc.walls[2]) + ", " + String(cur_loc.walls[3]));
 
         // If there is no north wall and north location is not visited, put it on loc_stack to explore later
         if (!cur_loc.walls[0] && !maze[cur_position[0]][cur_position[1] + 1].visited && !maze[cur_position[0]][cur_position[1] + 1].ballgreifer) {
