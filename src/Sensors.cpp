@@ -101,9 +101,12 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
             air_values[j] += Distance_Sensor[j];
         }
     }
-    digitalWrite(LED_GREEN, HIGH);
 
-    // Wait for user finger
+    // 
+    SENSORS_CALIBRATED = true; // setting sensors calibrated to true so that for neutral values we use the right correction
+    
+    // Light LED and Wait for user finger
+    digitalWrite(LED_GREEN, HIGH);
     start();
 
     // measure in the maze and add up to array
@@ -120,5 +123,4 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(maze_values[i]) / measurements_maze));
     }
 
-    SENSORS_CALIBRATED = true;
 }
