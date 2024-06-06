@@ -36,9 +36,6 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    // double factor = dutyCycle / 100.0;
-    // int correctionL = static_cast<int>(round(dutyCycle + (PID_values[0] * factor)));
-    // int correctionR = static_cast<int>(round(dutyCycle + (PID_values[1] * factor)));
     if(dutyCycle + PID_values[0] > 0){
         ForwardLeft(dutyCycle + PID_values[0]);
     }

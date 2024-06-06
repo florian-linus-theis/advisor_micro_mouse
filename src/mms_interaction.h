@@ -76,6 +76,7 @@ void move_forward_fast(int squares = 1) {
 
 void move_forward_mapping(int squares = 1){
     move_forward_different(DUTY_SLOW, 0, squares);
+    recalibrate_front_wall();
     update_position();
 }
 

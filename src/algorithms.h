@@ -27,16 +27,11 @@ void dfs_mapping(){
         display->clearDisplay();
         display->print("Maze already mapped");
         return;
-    }
-    // TODO: buzzer sounds for start and end of mapping
-    // log("Mapping the maze..."); 
-    display->clearDisplay();
-    display->print("Mapping the maze...");
+    } 
+    ble->println("Mapping maze using DFS");	
     dfs_map_maze(); // Mapping the maze using depth-first search 
     set_dir(0); // Reset heading to north
-    display->clearDisplay();
-    delay(1000);
-    display->print("Mapping complete");
+    display_print("Mapping complete");
     return;
 }
 

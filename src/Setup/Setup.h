@@ -114,6 +114,8 @@ extern void reset_PID_values();
 extern int determine_PID_case();
 extern std::vector<bool> find_walls();
 extern void pid_move_function(int);
+extern void calc_average_PID_values();
+extern void recalibrate_front_wall();
 extern double differential;
 extern double integral;
 extern double proportional; 
@@ -262,3 +264,9 @@ extern void start();
 // Ballgrabber
 extern std::vector<int> ballgrabber_calibration;
 extern void grab_ball();
+
+
+// MMS Interaction
+extern std::vector<int> cur_position;
+extern int cur_direction;
+extern void move_forward_mapping(int);	

@@ -111,7 +111,7 @@ void handleModeSelection(Mode mode) {
     display->clearDisplay();
     switch (mode) {
         case MODE_STANDBY:
-            display_print("Stand By Mode selected");
+            display_print("Calibration Mode selected");
             delay(1000); // Delay to allow the user to read the message
             calibrate_sensors(10, 10);
             ble->println("Calibration done");
@@ -126,12 +126,8 @@ void handleModeSelection(Mode mode) {
             display_print("Soft Reset Mode selected");
             timer14->resume(); // starting systick timer
             delay(1000);
-            // ForwardBoth(10);
-            move_actual(100);
-            delay(2000);
-            ForwardRight(0);
-            ForwardLeft(0);
-            //stop();
+            SET_PID_MANUALLY = false;
+            while(encoderTurned == false){}
             delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
@@ -159,14 +155,22 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             timer14->resume(); // starting systick timer
             delay(1000);
-            left_curve(100);
-            left_curve(100);
-            left_curve(100);
-            left_curve(100);
-            delay(500);
-            // decelerate();
-            // right_curve(DUTY_SLOW);
-            // stop();
+            start();
+            SET_PID_MANUALLY = false;
+            reset_encoders();
+            reset_PID_values();
+            move_forward_mapping(6);
+            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+            rotate_right();
+            move_forward_mapping(1);
+            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+            rotate_right();
+            move_forward_mapping(3);
+            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+            rotate_right();
+            move_forward_mapping(1);
+            move_forward_mapping(1);
+            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             delay(200);
@@ -182,8 +186,7 @@ void handleModeSelection(Mode mode) {
             timer14->resume();
             reset_encoders();
             reset_PID_values();
-            grab_ball();
-            delay(1000);
+            
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             //Imperial_March();

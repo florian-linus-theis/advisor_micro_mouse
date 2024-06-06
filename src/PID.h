@@ -14,6 +14,7 @@ int current_state;
 int toggle_drive;
 int LAST_CASE_PID = -1;
 bool SET_PID_MANUALLY = false;
+std::vector<int> avg_PID_values(2, 0);
 
 enum PID_CASES{
     ROT_ERROR = 0,
@@ -25,7 +26,8 @@ enum PID_CASES{
     ROTATE_RIGHT = 6,
     CURVE_LEFT_ERROR = 7,
     CURVE_RIGHT_ERROR = 8,
-    BLIND = 9
+    TRANSITION = 9,
+    BLIND = 10
 };
 
 int CURRENT_CASE_PID = X_ERROR_LEFT_WALL_ONLY;
@@ -215,13 +217,18 @@ std::vector<int> calc_correction(int PID_case){
         break;
 
     case BLIND:
-        correction_left = 0;
-        correction_right = 0;
+        correction_left = avg_PID_values[0]; // using average PID values to just drive straight
+        correction_right = avg_PID_values[1];
+        break;
+
+    case TRANSITION:
+        correction_left = avg_PID_values[0]; // using average PID values to just drive straight
+        correction_right = avg_PID_values[1];
         break;
 
     default:
-        correction_left = -7;
-        correction_right = -7;
+        correction_left = avg_PID_values[0];
+        correction_right = avg_PID_values[1];
         break;
     }
 
@@ -252,30 +259,20 @@ std::vector<bool> find_walls(){
 int determine_PID_case(){
     std::vector<bool> walls_compare_threshold(7, false);
     for (int i = 0; i < 6; i++){
-        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.6);
+        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.5); // threshold of 50% of the neutral value
     }
-    // if both walls are there and also in the future
-    if(walls_compare_threshold[0] && walls_compare_threshold[5] && walls_compare_threshold[1] && walls_compare_threshold[4] ){
-        ble->println("b");
+    if (walls_compare_threshold[0] && walls_compare_threshold[5] && walls_compare_threshold[1] && walls_compare_threshold[4] ){
         return X_ERROR;
+    } else if (walls_compare_threshold[0] && walls_compare_threshold[1] && (!walls_compare_threshold[4] || !walls_compare_threshold[5])){
+        return X_ERROR_LEFT_WALL_ONLY;
+    } else if (walls_compare_threshold[4] && walls_compare_threshold[5] && (!walls_compare_threshold[0] || !walls_compare_threshold[1])){
+        return X_ERROR_RIGHT_WALL_ONLY;
+    } else if (!walls_compare_threshold[0] && !walls_compare_threshold[1] && !walls_compare_threshold[4] && !walls_compare_threshold[5]){
+        return BLIND;
+    } else {
+        return TRANSITION;
     }
-    // else if(wallsVec[0] == true){
-    //     ble->println("y");
-    //     return Y_ERROR;
-    // }
-    // else if(walls_compare_threshold[0] && walls){
-    //     ble->println("l");
-    //     return X_ERROR_LEFT_WALL_ONLY;
-    // }
-    // else if(wallsVec[3] == false && wallsVec[1] == true){
-    //     ble->println("r");
-    //     return X_ERROR_RIGHT_WALL_ONLY;
-    // }
-    // else if(wallsVec[1] == false && wallsVec[3] == false){
-    //     ble->println("n");
-    //     return BLIND;
-    // }
-    return 0;
+    return 10; // just default but will not be reached
 }
 
 
@@ -291,11 +288,8 @@ void pid_move_function(int base_speed){
         // if (old_pid == PID_values){
         //     continue;
         // }
-        delay(10);
+        delay(8);
         old_pid = PID_values;
-        ble->println(PID_values[0] + " " + PID_values[1]);
-
-
 
         if(encoderTurned){
             ForwardBoth(0);
@@ -303,13 +297,13 @@ void pid_move_function(int base_speed){
             break;
         }
 
-        if(PID_values[0] > 1){
-            ForwardRight(base_speed + PID_values[0]);
-            ForwardLeft(base_speed + PID_values[0]);
+        if(PID_values[0]+avg_PID_values[0] > 1){
+            ForwardLeft(base_speed + avg_PID_values[0] + PID_values[0]);
+            ForwardRight(base_speed + avg_PID_values[1] + PID_values[0]);
         }
-        else if(PID_values[0] < -1){
-            BackwardRight(base_speed - PID_values[0]);
-            BackwardLeft(base_speed - PID_values[0]);
+        else if(PID_values[0]+avg_PID_values[0] < -1){
+            BackwardLeft(base_speed - avg_PID_values[0] - PID_values[0]);
+            BackwardRight(base_speed - avg_PID_values[1] - PID_values[0]);
         }
         else if(abs(PID_values[0]) + base_speed <= 51){
             ForwardLeft(0);
@@ -317,42 +311,43 @@ void pid_move_function(int base_speed){
             counter++; 
             if (counter > 20) break;
         }
-
-        // if(PID_values[1] > 1 && PID_values[0] != 0){
-        //     ForwardRight(base_speed + PID_values[1]);
-        // }
-        // else if(PID_values[1] + base_speed < -5 && PID_values[0] + base_speed != 0){
-        //     BackwardRight(base_speed + PID_values[1]);
-        // }
-        // else if(abs(PID_values[1] + base_speed) <= 5){
-        //     ForwardBoth(0);
-        // }
     }
+    return;
 }
 
 
-// void PID_Test(){
-//     digitalWrite(MOTOR_ENABLE, LOW);
-//     while(1){
-//         delay(1);
-//         //debug_print();
+// Function to calculate the average PID values
+void calc_average_PID_values() {
+  static int counter = 0;
+  counter++;
 
-//         pid_move_function(calc_correction(X_ERROR_LEFT_WALL_ONLY));
+  avg_PID_values[0] += PID_values[0]; 
+  avg_PID_values[1] += PID_values[1];
 
-//         if(encoderTurned){
-//             // || Distance_Sensor[2] > 500 || Distance_Sensor[3] > 500
-//             ForwardBoth(0);
-//             encoderTurned=false;
-//             digitalWrite(MOTOR_ENABLE, HIGH);
-//             break;
-//         }
-//     }
-// }
+  avg_PID_values[0] = static_cast<int>(std::round(static_cast<double>(avg_PID_values[0]) / counter));
+  avg_PID_values[1] = static_cast<int>(std::round(static_cast<double>(avg_PID_values[1]) / counter));
+}
 
-
+// Function to reset the PID values
 void reset_PID_values(){
     PID_values = {0,0};
     integral = 0;
     differential = 0;
     proportional = 0;
+}
+
+
+// Function that is called if there is a wall in front of the robot such that we can use the front wall to recalibrate position
+void recalibrate_front_wall(){
+    // if the front wall is detected, we can use the front wall to recalibrate the position of the robot
+    if(Distance_Sensor[6] > NeutralSensorValues[6] * 0.5 || Distance_Sensor[2] > NeutralSensorValues[2]*0.5 || Distance_Sensor[3] > NeutralSensorValues[3]*0.5){
+        SET_PID_MANUALLY = true;
+        CURRENT_CASE_PID = Y_ERROR;
+        delay(800);
+        reset_PID_values();
+        pid_move_function(50);
+        delay(800);
+        SET_PID_MANUALLY = false;
+        reset_PID_values();
+    }
 }
