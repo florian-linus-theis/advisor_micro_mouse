@@ -92,6 +92,7 @@ void grab_ball(){
     CURRENT_CASE_PID = 3; // set PID case to 0
     delay(500);
     move_forward_different(100, 0, 1); // move forward to the middle of the cell
+    delay(500);
     NeutralSensorValues = original_calibration_values; // reset sensor values
     CURRENT_CASE_PID = 4;
     pid_move_function(50);

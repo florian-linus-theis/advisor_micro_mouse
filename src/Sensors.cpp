@@ -108,6 +108,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     SENSORS_CALIBRATED = true; // setting sensors calibrated to true so that for neutral values we use the right correction
     
     // Light LED and Wait for user finger
+    display_print("Now in start square...", 1);
     digitalWrite(LED_GREEN, HIGH);
     start();
 
@@ -118,13 +119,25 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
             maze_values[j] += Distance_Sensor[j];
         }
     }
-    display_print("Now Ballgrabber...", 1);
+    display_print("Now facing Ballgrabber", 1);
     digitalWrite(LED_GREEN, HIGH);
     start();
 
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         for(int j=0; j<7; j++) {
+            if (j == 4 || j == 5) continue;
+            ballgrabber_values[j] += Distance_Sensor[j];
+        }
+    }
+
+    display_print("Now facing away from Ballgrabber", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start();
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        for(int j=0; j<7; j++) {
+            if (j != 4 || j != 5) continue;
             ballgrabber_values[j] += Distance_Sensor[j];
         }
     }
