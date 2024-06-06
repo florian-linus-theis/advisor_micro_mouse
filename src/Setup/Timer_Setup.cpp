@@ -233,11 +233,11 @@ void Timer7_Setup(void) {   //Buzzer Delay Timer
 
 
 void Timer8_Setup(void) {   //Music Delay Timer
-    timer7->setPrescaleFactor(168000);              // Set prescaler so that 1 tick equals 1ms
-    timer7->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
-    timer7->attachInterrupt(Timer8_Interrupt);
-    timer7->refresh();
-    timer7->pause();
+    timer8->setPrescaleFactor(168000);              // Set prescaler so that 1 tick equals 1ms
+    timer8->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
+    timer8->attachInterrupt(Timer8_Interrupt);
+    timer8->refresh();
+    timer8->pause();
 }
 
 

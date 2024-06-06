@@ -409,6 +409,7 @@ int* full_90s_pause[] = {
 void Running_in_the_90s(){
     note_cnt = 0;
     beat_cnt = 0;
+    bool SONG_COMPLETE = false;
     timer8->setCount(0);
     timer8->refresh();
     timer8->resume();
@@ -420,12 +421,14 @@ void Running_in_the_90s(){
 
 void Timer8_Interrupt() {
     if(!SETUP_COMPLETE) return;
-    timer8->setOverflow(full_90s_pause[beat_cnt][note_cnt]);
+    timer8->setOverflow(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
+    SETUP_COMPLETE = false;
     timer8->refresh();
+    SETUP_COMPLETE = true;
     timer8->resume();
     Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
     note_cnt++;
-    if (note_cnt > sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
+    if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
         note_cnt = 0;
         beat_cnt++;
     }
