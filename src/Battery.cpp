@@ -19,10 +19,7 @@ void getBattery() {
 
     //Not-Aus 
     if(battery_percentage < 10) {
-        display->clearDisplay();
-        display->setTextSize(1);
-        display->setTextColor(SSD1306_WHITE);
-        display->print("Battery low!!!"); 
+        display_print("Battery low!!!", 2); 
         Buzzer_beep(4000, 3);
         delay(1000);
         digitalWrite(POWER_ENABLE, LOW);
