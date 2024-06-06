@@ -113,12 +113,7 @@ void handleModeSelection(Mode mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
-            calibrate_sensors(10, 10);
-            ble->println("Calibration done");
-            ble->println("Calibration values: ");
-            ble->println("1: " + String(calibration_sensor[0]) + " 2: " + String(calibration_sensor[1]) + " 3: " + String(calibration_sensor[2]) + " 4: " + String(calibration_sensor[3]) + " 5: " + String(calibration_sensor[4]) + " 6: " + String(calibration_sensor[5]) + " 7: " + String(calibration_sensor[6]));
-            ble->println("Neutral values: ");
-            ble->println("1: " + String(NeutralSensorValues[0]) + " 2: " + String(NeutralSensorValues[1]) + " 3: " + String(NeutralSensorValues[2]) + " 4: " + String(NeutralSensorValues[3]) + " 5: " + String(NeutralSensorValues[4]) + " 6: " + String(NeutralSensorValues[5]) + " 7: " + String(NeutralSensorValues[6]));
+            Running_in_the_90s();
             // always keep this last
             displayOptions(MODE_STANDBY, false);
             break;
@@ -258,11 +253,21 @@ void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beep
     }
 }
 
-
 void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, Number of beeps and Tone Length in ms
-    int overflow = 1000000/freq;
+    int overflow;
+    int duty;
+
+    if (freq = 0) {
+        duty = 0;
+        freq = 1000;
+    }
+    else {
+        overflow = 1000000 / freq;
+        duty = overflow / 2;
+    }
+
     timer1->setOverflow(overflow);
-    timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);  // 50% Duty Cycle - square wave
+    timer1->setCaptureCompare(4, duty, TICK_COMPARE_FORMAT);  // 50% Duty Cycle - square wave
     timer1->refresh();
     timer1->resume();
 
