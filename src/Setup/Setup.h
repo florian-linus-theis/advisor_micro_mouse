@@ -234,5 +234,8 @@ extern bool confirmationPending;
 
 extern void Buzzer_beep(int, int);
 
-extern float voltage(float);
-extern int battery_status(int);
+extern void getBattery();
+extern void drawBatteryStatus();
+extern void print_Battery_Status();
+// extern float battery_volts;  
+// extern int battery_percentage; 

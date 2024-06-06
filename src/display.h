@@ -3,7 +3,7 @@
 #include <robin.h>
 #include <ballgrabber.h>
 #include "PID_neu.h"
-
+//#include "battery.h"
 
 // Define an enum for all modes
 enum Mode {
@@ -65,7 +65,7 @@ void displayOptions(Mode currentMode, bool confirmation) {
     display->clearDisplay();
     display->setTextSize(1);
     display->setTextColor(SSD1306_WHITE);
-    display->setRotation(2);
+    display->setRotation(2); 
     display->display();
 
     display->setCursor(0, 0);
@@ -108,7 +108,12 @@ void handleModeSelection(Mode mode) {
     switch (mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
-            delay(1000); // Delay to allow the user to read the message
+            getBattery();
+            drawBatteryStatus();
+            delay(1000);
+            display->clearDisplay();
+            delay(1000);
+            // Delay to allow the user to read the message
             // Handle Stand By Mode
             break;
         case MODE_SOFT_RESET:
@@ -116,64 +121,26 @@ void handleModeSelection(Mode mode) {
             timer14->resume(); // starting systick timer
             delay(1000);
             // ForwardBoth(10);
-            move_actual(100);
-            delay(2000);
-            ForwardRight(0);
-            ForwardLeft(0);
-            //stop();
-            delay(1000);
+            move_forward_middle_level(10, 1);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            timer14->pause(); // stopping systick timer
             delay(1000);
+            //timer14->pause(); // stopping systick timer
             break;
         case MODE_SHOW_DATA:
-            // display_print("Data Mode selected");
+            display_print("Data Mode selected");
             // // delay(1000);
-            // display_print("Testing Encoders");
-            timer14->resume(); // starting systick timer
-            delay(1000);
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            delay(1000);
-            move_forward_different(100, 0, 1.5);
-            delay(100);
-            rotate_right();
-            move_forward_different(100, 0, 1);
-            //handling ballgrabber
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            // delay(500);
-            Timer4_Setup_Servo();
-            digitalWrite(SERVO_ENABLE, HIGH);
-            delay(1000); // delay to allow the user to read the message
-            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
-            delay(1000);
-            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
-            delay(1000);
-            digitalWrite(SERVO_ENABLE, LOW);
-            Timer4_Setup_Motor();
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            // delay(1000);
-            // ballgrabber done
-            rotate_right();
-            rotate_right();
-            move_forward_different(100, 0, 1);
-            rotate_right();
-            move_forward_different(100, 0, 1.5);
-            timer14->pause();
-            display->clearDisplay();
-            delay(100);
-            display->println("Test Servo");
+            // display_print("Testing Encoders"); 
+            // display->clearDisplay();
+            // display->println("Test");
+            // test_encoders();
             // Handle Hard Reset Mode
-            delay(100);
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             delay(1000);
             // timer14->resume(); // starting systick timer
-            move_forward_middle_level(200, 3);
-            // decelerate();
-            // right_curve(DUTY_SLOW);
-            // stop();
+            move_forward_middle_level(15, 2);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             delay(200);
@@ -182,9 +149,7 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_BFS:
             display_print("BFS Mode selected");
-            PID_Test();
-
-
+            //PID-Test 
             delay(1000);
             Buzzer_beep(2000, 4);
             // Handle BFS Mode
@@ -194,7 +159,7 @@ void handleModeSelection(Mode mode) {
             digitalWrite(SERVO_ENABLE, LOW);
 
             // Code doesnt work YET
-            // Timer4_Setup_Motor();
+            // Timer4_Setup_Motor(); 
             ble->println("motor setup done");
             // delay(2000);
             robin_test();
@@ -238,3 +203,4 @@ void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
         delay(100);
     }
 }
+
