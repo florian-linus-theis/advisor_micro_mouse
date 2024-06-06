@@ -29,9 +29,9 @@ int encoder_R = 0;
 // int tick_rotate = 7460 * 4;
 // int tick_accelerate = 13355 * 4;
 
-int tick_forward = 26668 * 4 - 3000;
+int tick_forward = 26668 * 4 - 4500;
 int tick_start = 6889 * 4;
-int tick_rotate = 24000; // --> works for us with 90 duty rotate cycle
+int tick_rotate = 23000; // --> works for us with 90 duty rotate cycle
 int tick_accelerate = 35000;
 
 
@@ -184,7 +184,7 @@ int decelerate_different(int end_duty_cycle, int remaining_distance_ticks){
     // If we are close to the end, stop the motors
     if (remaining_distance_ticks <= DISTANCE_DUTY_MIN_TO_ZERO && end_duty_cycle == 0) {
         stop();
-        ble->println("Stopping motors");
+        delay(700);
         return 0; 
     }
     // if desired end duty cycle is reached no need to further decelerate
@@ -228,6 +228,7 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
     ble->println("Moving forward");
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
+    reset_PID_values();
     while(avg_distance_traveled < desired_distance){ 
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled;
@@ -291,6 +292,7 @@ void rotate_left(){
     //     }
     // }
     stop();
+    delay(700);
     reset_distance_traveled();
 }
 
@@ -305,48 +307,36 @@ void rotate_right(){
         if (distance_travelled_right == distance_traveled_R) continue;
         distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
         
-        // calculate the ratio of the distance traveled by the two wheels and adjust pwm values accordingly
-        double wheel_ratio = static_cast<double>(abs(distance_traveled_L)) / static_cast<double>(abs(distance_traveled_R));
-        if (wheel_ratio > 1){
-            BackwardRight(DUTY_SLOW_ROTATION + static_cast<int>(wheel_ratio * 3.7)); 
-            ForwardLeft(DUTY_SLOW_ROTATION);  // 
-        } else {
-            BackwardRight(DUTY_SLOW_ROTATION - static_cast<int>(1 / wheel_ratio * 3.7)); 
-            ForwardLeft(DUTY_SLOW_ROTATION);  // 
-        }
+        // // calculate the ratio of the distance traveled by the two wheels and adjust pwm values accordingly
+        // double wheel_ratio = static_cast<double>(abs(distance_traveled_L)) / static_cast<double>(abs(distance_traveled_R));
+        // if (wheel_ratio > 1){
+        //     BackwardRight(DUTY_SLOW_ROTATION + static_cast<int>(wheel_ratio * 3.7)); 
+        //     ForwardLeft(DUTY_SLOW_ROTATION);  // 
+        // } else {
+        //     BackwardRight(DUTY_SLOW_ROTATION - static_cast<int>(1 / wheel_ratio * 3.7)); 
+        //     ForwardLeft(DUTY_SLOW_ROTATION);  // 
+        // }
     }
-    // if (abs(distance_traveled_R) < abs(distance_traveled_R)){
-    //     ForwardLeft(0);
-    //     BackwardRight(DUTY_SLOW_ROTATION);
-    //     while(abs(distance_traveled_R) < abs(distance_traveled_L)){
-    //             delay(1);
-    //     }
-    // } else {
-    //     BackwardRight(0);
-    //     ForwardLeft(DUTY_SLOW_ROTATION);
-    //     while(abs(distance_traveled_L) < abs(distance_traveled_R)){
-    //             delay(1);
-    //     }
-    // }
     stop();
+    delay(700);
     reset_distance_traveled();
 }
 
-void turn_around(){
-    ForwardRight (DUTY_SLOW_ROTATION); 
-    BackwardLeft(DUTY_SLOW_ROTATION);
-    int last_distance_traveled = 0;
-    while(avg_distance_traveled < (tick_rotate * 2)){
-        // basically turning left left two times 
-        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
-        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ForwardRight(DUTY_SLOW_ROTATION); 
-        BackwardLeft(DUTY_SLOW_ROTATION); 
-    }
-    stop();
-    current_duty_cycle = 0;
-    reset_distance_traveled();
-}
+// void turn_around(){
+//     ForwardRight (DUTY_SLOW_ROTATION); 
+//     BackwardLeft(DUTY_SLOW_ROTATION);
+//     int last_distance_traveled = 0;
+//     while(avg_distance_traveled < (tick_rotate * 2)){
+//         // basically turning left left two times 
+//         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+//         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
+//         ForwardRight(DUTY_SLOW_ROTATION); 
+//         BackwardLeft(DUTY_SLOW_ROTATION); 
+//     }
+//     stop();
+//     current_duty_cycle = 0;
+//     reset_distance_traveled();
+// }
 
 void turn_around_right(){
     rotate_right();

@@ -29,7 +29,7 @@ void Systick_Interrupt() {
     CURRENT_CASE_PID = determine_PID_case();
   }
   PID_values = calc_correction(CURRENT_CASE_PID);
-  // counter++; 
+  calc_average_PID_values();
 }
 
 
