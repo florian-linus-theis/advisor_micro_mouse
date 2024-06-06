@@ -1,6 +1,7 @@
 #pragma once
 #include "Setup\Setup.h"
 #include <cmath>
+#include <Music.h>
 
 double last_time=0;
 double dt, kp_default=2, ki_default=0, kd_default=0.001;
@@ -346,6 +347,7 @@ void PID_Test(){
         if(encoderTurned){
             // || Distance_Sensor[2] > 500 || Distance_Sensor[3] > 500
             ForwardBoth(0);
+            Running_in_the_90s();
             encoderTurned=false;
             digitalWrite(MOTOR_ENABLE, HIGH);
             break;
