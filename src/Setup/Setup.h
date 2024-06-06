@@ -238,7 +238,7 @@ extern int calibration_sensor[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
-extern volatile int interrupt_counter;
+extern int interrupt_counter;
 extern int Flag_Mid;
 
 
@@ -255,14 +255,22 @@ extern bool optionSelected;
 extern volatile bool encoderTurned;
 extern bool confirmationPending;
 
+// Buzzer
 extern void Buzzer_beep(int, int);
 extern void Buzzer_beep(int, int, int);
 extern void Buzzer_beep_noBlock(int, int, int);
 extern void Timer7_Interrupt();
 
+// Before Start
 extern void calibrate_sensors(int, int);
 extern void start();
 
+// Battery
+extern void getBattery();
+extern void drawBatteryStatus();
+extern void print_Battery_Status();
+// extern float battery_volts;  
+// extern int battery_percentage; 
 
 
 // Ballgrabber

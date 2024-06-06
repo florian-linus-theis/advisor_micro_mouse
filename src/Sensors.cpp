@@ -13,7 +13,6 @@ int calibration_sensor[7] = {320, 516, 464, 200, 630, 348, 709};
 bool Walls_Flag[7] ={};
 
 //Meassurement Data Vector
-
 volatile int interrupt_counter = 0;
 
 void Distanz_Messung_Hell(void);

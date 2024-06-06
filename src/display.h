@@ -2,9 +2,9 @@
 #include "Setup\Setup.h"
 #include <robin.h>
 #include <ballgrabber.h>
+//#include "battery.h"
 #include "PID.h"
 #include "Music.h"
-
 
 // Define an enum for all modes
 enum Mode {
@@ -69,7 +69,7 @@ void displayOptions(Mode currentMode, bool confirmation) {
     display->clearDisplay();
     display->setTextSize(1);
     display->setTextColor(SSD1306_WHITE);
-    display->setRotation(2);
+    display->setRotation(2); 
     display->display();
 
     display->setCursor(0, 0);
@@ -135,18 +135,14 @@ void handleModeSelection(Mode mode) {
             displayOptions(MODE_SOFT_RESET, false);
             break;
         case MODE_SHOW_DATA:
-            // display_print("Data Mode selected");
-            // // delay(1000);
-            // display_print("Testing Encoders");
-            timer14->resume(); // starting systick timer
+            display_print("Data Mode selected");
+            delay(1000) 
+            getBattery();
+            drawBatteryStatus();
             delay(1000);
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            delay(1000);
-            grab_ball();
-            timer14->pause();
             display->clearDisplay();
-            delay(100);
-            // Handle Hard Reset Mode
+            delay(1000);
+           
             // always keep this last
             displayOptions(MODE_SHOW_DATA, false);
             break;
@@ -196,7 +192,7 @@ void handleModeSelection(Mode mode) {
             // always keep this last
             displayOptions(MODE_BFS, false);
             break;
-        case MODE_ASTAR:
+        case MODE_ASTAR
             display_print("A* Mode selected wait for Finger");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             start(); // wait for finger
@@ -246,6 +242,7 @@ void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
         i++;
     }
 }
+
 
 void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beeps and Tone Length in ms
     int overflow = 1000000/freq;
@@ -314,3 +311,4 @@ void start(){
     //timer14->resume();
     //move_forward_different(100, 100, 0.5);
 }
+
