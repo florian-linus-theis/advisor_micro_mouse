@@ -90,8 +90,21 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     int air_values[7] = {0};
     int maze_values[7] = {0};
 
+    //confirmation on display via encoder button
+    display->clearDisplay();
+    display->setTextSize(1);
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(0, 0);
+    display->println("Please point Robot in the air");
+    display->println("Press to Start:");
+    display->display();
+
+    while(!optionSelected) {
+      delay(1);
+    }
+
     digitalWrite(LED_GREEN, LOW);
-    Buzzer_beep(3000, 3, 100);
+    Buzzer_beep(4000, 2, 50);
 
 
     // measure in the air and add up to array
@@ -105,9 +118,18 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     // 
     SENSORS_CALIBRATED = true; // setting sensors calibrated to true so that for neutral values we use the right correction
     
-    // Light LED and Wait for user finger
+
+    //LED Off, Display Instructions and Wait for user finger ;D
     digitalWrite(LED_GREEN, HIGH);
+    display->clearDisplay();
+    display->setTextSize(1);
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(0, 0);
+    display->println("Please set Robot in the maze");
+    display->println("Finger to Start:");
+    display->display();
     start();
+
 
     // measure in the maze and add up to array
     for (int i=0; i<measurements_maze; i++){
@@ -123,4 +145,11 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(maze_values[i]) / measurements_maze));
     }
 
+    display->clearDisplay();
+    display->setTextSize(1);
+    display->setTextColor(SSD1306_WHITE);
+    display->setCursor(0, 0);
+    display->println("calibration");
+    display->println("succesful");
+    display->display();
 }

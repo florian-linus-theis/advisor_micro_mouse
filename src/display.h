@@ -41,7 +41,7 @@ void handleEncoderTurn() {
 // Interrupt Service Routine (ISR) for rotary encoder button press
 void handleEncoderButton() {
     optionSelected = true;
-    Buzzer_beep_noBlock(1000, 1, 100);
+    Buzzer_beep_noBlock(1500, 1, 100);
 }
 
 
@@ -119,8 +119,6 @@ void handleModeSelection(Mode mode) {
             ble->println("1: " + String(calibration_sensor[0]) + " 2: " + String(calibration_sensor[1]) + " 3: " + String(calibration_sensor[2]) + " 4: " + String(calibration_sensor[3]) + " 5: " + String(calibration_sensor[4]) + " 6: " + String(calibration_sensor[5]) + " 7: " + String(calibration_sensor[6]));
             ble->println("Neutral values: ");
             ble->println("1: " + String(NeutralSensorValues[0]) + " 2: " + String(NeutralSensorValues[1]) + " 3: " + String(NeutralSensorValues[2]) + " 4: " + String(NeutralSensorValues[3]) + " 5: " + String(NeutralSensorValues[4]) + " 6: " + String(NeutralSensorValues[5]) + " 7: " + String(NeutralSensorValues[6]));
-            // always keep this last
-            displayOptions(MODE_STANDBY, false);
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
@@ -213,6 +211,8 @@ void handleModeSelection(Mode mode) {
     }
 }
 
+
+//blocking Buzzer function
 void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
     int overflow = 1000000/freq;
     timer1->setOverflow(overflow);
@@ -230,6 +230,7 @@ void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
     }
 }
 
+//blocking Buzzer function
 void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beeps and Tone Length in ms
     int overflow = 1000000/freq;
     timer1->setOverflow(overflow);
@@ -248,6 +249,7 @@ void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beep
 }
 
 
+//non blocking (no delay) Buzzer function 
 void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, Number of beeps and Tone Length in ms
     int overflow = 1000000/freq;
     timer1->setOverflow(overflow);
@@ -277,7 +279,7 @@ void Timer7_Interrupt(void) {
 
 
 // Function to start all driving modes 
-// Waits for finger to be in front of the sensor (front right), then starts the driving mode
+// Waits for user finger to be in front of the sensor (diagonal right), then starts the driving mode
 void start(){
     while(Distance_Sensor[5] <= 1250){   //SENSOR_RD
         Distanz_Messung_Sensoren();
@@ -290,10 +292,7 @@ void start(){
         delay(50);
     }
 
-    delay(1000);
+    delay(500);
     Buzzer_beep(4000, 2, 50);
     digitalWrite(LED_GREEN, HIGH);
-
-    //timer14->resume();
-    //move_forward_different(100, 100, 0.5);
 }
