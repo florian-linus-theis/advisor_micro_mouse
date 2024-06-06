@@ -41,20 +41,20 @@ void update_direction(int turn_direction) {
 // Function to get the list of walls around the current cell in the maze, e.g. [True, False, True, False] -> No walls to the front and the back of the mouse but left and right
 // returns values relative to direction we come from
 std::vector<bool> get_walls() {
-    std::vector<bool> walls(4, false); // initializing list containing 4 walls each to be false by default
-
+    std::vector<bool> walls_absolute(4, false); // initializing list containing 4 walls each to be false by default
+    std::vector<bool> walls_relative_cur_dir = find_walls(); // initializing list containing 4 walls each to be false by default
     // Check for walls in each direction independent of the current direction 
-    walls[cur_direction] = API::wallFront(); // Is there a wall in front
-    walls[(cur_direction + 1) % 4] = API::wallRight(); // Is there a wall to the right
-    walls[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
-    walls[(cur_direction + 3) % 4] = API::wallLeft(); // Is there a wall to the left
+    walls_absolute[cur_direction] = walls_relative_cur_dir[0]; // Is there a wall in front
+    walls_absolute[(cur_direction + 1) % 4] = walls_relative_cur_dir[1]; // Is there a wall to the right
+    walls_absolute[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
+    walls_absolute[(cur_direction + 3) % 4] = walls_relative_cur_dir[3]; // Is there a wall to the left
 
     // If it's the first square, mark the bottom wall as there
     if (cur_position == std::vector<int>{0, 0}) {
-        walls[2] = true;
+        walls_absolute[2] = true;
     }
 
-    return walls;
+    return walls_absolute;
 }
 
 
@@ -127,16 +127,3 @@ void turn_toward(Location loc) {
     set_dir(_dir); // turning towards desired location
 }
 
-
-void grab_ball(){
-    reset_distance_traveled(); // reset distance to zero 
-    move_forward_different(100, 0, 1.75); // move forward from very back to ball
-    delay(100); // wait for wheels to really stop
-    rotate_right(); // rotate right to face ball
-    move_forward_different(100, 0, 1);  // move forward to ball
-    handle_ballgrabber(); // grab the ball
-    turn_around_right(); // turn around to face the opposite direction
-    move_forward_different(100, 0, 1); // move forward to the middle of the cell
-    rotate_right(); // rotate right to face the exit of starting area
-    move_forward_different(100, 0, 1); // move to the exit of starting area
-} 

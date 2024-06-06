@@ -16,7 +16,7 @@ void Systick_Interrupt() {
   if (!SETUP_COMPLETE) {return;}
 
   // first read encoder values 
-  static int counter = 0; 
+  // static int counter = 0; 
   update_encoders();
   
   // then read sensor values
@@ -24,14 +24,12 @@ void Systick_Interrupt() {
   // print_sensors(); // just for test purposes
   
   // lastly update the PID controller 
-  CURRENT_CASE_PID = determine_PID_case(); 
+  // only determine PID case if not set manually
+  if (!SET_PID_MANUALLY){
+    CURRENT_CASE_PID = determine_PID_case();
+  }
   PID_values = calc_correction(CURRENT_CASE_PID);
-  // if (counter % 50 == 0) {
-  //   print_pid(); // print_encoders(); just for test purposes
-  // }
-  
-
-  counter++; 
+  // counter++; 
 }
 
 

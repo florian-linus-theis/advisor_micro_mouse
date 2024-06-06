@@ -87,8 +87,10 @@ void printDistanzSensoren(void) {
 
 // Function to calibrate the sensors - first in the air, then in the maze start cell.
 void calibrate_sensors(int measurements_air, int measurements_maze){
+    SENSORS_CALIBRATED = false; // we start from scratch again
     int air_values[7] = {0};
     int maze_values[7] = {0};
+    int ballgrabber_values[7] = {0};
 
     digitalWrite(LED_GREEN, LOW);
     Buzzer_beep(3000, 3, 100);
@@ -116,11 +118,22 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
             maze_values[j] += Distance_Sensor[j];
         }
     }
+    display_print("Now Ballgrabber...", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start();
+
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        for(int j=0; j<7; j++) {
+            ballgrabber_values[j] += Distance_Sensor[j];
+        }
+    }
 
     // calculate average by dividing through # of measurements
     for(int i=0 ; i<7 ; i++){
         calibration_sensor[i] = static_cast<int>(std::round(static_cast<double>(air_values[i]) / measurements_air));
         NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(maze_values[i]) / measurements_maze));
+        ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
     }
 
 }

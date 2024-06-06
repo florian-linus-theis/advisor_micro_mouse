@@ -2,8 +2,6 @@
 #include "Setup\Setup.h"
 #include <display.h>
 
-extern bool encoderTurned;
-
 void BackwardLeft(int dutyCycle) {
     timer3->setCount(0);
     timer3->resume();

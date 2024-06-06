@@ -440,3 +440,15 @@ void decelerate(int start_duty_cycle, int end_duty_cycle){
     }
     reset_distance_traveled();
 }
+
+
+// ----------------------------------------------------------------------------------------------------
+// Function to drive to front wall
+
+
+void drive_to_wall(){
+    delay(500); // wait for wheels to really stop
+    CURRENT_CASE_PID = 4;
+    pid_move_function(50);
+    delay(500);
+}
