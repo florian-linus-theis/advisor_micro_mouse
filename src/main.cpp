@@ -13,7 +13,7 @@
 int current_option = MODE_STANDBY;
 int selected_option = MODE_STANDBY;
 bool optionSelected = false;
-bool encoderTurned = false;
+volatile bool encoderTurned = false;
 bool confirmationPending = false;
 bool SETUP_COMPLETE = false;
 

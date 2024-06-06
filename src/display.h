@@ -2,7 +2,7 @@
 #include "Setup\Setup.h"
 #include <robin.h>
 #include <ballgrabber.h>
-#include "PID_neu.h"
+#include "PID.h"
 #include "Music.h"
 
 
@@ -176,11 +176,16 @@ void handleModeSelection(Mode mode) {
             displayOptions(MODE_MAP_MAZE, false);
             break;
         case MODE_BFS:
-            timer14->resume(); // starting systick timer
+             // starting systick timer
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             display_print("BFS Mode selected");
-            PID_Test();
-            timer14->pause();
+            timer14->resume();
+            reset_encoders();
+            reset_PID_values();
+            grab_ball();
             delay(1000);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            timer14->pause(); // stopping systick timer
             //Imperial_March();
             // always keep this last
             displayOptions(MODE_BFS, false);
@@ -190,19 +195,25 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             start(); // wait for finger
             timer14->resume(); // starting systick timer
+            delay(20);
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
-            // Handle A* Mode
             while(1){
+                CURRENT_CASE_PID = 3;
                 move_forward_different(100, 0, 2);
                 delay(500);
+                CURRENT_CASE_PID = 4;
+                pid_move_function(50);
+                reset_PID_values();
+                delay(200);
                 rotate_left();
                 delay(500);
                 if(encoderTurned) break;
             }
+            delay(500);
             timer14->pause();
-            display_print("A* Mode completed");
+            // display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             // always keep this last
             displayOptions(MODE_ASTAR, false);

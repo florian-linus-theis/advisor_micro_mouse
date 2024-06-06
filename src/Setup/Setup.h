@@ -1,18 +1,16 @@
 //Include Librarys
-#include "Arduino.h"
+#include <Arduino.h>
 #include "cmath"
 #include "vector"
 #include "tuple"
 #include "string"
-#include "HardwareTimer.h"
-#include "HardwareSerial.h"
 #include "iostream"
-#include "wiring.h"
-#include "Wire.h"
+#include <wiring.h>
+#include <Wire.h>
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
 #include "./location.h"
-#include "stm32f4xx_hal.h" //probably not neccessary
+#include <stm32f4xx_hal.h> //probably not neccessary
 
 //Pin Naming
 //System
@@ -114,10 +112,13 @@ extern std::vector<int> PID_values;
 extern std::vector<int> calc_correction(int);
 extern void reset_PID_values();
 extern int determine_PID_case();
+extern std::vector<bool> find_walls();
+extern void pid_move_function(int);
 extern double differential;
 extern double integral;
 extern double proportional; 
 extern int CURRENT_CASE_PID; 
+extern bool SET_PID_MANUALLY;
 
 
 // ---------------------------------------
@@ -245,7 +246,7 @@ extern void handleEncoderButton(void);
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;
-extern bool encoderTurned;
+extern volatile bool encoderTurned;
 extern bool confirmationPending;
 
 extern void Buzzer_beep(int, int);
@@ -255,3 +256,9 @@ extern void Timer7_Interrupt();
 
 extern void calibrate_sensors(int, int);
 extern void start();
+
+
+
+// Ballgrabber
+extern std::vector<int> ballgrabber_calibration;
+extern void grab_ball();
