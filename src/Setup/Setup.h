@@ -1,20 +1,16 @@
 //Include Librarys
-#include "Arduino.h"
+#include <Arduino.h>
 #include "cmath"
 #include "vector"
 #include "tuple"
 #include "string"
-#include "HardwareTimer.h"
-#include "HardwareSerial.h"
 #include "iostream"
-#include "wiring.h"
-#include "Wire.h"
+#include <wiring.h>
+#include <Wire.h>
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
 #include "./location.h"
-//#include "Sensors.h"
-
-
+#include <stm32f4xx_hal.h> //probably not neccessary
 
 //Pin Naming
 //System
@@ -90,25 +86,45 @@
 
 
 
-
 // ---------------------------------------
 // Driving constants 
 #define DUTY_SLOW 100
-#define DUTY_SLOW_ROTATION 90
+#define DUTY_SLOW_ROTATION 100 // --> Tested - works with 24000 ticks for rotation
 #define DUTY_FAST 400
-#define DUTY_FAST_CURVE 200
+#define DUTY_FAST_CURVE 100
 #define MINIMUM_DUTY 50
-#define TICKS_INNER_WHEEL 8600 * 4
-#define TICKS_OUTER_WHEEL 18105 * 4
+#define TICKS_INNER_WHEEL 23750
+#define TICKS_OUTER_WHEEL 50000
 #define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
 #define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
 #define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
 
 
+// Global Variables 
+extern bool SETUP_COMPLETE;
+
+// Algorithms
+extern void dfs_mapping();
+extern void bfs_algorithm();
+extern void a_star_algorithm();
+
 // ---------------------------------------
 // PID 
+extern std::vector<int> NeutralSensorValues;
 extern std::vector<int> PID_constants; // Global variable to store the PID constants
-
+extern std::vector<int> PID_values; 
+extern std::vector<int> calc_correction(int);
+extern void reset_PID_values();
+extern int determine_PID_case();
+extern std::vector<bool> find_walls();
+extern void pid_move_function(int);
+extern void calc_average_PID_values();
+extern void recalibrate_front_wall();
+extern double differential;
+extern double integral;
+extern double proportional; 
+extern int CURRENT_CASE_PID; 
+extern bool SET_PID_MANUALLY;
 
 
 // ---------------------------------------
@@ -134,10 +150,8 @@ extern void Pin_Setup(void);
 extern void Set_Output(void);
 
 
-
-//Clock_Setup
-extern void Clock_Setup(void);
-
+//ADC_Setup
+extern void ADC_Setup(void);
 
 
 //Timer_Setup
@@ -149,6 +163,7 @@ extern HardwareTimer *timer5;
 extern HardwareTimer *timer6;
 extern HardwareTimer *timer10;
 extern HardwareTimer *timer1;
+extern HardwareTimer *timer7;
 
 extern void Timer_Setup(void);
 extern void Timer4_Setup_Motor(void); // needed for manual resetting of the motor timers after ballgrabbing
@@ -163,22 +178,27 @@ extern int Systick_Counter;
 // Global variables updated during systick 
 extern int encoder_right_total; 
 extern int encoder_left_total;
-extern int distance_traveled_L; // TODO: evtl float
-extern int distance_traveled_R; // TODO: evtl float
-extern int avg_distance_traveled; // TODO: evtl float
+extern volatile int distance_traveled_L; // TODO: evtl float
+extern volatile int distance_traveled_R; // TODO: evtl float
+extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
 extern int current_speed; 
+extern void reset_distance_traveled(void);
+extern void reset_encoders(void);
 
 
-// Drive Motors
+
+// Driving Functions
 extern void ForwardLeft(int);
 extern void ForwardRight(int);
 extern void BackwardLeft(int);
 extern void BackwardRight(int);
 extern void rotate_left();
 extern void rotate_right();
+extern void turn_around_right();
+extern void turn_around_left();
 extern void move_forward_middle_level(int, float);
 extern void stop(); 
 extern void accelerate();
@@ -191,8 +211,9 @@ extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
 
 
-//ADC_Setup
-extern void ADC_Setup(void);
+// Middle Layer Drving Functions
+extern void grab_ball();
+
 
 
 
@@ -206,6 +227,8 @@ extern void Distanz_Messung_Blind(void);
 extern void Distanz_Messung_Hell(void);
 extern void Distanz_Mid_Sensor(void);
 extern void printDistanzSensoren(void);
+extern void calibrate_sensors(int, int);
+extern bool SENSOR_CALIBRATED;
 
 extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
@@ -229,13 +252,33 @@ extern void handleEncoderButton(void);
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;
-extern bool encoderTurned;
+extern volatile bool encoderTurned;
 extern bool confirmationPending;
 
+// Buzzer
 extern void Buzzer_beep(int, int);
+extern void Buzzer_beep(int, int, int);
+extern void Buzzer_beep_noBlock(int, int, int);
+extern void Timer7_Interrupt();
 
+// Before Start
+extern void calibrate_sensors(int, int);
+extern void start();
+
+// Battery
 extern void getBattery();
 extern void drawBatteryStatus();
 extern void print_Battery_Status();
 // extern float battery_volts;  
 // extern int battery_percentage; 
+
+
+// Ballgrabber
+extern std::vector<int> ballgrabber_calibration;
+extern void grab_ball();
+
+
+// MMS Interaction
+extern std::vector<int> cur_position;
+extern int cur_direction;
+extern void move_forward_mapping(int);	

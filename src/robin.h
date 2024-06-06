@@ -1,12 +1,6 @@
 #pragma once
-#include <Arduino.h>
-#include <wiring.h>
-#include "HardwareTimer.h"
-#include "stm32f4xx_hal.h"
 #include "Setup\Setup.h"
 #include <display.h>
-
-extern bool encoderTurned;
 
 void BackwardLeft(int dutyCycle) {
     timer3->setCount(0);
@@ -17,10 +11,11 @@ void BackwardLeft(int dutyCycle) {
 }
 
 void ForwardLeft(int dutyCycle) {
+    int correction = round(dutyCycle * 0.037);
     timer3->setCount(0);
     timer3->resume();
     timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
-    timer3->setCaptureCompare(2, dutyCycle, TICK_COMPARE_FORMAT);
+    timer3->setCaptureCompare(2, dutyCycle + correction, TICK_COMPARE_FORMAT);
     timer3->refresh();
 }
 
@@ -41,9 +36,19 @@ void BackwardRight(int dutyCycle) {
 }
 
 void ForwardBoth(int dutyCycle) {
-    int correction = round(dutyCycle * 0.04);
-    ForwardLeft(dutyCycle + correction);
-    ForwardRight(dutyCycle);
+    if(dutyCycle + PID_values[0] > 0){
+        ForwardLeft(dutyCycle + PID_values[0]);
+    }
+    else if(dutyCycle + PID_values[0] <= 0){
+        ForwardLeft(0);
+    }
+
+    if(dutyCycle + PID_values[1] > 0){
+        ForwardRight(dutyCycle + PID_values[1]);
+    }
+    else if(dutyCycle + PID_values[1] <= 0){
+        ForwardRight(0);
+    }
     current_duty_cycle = dutyCycle;
 }
 

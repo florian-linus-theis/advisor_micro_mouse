@@ -104,10 +104,10 @@ public:
 
 
     // Function to execute the shortest path found by the A* algorithm
-    void execute_shortest_path_psp(A_star_node* solution) {
+    std::vector<int> return_action_vector_shortest_path_psp(A_star_node* solution) {
         if (solution == nullptr) {  // If no solution was found
             display_print("No solution found");
-            return;
+            return {-1}; // Return -1 to indicate no solution found
         }
         
         std::vector<int> act_vector_psp;
@@ -121,29 +121,6 @@ public:
         // reverse the vector to get the correct order of actions
         reverse(act_vector_psp.begin(), act_vector_psp.end());
 
-        display_print("Backtracking complete");
-        delay(2000); // Delay for 2 seconds to give the user time to read the display
-        int counter = 0;
-        
-        // Accounting for the fact that we might have to grab the ball first
-        if (BALLGREIFER == true) {
-            grab_ball();
-            counter += 2; // So that we skip the first two actions
-        }
-
-        // iterate through the vector and execute the actions
-        for (counter; counter < act_vector_psp.size(); counter++){
-            if (current_option == 0) { // If we have an external interrupt triggered by the rotation of the rotary encoder
-                return; // return to main loop
-            }
-            int act = act_vector_psp[counter]; // Get action from vector
-            if (act == 1) {
-                fast_turn_right();
-            } else if (act == 3) {
-                fast_turn_left();
-            }
-            move_forward();
-        }
-        display_print("Path executed");
+       return act_vector_psp;
     }
 };

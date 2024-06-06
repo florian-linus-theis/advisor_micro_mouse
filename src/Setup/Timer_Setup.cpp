@@ -1,14 +1,24 @@
 #include "Setup\Setup.h"
 
-//unused Timers 7,8,9,11,12,13
+/*
+Clock Overview:
+    Processor Core Clock: 168MHz
+    APB1 Timer Clock:     84MHz     Timers: 2, 3, 4, 5, 6, 7, 12, 13, 14
+    APB2 Timer Clock:     168MHz    Timers: 1, 8, 9, 10, 11
+*/
+
+
+//unused Timers 8,9,11,12,13
+
 HardwareTimer *timer14 = new HardwareTimer(TIM14);
 HardwareTimer *timer3 = new HardwareTimer(TIM3);
 HardwareTimer *timer4 = new HardwareTimer(TIM4);
 HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer5 = new HardwareTimer(TIM5);
 HardwareTimer *timer6 = new HardwareTimer(TIM6);
-HardwareTimer *timer10 = new HardwareTimer(TIM10);
+//HardwareTimer *timer10 = new HardwareTimer(TIM10);
 HardwareTimer *timer1 = new HardwareTimer(TIM1);
+HardwareTimer *timer7 = new HardwareTimer(TIM7);
 
 
 
@@ -21,28 +31,31 @@ void Timer5_Setup();
 void Timer6_Setup();
 void Timer10_Setup();
 void Timer1_Setup(); 
+void Timer7_Setup(); 
 
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
-    // Enable Systick Timer
-    Systick_Setup();
 
     //Motor Timers
-    Timer3_Setup(); //PWM Timer Left        
-    Timer4_Setup_Motor(); //PWM Timer Right 
-    // Timer4_Setup_Servo(); //PWM Timer Servo   
-    Timer2_Setup(); //Encoder Timer Left    //TO-DO / Overhaul
-    Timer5_Setup(); //Encoder Timer Right   //TO-DO / Overhaul
+    Timer3_Setup();         //PWM Timer Left        
+    Timer4_Setup_Motor();   //PWM Timer Right 
+  //Timer4_Setup_Servo();   //PWM Timer Servo   
+    Timer2_Setup();         //Encoder Timer Left
+    Timer5_Setup();         //Encoder Timer Right
 
     //Infrared Timers
     Timer6_Setup(); //Main Interrupt Timer
     
 
     //Servo1 PWM Timer
-    Timer10_Setup();                        //TO-DO
+    //Timer10_Setup();                        //CHECK WHY NOT WORKING ?!
 
-    //Buzzer PWM Timer
-    Timer1_Setup();                         //TO-DO
+    //Buzzer PWM and Delay Timer
+    Timer1_Setup();
+    Timer7_Setup();
+
+    // Enable Systick Timer
+    Systick_Setup();
 }
 
 
@@ -70,9 +83,6 @@ void Timer3_Setup() {   // Motor PWM Left
 }
 
 
-// Timer4 calculations
-const uint16_t PRESCALER = 1680 - 1; // Prescaler to get 100 kHz timer frequency
-const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
 
 // Timer 4 setup for motor PWM Right
 void Timer4_Setup_Motor() {   // Motor PWM Right
@@ -86,6 +96,14 @@ void Timer4_Setup_Motor() {   // Motor PWM Right
     timer4->refresh();
     timer4->resume();
 }
+
+
+
+// Timer4 calculations
+const uint16_t PRESCALER = 1680 - 1; // Prescaler to get 100 kHz timer frequency
+const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
+
+
 
 // Timer 4 setup for servo ballgrabber
 void Timer4_Setup_Servo() {      //Servo1 PWM TImer
@@ -135,6 +153,7 @@ void Timer2_Setup(void) {                // Konfiguration für PB3 und PA15
 }
 
 
+
 void Timer5_Setup(void) {                // Konfiguration für PA0 und PA1
     // Takt für GPIOA und Timer 5 aktivieren
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
@@ -173,7 +192,7 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
     timer6->setPrescaleFactor(50);               // Set prescaler to 50
     timer6->setOverflow(160);                     // Set overflow to 16 = 50us intervals
     timer6->attachInterrupt(Timer6_Interrupt);
-    timer6->refresh();
+    // timer6->refresh();
     timer6->pause();
 }
 
@@ -190,7 +209,7 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 
 void Timer1_Setup() {       //Buzzer PWM TImer
     timer1->setMode(4, TIMER_OUTPUT_COMPARE_PWM1, BUZZER);
-    timer1->setPrescaleFactor(84);    // Set prescaler so that 1 tick equals 1us
+    timer1->setPrescaleFactor(186);    // Set prescaler so that 1 tick equals 1us
     //freq = 1/T = 1/(Overflow*1us)
     //Overflow = 1/(freq*1us) = 100000/freq
     int freq = 2000;
@@ -199,6 +218,16 @@ void Timer1_Setup() {       //Buzzer PWM TImer
     timer1->refresh();
     timer1->pause();
 }
+
+
+void Timer7_Setup(void) {   //Buzzer Delay Timer
+    timer7->setPrescaleFactor(84000);               // Set prescaler so that 1 tick equals 1ms
+    timer7->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
+    timer7->attachInterrupt(Timer7_Interrupt);
+    timer7->refresh();
+    timer7->pause();
+}
+
 
 
 

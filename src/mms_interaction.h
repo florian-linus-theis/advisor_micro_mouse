@@ -41,20 +41,20 @@ void update_direction(int turn_direction) {
 // Function to get the list of walls around the current cell in the maze, e.g. [True, False, True, False] -> No walls to the front and the back of the mouse but left and right
 // returns values relative to direction we come from
 std::vector<bool> get_walls() {
-    std::vector<bool> walls(4, false); // initializing list containing 4 walls each to be false by default
-
+    std::vector<bool> walls_absolute(4, false); // initializing list containing 4 walls each to be false by default
+    std::vector<bool> walls_relative_cur_dir = find_walls(); // initializing list containing 4 walls each to be false by default
     // Check for walls in each direction independent of the current direction 
-    walls[cur_direction] = API::wallFront(); // Is there a wall in front
-    walls[(cur_direction + 1) % 4] = API::wallRight(); // Is there a wall to the right
-    walls[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
-    walls[(cur_direction + 3) % 4] = API::wallLeft(); // Is there a wall to the left
+    walls_absolute[cur_direction] = walls_relative_cur_dir[0]; // Is there a wall in front
+    walls_absolute[(cur_direction + 1) % 4] = walls_relative_cur_dir[1]; // Is there a wall to the right
+    walls_absolute[(cur_direction + 2) % 4] = false; // No wall from the direction we came from also in real scenario we do not have any sensors at the back
+    walls_absolute[(cur_direction + 3) % 4] = walls_relative_cur_dir[3]; // Is there a wall to the left
 
     // If it's the first square, mark the bottom wall as there
     if (cur_position == std::vector<int>{0, 0}) {
-        walls[2] = true;
+        walls_absolute[2] = true;
     }
 
-    return walls;
+    return walls_absolute;
 }
 
 
@@ -64,7 +64,7 @@ std::vector<bool> get_walls() {
 
 
 // Function to take all actions to move forward and update belief state
-void move_forward(int squares = 1) {
+void move_forward_fast(int squares = 1) {
     if(current_option == MODE_STANDBY) return;
     int duty_cycle = DUTY_SLOW;
     if (current_option == MODE_BFS || current_option == MODE_ASTAR) {
@@ -74,16 +74,38 @@ void move_forward(int squares = 1) {
     update_position();  // Update current position
 }
 
+void move_forward_mapping(int squares = 1){
+    move_forward_different(DUTY_SLOW, 0, squares);
+    recalibrate_front_wall();
+    update_position();
+}
+
 // Function to take all actions to turn left and update belief state
 void fast_turn_left() {
-    API::turnLeft();
+    left_curve(DUTY_FAST_CURVE);
     update_direction(-1);  // We are turning left
 }
 
 // Function to take all actions to turn right and update belief state
 void fast_turn_right() {
-    API::turnRight();
+    right_curve(DUTY_FAST_CURVE);
     update_direction(+1);  // We are turning right
+}
+
+void turn_right(){
+    rotate_right();
+    update_direction(+1);
+
+}
+
+void turn_left(){
+    rotate_left();
+    update_direction(-1);
+}
+
+void turn_around(){
+    turn_around_right();
+    update_direction(+2);
 }
 
 // Function to change current direction to a specific direction
@@ -92,14 +114,14 @@ void set_dir(int _dir) {
         return;
     }
     if (_dir == (cur_direction + 1) % 4) {  // If need to turn right once
-        rotate_right();
+        turn_right();
         return;
     }
     if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
         turn_around();
         return;
     }
-    rotate_left();  // If need to turn left once
+    turn_left();  // If need to turn left once
 }
 
 // Function to turn toward an adjacent location object
@@ -122,17 +144,3 @@ void turn_toward(Location loc) {
     set_dir(_dir); // turning towards desired location
 }
 
-
-void grab_ball(){
-    // Drive to the ball
-    go_to_start(DUTY_FAST);
-    move_forward();
-    fast_turn_right();
-    move_ballgrabber_forward();
-    move_forward(0.75); 
-    delay(500); 
-    move_ballgrabber_backward();
-    turn_around();
-    move_forward(0.75);
-    fast_turn_right(); 
-} 

@@ -1,5 +1,4 @@
 //Include Header Files
-//#pragma once
 #include "Setup\Setup.h"
 
 //Include Librarys in Setup.h !!!
@@ -14,27 +13,30 @@
 int current_option = MODE_STANDBY;
 int selected_option = MODE_STANDBY;
 bool optionSelected = false;
-bool encoderTurned = false;
+volatile bool encoderTurned = false;
 bool confirmationPending = false;
+bool SETUP_COMPLETE = false;
 
 
 
 void setup() {
     Pin_Setup();
-    Timer_Setup();
     ADC_Setup();
-    maze_setup(); // setting up the maze file
+    Timer_Setup();
     set_Interrupt_Priority();
-
-    //Start Systick Timer (manually enable when in drive mode to speed up rest)
-    timer14->resume();
-
+    maze_setup(); // setting up the maze file
+  
     // Setup Complete
     // Display the initial options on display
     displayOptions(static_cast<Mode>(current_option), false);
 
     // Test Bluetooth
     ble->println("test bluetooth");
+
+    SETUP_COMPLETE = true;
+  
+    //Start Systick Timer (manually enable when in drive mode to speed up rest)
+    // timer14->resume();
 }
 
 
