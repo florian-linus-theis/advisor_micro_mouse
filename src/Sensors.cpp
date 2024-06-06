@@ -95,14 +95,15 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     display->setTextSize(1);
     display->setTextColor(SSD1306_WHITE);
     display->setCursor(0, 0);
-    display->println("Please point Robot in the air");
-    display->println("Press to Start:");
+    display->println("Please point Robot");
+    display->println("in the air");
+    display->println("Press to start cal:");
     display->display();
 
     while(!optionSelected) {
       delay(1);
     }
-
+    delay(50);
     digitalWrite(LED_GREEN, LOW);
     Buzzer_beep(4000, 2, 50);
 
@@ -125,8 +126,9 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     display->setTextSize(1);
     display->setTextColor(SSD1306_WHITE);
     display->setCursor(0, 0);
-    display->println("Please set Robot in the maze");
-    display->println("Finger to Start:");
+    display->println("Please set Robot");
+    display->println("in the maze");
+    display->println("Finger to start cal.:");
     display->display();
     start();
 
