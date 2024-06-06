@@ -180,6 +180,7 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             display_print("BFS Mode selected");
             timer14->resume();
+            start();
             reset_encoders();
             reset_PID_values();
             grab_ball();
