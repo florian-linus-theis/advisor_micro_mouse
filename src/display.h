@@ -2,7 +2,7 @@
 #include "Setup\Setup.h"
 #include <robin.h>
 #include <ballgrabber.h>
-#include "PID_neu.h"
+#include "PID.h"
 #include "Music.h"
 
 
@@ -41,6 +41,7 @@ void handleEncoderTurn() {
 // Interrupt Service Routine (ISR) for rotary encoder button press
 void handleEncoderButton() {
     optionSelected = true;
+    Buzzer_beep_noBlock(1000, 1, 100);
 }
 
 
@@ -112,7 +113,14 @@ void handleModeSelection(Mode mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
-            // Handle Stand By Mode
+            calibrate_sensors(10, 10);
+            ble->println("Calibration done");
+            ble->println("Calibration values: ");
+            ble->println("1: " + String(calibration_sensor[0]) + " 2: " + String(calibration_sensor[1]) + " 3: " + String(calibration_sensor[2]) + " 4: " + String(calibration_sensor[3]) + " 5: " + String(calibration_sensor[4]) + " 6: " + String(calibration_sensor[5]) + " 7: " + String(calibration_sensor[6]));
+            ble->println("Neutral values: ");
+            ble->println("1: " + String(NeutralSensorValues[0]) + " 2: " + String(NeutralSensorValues[1]) + " 3: " + String(NeutralSensorValues[2]) + " 4: " + String(NeutralSensorValues[3]) + " 5: " + String(NeutralSensorValues[4]) + " 6: " + String(NeutralSensorValues[5]) + " 7: " + String(NeutralSensorValues[6]));
+            // always keep this last
+            displayOptions(MODE_STANDBY, false);
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
@@ -127,7 +135,8 @@ void handleModeSelection(Mode mode) {
             delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
-            delay(1000);
+            // always keep this last
+            displayOptions(MODE_SOFT_RESET, false);
             break;
         case MODE_SHOW_DATA:
             // display_print("Data Mode selected");
@@ -141,9 +150,9 @@ void handleModeSelection(Mode mode) {
             timer14->pause();
             display->clearDisplay();
             delay(100);
-            display->println("Test Servo");
             // Handle Hard Reset Mode
-            delay(100);
+            // always keep this last
+            displayOptions(MODE_SHOW_DATA, false);
             break;
         case MODE_MAP_MAZE:
             display_print("DFS Mode selected");
@@ -163,43 +172,51 @@ void handleModeSelection(Mode mode) {
             delay(200);
             // ble->println(avg_distance_traveled);
             // Handle Map Maze Mode
+            // always keep this last
+            displayOptions(MODE_MAP_MAZE, false);
             break;
         case MODE_BFS:
+             // starting systick timer
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             display_print("BFS Mode selected");
-            PID_Test();
+            timer14->resume();
+            reset_encoders();
+            reset_PID_values();
+            grab_ball();
             delay(1000);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            timer14->pause(); // stopping systick timer
             //Imperial_March();
-            // Handle BFS Mode
+            // always keep this last
+            displayOptions(MODE_BFS, false);
             break;
         case MODE_ASTAR:
-            display_print("A* Mode selected");
-            digitalWrite(SERVO_ENABLE, LOW);
-
-            // Code doesnt work YET
-            // Timer4_Setup_Motor();
-            ble->println("motor setup done");
-            // delay(2000);
-            robin_test();
+            display_print("A* Mode selected wait for Finger");
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            start(); // wait for finger
+            timer14->resume(); // starting systick timer
+            delay(20);
+            // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
+            reset_encoders();
+            reset_PID_values();
+            while(1){
+                CURRENT_CASE_PID = 3;
+                move_forward_different(100, 0, 2);
+                delay(500);
+                CURRENT_CASE_PID = 4;
+                pid_move_function(50);
+                reset_PID_values();
+                delay(200);
+                rotate_left();
+                delay(500);
+                if(encoderTurned) break;
+            }
             delay(500);
-            ble->println("robin test done");
-            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            Timer4_Setup_Servo();
-            digitalWrite(SERVO_ENABLE, HIGH);
-            delay(500); // delay to allow the user to read the message
-            ble->println("servo setup done");
-            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
-            // timer4->refresh();
-            delay(1000);
-            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
-            // delay(2000);
-            delay(750);
-            digitalWrite(SERVO_ENABLE, LOW);
-            ble->println("ballgrabber done");
-            Timer4_Setup_Motor();
-            // // delay(1000);
-            ble->println("motor setup done");
-            robin_test();
-            // Handle A* Mode
+            timer14->pause();
+            // display_print("A* Mode completed");
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            // always keep this last
+            displayOptions(MODE_ASTAR, false);
             break;
         default:
             display_print("Invalid mode");
@@ -265,4 +282,29 @@ void Timer7_Interrupt(void) {
         timer1->resume();
     }
     buzzer_counter--;
+}
+
+
+
+
+// Function to start all driving modes 
+// Waits for finger to be in front of the sensor (front right), then starts the driving mode
+void start(){
+    while(Distance_Sensor[5] <= 1250){   //SENSOR_RD
+        Distanz_Messung_Sensoren();
+        delay(50);
+    }
+
+    digitalWrite(LED_GREEN, LOW);       //SENSOR_RD
+    while(Distance_Sensor[5] > 1250){
+        Distanz_Messung_Sensoren();
+        delay(50);
+    }
+
+    delay(1000);
+    Buzzer_beep(4000, 2, 50);
+    digitalWrite(LED_GREEN, HIGH);
+
+    //timer14->resume();
+    //move_forward_different(100, 100, 0.5);
 }

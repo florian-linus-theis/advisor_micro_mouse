@@ -1,6 +1,7 @@
 #pragma once
 #include <Setup\Setup.h>
 
+
 // Für Servo 
 #define TIMER_FREQUENCY 142000000 // 168 MHz
 
@@ -13,7 +14,8 @@ const uint16_t PULSE_WIDTH_180 = 1950; // ~2 ms (not exactly 180 degrees (rather
 const uint16_t PRESCALER = 1680 - 1; // Prescaler to get 100 kHz timer frequency
 const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
 
-
+// Sensor Calibrations 
+std::vector<int> ballgrabber_calibration(7, 0);
 
 
 void writeServo(int angle) {
@@ -67,3 +69,39 @@ void handle_ballgrabber(){
             Timer4_Setup_Motor();
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
 }
+
+// Full Function to grab the ball
+void grab_ball(){
+    CURRENT_CASE_PID = 2; // set PID case to 0
+    reset_distance_traveled(); // reset distance to zero 
+    reset_PID_values(); // reset PID values to zero
+    move_forward_different(100, 0, 1.75); // move forward from very back to ball
+    delay(500); // wait for wheels to really stop
+    rotate_right(); // rotate right to face ball  // move forward to ball
+    delay(500); // wait for wheels to really stop
+    reset_PID_values(); // reset PID values to zero
+    std::vector<int> original_calibration_values = NeutralSensorValues;
+    NeutralSensorValues = ballgrabber_calibration;
+    move_forward_different(100, 0, 1);  // move forward to ball
+    delay(500); // wait for wheels to really stop
+    CURRENT_CASE_PID = 4;
+    pid_move_function(50);
+    delay(500);
+    handle_ballgrabber(); // grab the ball
+    turn_around_right(); // turn around to face the opposite direction
+    CURRENT_CASE_PID = 3; // set PID case to 0
+    delay(500);
+    move_forward_different(100, 0, 1); // move forward to the middle of the cell
+    NeutralSensorValues = original_calibration_values; // reset sensor values
+    CURRENT_CASE_PID = 4;
+    pid_move_function(50);
+    delay(500);
+    CURRENT_CASE_PID = 2; // set PID case to 0
+    rotate_right(); // rotate right to face the exit of starting area
+    delay(500);
+    move_forward_different(100, 0, 1.5); // move to the exit of starting area
+    delay(500);
+    CURRENT_CASE_PID = 4;
+    pid_move_function(50);
+    delay(500);
+} 

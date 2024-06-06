@@ -1,17 +1,16 @@
 //Include Librarys
-#include "Arduino.h"
+#include <Arduino.h>
 #include "cmath"
 #include "vector"
 #include "tuple"
 #include "string"
-#include "HardwareTimer.h"
-#include "HardwareSerial.h"
 #include "iostream"
-#include "wiring.h"
-#include "Wire.h"
+#include <wiring.h>
+#include <Wire.h>
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
 #include "./location.h"
+#include <stm32f4xx_hal.h> //probably not neccessary
 
 //Pin Naming
 //System
@@ -107,8 +106,19 @@ extern bool SETUP_COMPLETE;
 
 // ---------------------------------------
 // PID 
+extern std::vector<int> NeutralSensorValues;
 extern std::vector<int> PID_constants; // Global variable to store the PID constants
-
+extern std::vector<int> PID_values; 
+extern std::vector<int> calc_correction(int);
+extern void reset_PID_values();
+extern int determine_PID_case();
+extern std::vector<bool> find_walls();
+extern void pid_move_function(int);
+extern double differential;
+extern double integral;
+extern double proportional; 
+extern int CURRENT_CASE_PID; 
+extern bool SET_PID_MANUALLY;
 
 
 // ---------------------------------------
@@ -134,10 +144,8 @@ extern void Pin_Setup(void);
 extern void Set_Output(void);
 
 
-
-//Clock_Setup
-extern void Clock_Setup(void);
-
+//ADC_Setup
+extern void ADC_Setup(void);
 
 
 //Timer_Setup
@@ -164,14 +172,16 @@ extern int Systick_Counter;
 // Global variables updated during systick 
 extern int encoder_right_total; 
 extern int encoder_left_total;
-extern int distance_traveled_L; // TODO: evtl float
-extern int distance_traveled_R; // TODO: evtl float
-extern int avg_distance_traveled; // TODO: evtl float
+extern volatile int distance_traveled_L; // TODO: evtl float
+extern volatile int distance_traveled_R; // TODO: evtl float
+extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
 extern int current_speed; 
 extern void reset_distance_traveled(void);
+extern void reset_encoders(void);
+
 
 
 // Driving Functions
@@ -194,12 +204,10 @@ extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
 
+
 // Middle Layer Drving Functions
 extern void grab_ball();
 
-
-//ADC_Setup
-extern void ADC_Setup(void);
 
 
 
@@ -213,6 +221,8 @@ extern void Distanz_Messung_Blind(void);
 extern void Distanz_Messung_Hell(void);
 extern void Distanz_Mid_Sensor(void);
 extern void printDistanzSensoren(void);
+extern void calibrate_sensors(int, int);
+extern bool SENSOR_CALIBRATED;
 
 extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
@@ -236,10 +246,19 @@ extern void handleEncoderButton(void);
 extern int current_option;
 extern int selected_option;
 extern bool optionSelected;
-extern bool encoderTurned;
+extern volatile bool encoderTurned;
 extern bool confirmationPending;
 
 extern void Buzzer_beep(int, int);
 extern void Buzzer_beep(int, int, int);
 extern void Buzzer_beep_noBlock(int, int, int);
 extern void Timer7_Interrupt();
+
+extern void calibrate_sensors(int, int);
+extern void start();
+
+
+
+// Ballgrabber
+extern std::vector<int> ballgrabber_calibration;
+extern void grab_ball();
