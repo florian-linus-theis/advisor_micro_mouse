@@ -55,15 +55,15 @@ void move_ballgrabber_backward() {
 
 //handling ballgrabber action including reset of motor timer and servo timer
 void handle_ballgrabber(){
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            Timer4_Setup_Servo();
-            digitalWrite(SERVO_ENABLE, HIGH);
-            delay(1000); // TODO: improve here, maybe cancel this out completely
-            timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
-            delay(1000);
-            timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
-            delay(1000); // TODO: improve here, maybe cancel this out completely
-            digitalWrite(SERVO_ENABLE, LOW);
-            Timer4_Setup_Motor();
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+    digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+    Timer4_Setup_Servo();
+    digitalWrite(SERVO_ENABLE, HIGH);
+    delay(1000); // TODO: improve here, maybe cancel this out completely
+    timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 0 degrees
+    delay(1000);
+    timer4->setCaptureCompare(3, 1950, MICROSEC_COMPARE_FORMAT); // 180 degrees
+    delay(1000); // TODO: improve here, maybe cancel this out completely
+    digitalWrite(SERVO_ENABLE, LOW);
+    Timer4_Setup_Motor();
+    digitalWrite(MOTOR_ENABLE, LOW); // enable motor
 }
