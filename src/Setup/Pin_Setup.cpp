@@ -163,5 +163,5 @@ void Set_Output(void) {
   digitalWrite(LED_BLUE, HIGH);
 
   // Servo
-  digitalWrite(SERVO_ENABLE, HIGH);
+  digitalWrite(SERVO_ENABLE, LOW);
 }
