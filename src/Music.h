@@ -421,20 +421,18 @@ void Running_in_the_90s(){
 
 void Timer8_Interrupt() {
     if(!SETUP_COMPLETE) return;
-    timer8->setOverflow(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
+
     SETUP_COMPLETE = false;
-    timer8->refresh();
+    timer8->setOverflow(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
+    //timer8->refresh();
     SETUP_COMPLETE = true;
-    timer8->resume();
+    //timer8->resume();
+
     Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
     note_cnt++;
     if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
         note_cnt = 0;
         beat_cnt++;
     }
-    if (beat_cnt > 37 && note_cnt >5) SONG_COMPLETE = true;
+    if (beat_cnt > 37) SONG_COMPLETE = true;
 } 
-
-
-
-

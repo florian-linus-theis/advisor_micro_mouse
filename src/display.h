@@ -113,7 +113,7 @@ void handleModeSelection(Mode mode) {
         case MODE_STANDBY:
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
-            Buzzer_beep_noBlock(2000, 5, 200);
+            Running_in_the_90s();
             // always keep this last
             displayOptions(MODE_STANDBY, false);
             break;
