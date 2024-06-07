@@ -3,7 +3,6 @@
 #include <robin.h>
 #include <ballgrabber.h>
 #include "PID.h"
-#include "Music.h"
 
 
 // Define an enum for all modes
@@ -258,16 +257,16 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
     int duty;
 
     if (freq == 0) {
-        duty = 0;
-        freq = 1000;
+        duty = 0;                   // 0% Duty Cycle -> OFF
+        overflow = 1000000 / 2000;  // not important
     }
     else {
         overflow = 1000000 / freq;
-        duty = overflow / 2;
+        duty = overflow / 2;      // 50% Duty Cycle - square wave
     }
 
     timer1->setOverflow(overflow);
-    timer1->setCaptureCompare(4, duty, TICK_COMPARE_FORMAT);  // 50% Duty Cycle - square wave
+    timer1->setCaptureCompare(4, duty, TICK_COMPARE_FORMAT);
     timer1->refresh();
     timer1->resume();
 

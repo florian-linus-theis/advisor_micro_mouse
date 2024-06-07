@@ -15,11 +15,11 @@ int selected_option = MODE_STANDBY;
 bool optionSelected = false;
 volatile bool encoderTurned = false;
 bool confirmationPending = false;
-bool SETUP_COMPLETE = false;
 
 
 
 void setup() {
+    SETUP_COMPLETE = false;
     Pin_Setup();
     ADC_Setup();
     Timer_Setup();

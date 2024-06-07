@@ -35,6 +35,8 @@ void Timer1_Setup();
 void Timer7_Setup(); 
 void Timer8_Setup();
 
+volatile bool SETUP_COMPLETE;
+
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
 

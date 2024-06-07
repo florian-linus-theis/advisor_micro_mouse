@@ -100,9 +100,6 @@
 #define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
 
 
-// Global Variables 
-extern bool SETUP_COMPLETE;
-
 
 // ---------------------------------------
 // PID 
@@ -135,6 +132,8 @@ extern std::vector<int> POSSIBLE_GOAL_POS_FOUR;
 
 
 //Object, Function and Variable Declaration - - - - - - - - - - - - - - - - - - - - -
+extern volatile bool SETUP_COMPLETE;
+
 //Pin_Setup
 extern SPIClass *imu;
 extern Adafruit_SSD1306 *display;
@@ -264,3 +263,7 @@ extern void start();
 // Ballgrabber
 extern std::vector<int> ballgrabber_calibration;
 extern void grab_ball();
+
+
+//Music.cpp
+extern void Running_in_the_90s(void);
