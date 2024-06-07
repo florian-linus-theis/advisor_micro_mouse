@@ -29,7 +29,7 @@ int encoder_R = 0;
 // int tick_rotate = 7460 * 4;
 // int tick_accelerate = 13355 * 4;
 
-int tick_forward = 26668 * 4 - 4500;
+int tick_forward = 26668 * 4 - 7000;
 int tick_start = 6889 * 4;
 int tick_rotate = 23000; // --> works for us with 90 duty rotate cycle
 int tick_accelerate = 35000;
@@ -292,7 +292,7 @@ void rotate_left(){
     //     }
     // }
     stop();
-    delay(700);
+    delay(400);
     reset_distance_traveled();
 }
 
@@ -318,7 +318,7 @@ void rotate_right(){
         // }
     }
     stop();
-    delay(700);
+    delay(400);
     reset_distance_traveled();
 }
 

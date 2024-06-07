@@ -9,7 +9,7 @@ signed int previous=0;
 int default_base_speed = 100;
 int default_max_correction_speed_x = 150;
 int max_correction_speed = 150;
-int default_max_correction_speed_y = 5;
+int default_max_correction_speed_y = 10;
 int current_state;
 int toggle_drive;
 int LAST_CASE_PID = -1;

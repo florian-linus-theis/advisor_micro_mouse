@@ -88,3 +88,50 @@ void execute_movements(const std::vector<std::tuple<int, float>>& movement) {
 }
 
 
+
+std::vector<std::tuple<int, float>> translate_actions_into_slow_movement(std::vector<int> actions, bool ballgreifer) {
+    std::vector<std::tuple<int, float>> movement;
+    int i = 0;
+    if (ballgreifer) i = 2; // skip the first two actions
+
+    for (; i < actions.size(); i++) {
+        
+        // CASE FORWARD
+        if (actions[i] == FORWARD) {
+            int j = 1;
+            // check how many forward actions are following
+            while (i + j < actions.size() && actions[i + j] == FORWARD) {
+                j++;
+            }
+            // if there are more than one forward actions, we drive multiple squares forward
+            if (j > 1) {
+                movement.push_back(std::make_tuple(FORWARD, j - 1)); // j-1 because we want to decelerate after the last square
+                i += j - 1;
+            }
+        // CASE RIGHT CURVE
+        } else if (actions[i] == RIGHT) {
+            if (actions[i - 1] == FORWARD) {
+                movement.push_back(std::make_tuple(DECELERATE, 0.5));
+            }
+            movement.push_back(std::make_tuple(RIGHT, 0));
+            if (actions[i + 1] == FORWARD) {
+                movement.push_back(std::make_tuple(ACCELERATE, 0.5));
+            }
+        // CASE LEFT CURVE
+        } else if (actions[i] == LEFT) {
+            if (actions[i - 1] == FORWARD) {
+                movement.push_back(std::make_tuple(DECELERATE, 0.5));
+            }
+            movement.push_back(std::make_tuple(LEFT, 0));
+            if (actions[i + 1] == FORWARD) {
+                movement.push_back(std::make_tuple(ACCELERATE, 0.5));
+            }
+        }
+        // Before the last square, we decelerate to stop
+        if (i == actions.size() - 1) {
+            movement.push_back(std::make_tuple(DECELERATE, 0)); // entschleunigt über halbe Zelle -> bleibt auf Zellübergang stehen
+            movement.push_back(std::make_tuple(STOP, 0));
+        }
+    }
+    return movement;
+}
