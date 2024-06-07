@@ -15,6 +15,7 @@ int toggle_drive;
 int LAST_CASE_PID = -1;
 bool SET_PID_MANUALLY = false;
 std::vector<int> avg_PID_values(2, 0);
+std::vector<int> PID_values_encoder = {0,0};
 
 enum PID_CASES{
     ROT_ERROR = 0,
@@ -27,7 +28,8 @@ enum PID_CASES{
     CURVE_LEFT_ERROR = 7,
     CURVE_RIGHT_ERROR = 8,
     TRANSITION = 9,
-    BLIND = 10
+    BLIND = 10,
+    X_ERROR_ENCODER_BASED = 11
 };
 
 int CURRENT_CASE_PID = X_ERROR_LEFT_WALL_ONLY;
@@ -65,8 +67,8 @@ void calc_Sensor_Errors(){
 }
 
 //adjust possible correction according to speed
-double give_percent(double value) {
-    return -100 + 200 * ((value +5000) / 10000);
+double give_percent(double value, int istart = -100, int istop = 100) {
+    return -100 + 200 * ((value - istart) / (istop - istart));
 }
 
 //Calculate error for PID (dependent on current case)
@@ -116,6 +118,12 @@ int calcError(int PID_case){
         error = distance_traveled_R - desired_distance_R;
         break;
 
+    case X_ERROR_ENCODER_BASED:
+        error = distance_traveled_L - distance_traveled_R;
+        ble->println(distance_traveled_L);
+        ble->println(distance_traveled_R);
+        break;
+
     default:
         error = 0;
         break;
@@ -129,7 +137,6 @@ int calcError(int PID_case){
 // last values kp = 3, ki = 0, kd = 0
 int applyPID(signed int error, double kp = 0.5 , double ki = 0, double kd = 0){
     // for PID function change
-    error = give_percent(error);
     proportional = error;
 
     if(abs(integral) < 100000){
@@ -168,7 +175,7 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(calcError(X_ERROR), 1.7, 0, 0.05); //<-- Case Specific kp,ki,kd-values can be defined here
+        output_G = applyPID(give_percent(calcError(X_ERROR),-5000,5000), 1.7, 0, 0.05); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = output_G;
@@ -225,6 +232,16 @@ std::vector<int> calc_correction(int PID_case){
         correction_left = avg_PID_values[0]; // using average PID values to just drive straight
         correction_right = avg_PID_values[1];
         break;
+
+     case X_ERROR_ENCODER_BASED:
+        max_correction_speed = default_max_correction_speed_x;
+        output_G = applyPID(give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960), 1.7, 0, 0.05); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = cap_output(output_G, max_correction_speed);
+        correction_left = -output_G;
+        correction_right = output_G;
+        break;
+
+    
 
     default:
         correction_left = avg_PID_values[0];
@@ -350,4 +367,50 @@ void recalibrate_front_wall(){
         SET_PID_MANUALLY = false;
         reset_PID_values();
     }
+}
+
+void encoder_based_move_function(){
+    reset_distance_traveled();
+    while(1){
+        delay(8);
+
+        if(encoderTurned){
+            ForwardBoth(0);
+            encoderTurned=false;
+            break;
+        }
+
+        std::vector<int> PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
+        int both_zero = 0;
+
+        //ble->println(PID_values_encoder[0]);
+        //ble->println(PID_values_encoder[1]);
+        if(default_base_speed + PID_values_encoder[0] > 50){
+            ForwardLeft(default_base_speed + PID_values_encoder[0]);
+            both_zero = 0;
+            //ForwardRight(default_base_speed + PID_values_encoder[1]);
+        }
+        else if(default_base_speed + PID_values_encoder[0] < 50){
+            BackwardLeft(default_base_speed - PID_values_encoder[0]);
+            both_zero = 0;
+            //BackwardRight(default_base_speed - avg_PID_values[1] - PID_values[0]);
+        }
+        else{
+            ForwardBoth(0);
+            both_zero = 1;
+        }
+
+        if(default_base_speed + PID_values_encoder[1] > 50 && both_zero == 0){
+            ForwardRight(default_base_speed + PID_values_encoder[1]);
+            //ForwardRight(default_base_speed + PID_values_encoder[1]);
+        }
+        else if(default_base_speed + PID_values_encoder[1] < 50 && both_zero == 0){
+            BackwardRight(default_base_speed - PID_values_encoder[1]);
+            //BackwardRight(default_base_speed - avg_PID_values[1] - PID_values[0]);
+        }
+        else{
+            ForwardBoth(0);
+        }
+    }
+    return;
 }

@@ -112,7 +112,8 @@ extern void a_star_algorithm();
 // PID 
 extern std::vector<int> NeutralSensorValues;
 extern std::vector<int> PID_constants; // Global variable to store the PID constants
-extern std::vector<int> PID_values; 
+extern std::vector<int> PID_values;
+//extern std::vector<int> PID_values_encoder;
 extern std::vector<int> calc_correction(int);
 extern void reset_PID_values();
 extern int determine_PID_case();

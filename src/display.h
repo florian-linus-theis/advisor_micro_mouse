@@ -137,8 +137,10 @@ void handleModeSelection(Mode mode) {
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
             delay(1000); 
-            getBattery();
-            drawBatteryStatus();
+            timer14->resume();
+            reset_distance_traveled();
+            encoder_based_move_function();
+            timer14->pause();
             delay(1000);
             display->clearDisplay();
             delay(1000);
