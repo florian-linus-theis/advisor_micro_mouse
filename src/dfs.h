@@ -29,7 +29,8 @@ std::stack<int> dir_stack;
 
 void dfs_map_maze() {
     Location& cur_loc = maze[cur_position[0]][cur_position[1]]; // Create a reference to the current location object for easier reference (added)
-    ble->println("in dfs");
+    ble->println("Current Cell: (" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+
     if (!cur_loc.visited) { // If current location has not been visited
         cur_loc.set_visited(true); // Mark location as visited
         cur_loc.set_walls(get_walls()); // Set wall locations

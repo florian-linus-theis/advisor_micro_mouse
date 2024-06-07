@@ -136,7 +136,7 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
-            delay(1000) 
+            delay(1000); 
             getBattery();
             drawBatteryStatus();
             delay(1000);
@@ -192,7 +192,7 @@ void handleModeSelection(Mode mode) {
             // always keep this last
             displayOptions(MODE_BFS, false);
             break;
-        case MODE_ASTAR
+        case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             start(); // wait for finger

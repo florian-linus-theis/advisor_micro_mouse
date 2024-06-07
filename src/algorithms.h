@@ -13,7 +13,7 @@
 #include "algorithms_to_movement.h"
 
 
-bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
+bool BALLGREIFER = true; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
 std::vector<int> POSSIBLE_GOAL_POS_ONE = {0,2}; 
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8, 8}; 
@@ -63,8 +63,7 @@ void bfs_algorithm(){
 
 void a_star_algorithm(){
     if (MAPPING_COMPLETE == false) {
-        display->clearDisplay();
-        display->print("Maze not mapped");
+        display_print("maze not mapped yet");
         Buzzer_beep(2000, 5); // Beep 4 times to indicate completion
         return;
     }
