@@ -116,9 +116,13 @@ void handleModeSelection(Mode mode) {
             calibrate_sensors(10, 10);
             ble->println("Calibration done");
             ble->println("Calibration values: ");
-            ble->println("1: " + String(calibration_sensor[0]) + " 2: " + String(calibration_sensor[1]) + " 3: " + String(calibration_sensor[2]) + " 4: " + String(calibration_sensor[3]) + " 5: " + String(calibration_sensor[4]) + " 6: " + String(calibration_sensor[5]) + " 7: " + String(calibration_sensor[6]));
+            ble->println("0:" + String(calibration_sensor[0]) + " 1:" + String(calibration_sensor[1]) + " 2:" + String(calibration_sensor[2]) + " 3:" + String(calibration_sensor[3]) + " 4:" + String(calibration_sensor[4]) + " 5:" + String(calibration_sensor[5]) + " 6:" + String(calibration_sensor[6]));
             ble->println("Neutral values: ");
-            ble->println("1: " + String(NeutralSensorValues[0]) + " 2: " + String(NeutralSensorValues[1]) + " 3: " + String(NeutralSensorValues[2]) + " 4: " + String(NeutralSensorValues[3]) + " 5: " + String(NeutralSensorValues[4]) + " 6: " + String(NeutralSensorValues[5]) + " 7: " + String(NeutralSensorValues[6]));
+            ble->println("0:" + String(NeutralSensorValues[0]) + " 1:" + String(NeutralSensorValues[1]) + " 2:" + String(NeutralSensorValues[2]) + " 3:" + String(NeutralSensorValues[3]) + " 4:" + String(NeutralSensorValues[4]) + " 5:" + String(NeutralSensorValues[5]) + " 6:" + String(NeutralSensorValues[6]));
+            ble->println("Max values: ");
+            ble->println("0:" + String(MaxSensorValues[0]) + " 1:" + String(MaxSensorValues[1]) + " 2:" + String(MaxSensorValues[2]) + " 3:" + String(MaxSensorValues[3]) + " 4:" + String(MaxSensorValues[4]) + " 5:" + String(MaxSensorValues[5]) + " 6:" + String(MaxSensorValues[6]));
+            ble->println("Min values: ");
+            ble->println("0:" + String(MinSensorValues[0]) + " 1:" + String(MinSensorValues[1]) + " 2:" + String(MinSensorValues[2]) + " 3:" + String(MinSensorValues[3]) + " 4:" + String(MinSensorValues[4]) + " 5:" + String(MinSensorValues[5]) + " 6:" + String(MinSensorValues[6]));   
             // always keep this last
             displayOptions(MODE_STANDBY, false);
             break;
@@ -151,7 +155,7 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             timer14->resume(); // starting systick timer
             delay(1000);
-            start();
+            start("right");
             SET_PID_MANUALLY = false;
             reset_encoders();
             reset_PID_values();
@@ -180,10 +184,10 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             display_print("BFS Mode selected");
             timer14->resume();
-            start();
+            start("right");
             reset_encoders();
             reset_PID_values();
-            start();
+            start("right");
             dfs_mapping();
             delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
@@ -195,22 +199,21 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            start(); // wait for finger
+            start("right"); // wait for finger
             timer14->resume(); // starting systick timer
             delay(20);
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
             while(1){
-                CURRENT_CASE_PID = 3;
-                move_forward_different(100, 0, 2);
-                delay(500);
-                CURRENT_CASE_PID = 4;
-                pid_move_function(50);
-                reset_PID_values();
-                delay(200);
-                rotate_left();
-                delay(500);
+                delay(3000);
+                Distanz_Messung_Sensoren();
+                ble->println("Distance Sensors:");
+                ble->println("0:" + String(Distance_Sensor[0]) + " 1:" + String(Distance_Sensor[1]) + " 2:" + String(Distance_Sensor[2]) + " 3:" + String(Distance_Sensor[3]) + " 4:" + String(Distance_Sensor[4]) + " 5:" + String(Distance_Sensor[5]) + " 6:" + String(Distance_Sensor[6]));
+                ble->println("Neutral Sensor Values:");
+                ble->println("0:" + String(NeutralSensorValues[0]) + " 1:" + String(NeutralSensorValues[1]) + " 2:" + String(NeutralSensorValues[2]) + " 3:" + String(NeutralSensorValues[3]) + " 4:" + String(NeutralSensorValues[4]) + " 5:" + String(NeutralSensorValues[5]) + " 6:" + String(NeutralSensorValues[6]));
+                ble->println("Min Sensor Values:");
+                ble->println("0:" + String(MinSensorValues[0]) + " 1:" + String(MinSensorValues[1]) + " 2:" + String(MinSensorValues[2]) + " 3:" + String(MinSensorValues[3]) + " 4:" + String(MinSensorValues[4]) + " 5:" + String(MinSensorValues[5]) + " 6:" + String(MinSensorValues[6]));
                 if(encoderTurned) break;
             }
             delay(500);
@@ -292,14 +295,19 @@ void Timer7_Interrupt(void) {
 
 // Function to start all driving modes 
 // Waits for finger to be in front of the sensor (front right), then starts the driving mode
-void start(){
-    while(Distance_Sensor[5] <= 1250){   //SENSOR_RD
+void start(std::string side = "right"){
+    int i = 5;
+    if (side == "left"){
+        i = 0;
+    }
+    
+    while(Distance_Sensor[i] <= 1250){   //SENSOR_RD
         Distanz_Messung_Sensoren();
         delay(50);
     }
 
     digitalWrite(LED_GREEN, LOW);       //SENSOR_RD
-    while(Distance_Sensor[5] > 1250){
+    while(Distance_Sensor[i] > 1250){
         Distanz_Messung_Sensoren();
         delay(50);
     }
@@ -307,8 +315,17 @@ void start(){
     delay(1000);
     Buzzer_beep(4000, 2, 50);
     digitalWrite(LED_GREEN, HIGH);
+}
 
-    //timer14->resume();
-    //move_forward_different(100, 100, 0.5);
+void wait_for_other_side(std::string side = "right"){
+    int i = 0;
+    if (side == "right"){
+        i = 5;
+    }
+    
+    while(Distance_Sensor[i] <= 1250){   //SENSOR_RD
+        Distanz_Messung_Sensoren();
+        delay(50);
+    }
 }
 

@@ -234,7 +234,8 @@ extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
 extern int Distance_Sensor[];
 extern int calibration_sensor[];
-
+extern int MinSensorValues[];
+extern int MaxSensorValues[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
@@ -263,7 +264,8 @@ extern void Timer7_Interrupt();
 
 // Before Start
 extern void calibrate_sensors(int, int);
-extern void start();
+extern void start(std::string);
+extern void wait_for_other_side(std::string);
 
 // Battery
 extern void getBattery();
