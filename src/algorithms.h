@@ -13,7 +13,7 @@
 #include "algorithms_to_movement.h"
 
 
-bool BALLGREIFER = true; // Using the Ballgreifer Version or not?
+bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
 std::vector<int> POSSIBLE_GOAL_POS_ONE = {0,2}; 
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8, 8}; 

@@ -4,6 +4,7 @@ int Channel_Emitter[] = {IR_EMITTER_LS, IR_EMITTER_LD, IR_EMITTER_LF, IR_EMITTER
 int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF, IR_SENSOR_RD, IR_SENSOR_RS, IR_SENSOR_MID};
 int Blind_Sensor[7] = {0};
 int Distance_Sensor[7] = {0};
+int Last_Distance_Sensor[7] = {0};
 int calibration_sensor[7] = {0};
 int MinSensorValues[7] = {0}; // for wall detection
 int MaxSensorValues[7] = {0}; // for PID range mapping
@@ -147,9 +148,19 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         Distanz_Messung_Sensoren();
         min_values[0] += Distance_Sensor[0];
         min_values[1] += Distance_Sensor[1];
-        min_values[6] += Distance_Sensor[6]; // mid sensor 
         max_values[4] += Distance_Sensor[4];
         max_values[5] += Distance_Sensor[5];
+    }
+
+    // Now Min values front
+    display_print("Move to CENTER BACK wheels on edge", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start("left");
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        min_values[2] += Distance_Sensor[2];
+        min_values[3] += Distance_Sensor[3];
+        min_values[6] += Distance_Sensor[6];
     }
 
     // for ballgrabber calibration while drivig towards ballgrabber

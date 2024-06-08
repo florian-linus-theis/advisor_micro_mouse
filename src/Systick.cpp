@@ -16,9 +16,15 @@ void Systick_Interrupt() {
   if (!SETUP_COMPLETE) {return;}
 
   // first read encoder values 
-  // static int counter = 0; 
+  static int counter = 0; 
   update_encoders();
   
+  // setting old values for comparison (every 5th iteration)
+  if (counter % 5 == 0) {
+    for(int i=0; i < 7; i++){
+      Last_Distance_Sensor[i] = Distance_Sensor[i];
+    }
+  }
   // then read sensor values
   Distanz_Messung_Sensoren();
   // print_sensors(); // just for test purposes
@@ -30,6 +36,7 @@ void Systick_Interrupt() {
   }
   PID_values = calc_correction(CURRENT_CASE_PID);
   calc_average_PID_values();
+  counter++;
 }
 
 
