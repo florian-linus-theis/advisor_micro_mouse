@@ -5,6 +5,7 @@ int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF
 int Blind_Sensor[7] = {0};
 int Distance_Sensor[7] = {0};
 bool SENSORS_CALIBRATED = false;
+int max_value_left = 0, max_value_right = 0;
 // int calibration_sensor[7] = {370,374,583,247,630,372,0};
 //int calibration_sensor[7] = {137,221,168,175,241,182,337};    //Kalibierung fehlt
 //int calibration_sensor[7] = {370,374,583,247,630,372,0};
@@ -147,5 +148,30 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(maze_values[i]) / measurements_maze));
         ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
     }
+
+    display_print("Now close to left wall", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start();
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        max_value_left += calcError(1);
+    }
+    ble->println(max_value_left);
+    max_value_left = max_value_left / measurements_maze;
+    ble->println("max_value_left: " + String(max_value_left));
+
+
+    display_print("Now close to right wall", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start();
+
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        max_value_right += calcError(1);
+    }
+    max_value_right = max_value_right / measurements_maze;
+    ble->println("max_value_right: " + String(max_value_right));
+
+    
 
 }

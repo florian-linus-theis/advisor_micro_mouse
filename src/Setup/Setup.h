@@ -113,8 +113,9 @@ extern void a_star_algorithm();
 extern std::vector<int> NeutralSensorValues;
 extern std::vector<int> PID_constants; // Global variable to store the PID constants
 extern std::vector<int> PID_values;
-//extern std::vector<int> PID_values_encoder;
+extern std::vector<int> PID_values_encoder;
 extern std::vector<int> calc_correction(int);
+extern std::vector<int> determine_correction_needed();
 extern void reset_PID_values();
 extern int determine_PID_case();
 extern std::vector<bool> find_walls();
@@ -126,6 +127,10 @@ extern double integral;
 extern double proportional; 
 extern int CURRENT_CASE_PID; 
 extern bool SET_PID_MANUALLY;
+extern int remapped_error;
+extern int max_value_left;
+extern int max_value_right;
+extern int calcError(int);
 
 
 // ---------------------------------------
@@ -180,7 +185,9 @@ extern int Systick_Counter;
 extern int encoder_right_total; 
 extern int encoder_left_total;
 extern volatile int distance_traveled_L; // TODO: evtl float
+extern volatile int distance_traveled_L_encoder; // TODO: evtl float
 extern volatile int distance_traveled_R; // TODO: evtl float
+extern volatile int distance_traveled_R_encoder; // TODO: evtl float
 extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;

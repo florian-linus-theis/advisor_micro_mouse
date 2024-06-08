@@ -2,6 +2,7 @@
 #include "Setup\Setup.h"
 #include <cmath>
 
+
 double last_time=0;
 double dt, kp_default=2, ki_default=0, kd_default=0.001;
 double proportional, integral, differential;
@@ -16,6 +17,7 @@ int LAST_CASE_PID = -1;
 bool SET_PID_MANUALLY = false;
 std::vector<int> avg_PID_values(2, 0);
 std::vector<int> PID_values_encoder = {0,0};
+int remapped_error = 0;
 
 enum PID_CASES{
     ROT_ERROR = 0,
@@ -67,12 +69,13 @@ void calc_Sensor_Errors(){
 }
 
 //adjust possible correction according to speed
-double give_percent(double value, int istart = -100, int istop = 100) {
+double give_percent(double value, int istart = 0, int istop = 0) {
     return -100 + 200 * ((value - istart) / (istop - istart));
 }
 
 //Calculate error for PID (dependent on current case)
 int calcError(int PID_case){
+    calc_Sensor_Errors();
     int error, desired_distance_L, desired_distance_R;
     switch (PID_case)
     {
@@ -120,8 +123,8 @@ int calcError(int PID_case){
 
     case X_ERROR_ENCODER_BASED:
         error = distance_traveled_L - distance_traveled_R;
-        ble->println(distance_traveled_L);
-        ble->println(distance_traveled_R);
+        // ble->println(distance_traveled_L);
+        // ble->println(distance_traveled_R);
         break;
 
     default:
@@ -151,7 +154,7 @@ int applyPID(signed int error, double kp = 0.5 , double ki = 0, double kd = 0){
 }
 
 //cap max correction speed
-int cap_output(int output_G, int max_correction_speed = 150){
+int cap_output(int output_G, int max_correction_speed = 15){
     if(output_G > max_correction_speed){
         output_G = max_correction_speed;
     }
@@ -163,7 +166,7 @@ int cap_output(int output_G, int max_correction_speed = 150){
 
 std::vector<int> calc_correction(int PID_case){
     dt = calc_dt();
-    calc_Sensor_Errors();
+
     signed int correction_left, correction_right;
     std::vector<signed int> correction_output;
     signed int output_G;
@@ -175,8 +178,9 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(give_percent(calcError(X_ERROR),-5000,5000), 1.7, 0, 0.05); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
-        output_G = cap_output(output_G, max_correction_speed);
+        remapped_error = give_percent(calcError(X_ERROR),max_value_left,max_value_right);
+        output_G = applyPID(remapped_error, 1, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
         break;
@@ -235,7 +239,7 @@ std::vector<int> calc_correction(int PID_case){
 
      case X_ERROR_ENCODER_BASED:
         max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960), 1.7, 0, 0.05); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = applyPID(give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960), 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = output_G;
@@ -369,8 +373,11 @@ void recalibrate_front_wall(){
     }
 }
 
-void encoder_based_move_function(){
+void encoder_based_move_function(int base_speed){
     reset_distance_traveled();
+    // ForwardLeft(base_speed + correction_left[0]);
+    // ForwardRight(base_speed + correction_right[1]);
+
     while(1){
         delay(8);
 
@@ -382,9 +389,8 @@ void encoder_based_move_function(){
 
         std::vector<int> PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
         int both_zero = 0;
-
-        //ble->println(PID_values_encoder[0]);
-        //ble->println(PID_values_encoder[1]);
+        ble->println(PID_values_encoder[0]);
+        ble->println(PID_values_encoder[1]);
         if(default_base_speed + PID_values_encoder[0] > 50){
             ForwardLeft(default_base_speed + PID_values_encoder[0]);
             both_zero = 0;

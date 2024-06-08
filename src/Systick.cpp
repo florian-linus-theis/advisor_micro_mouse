@@ -28,7 +28,9 @@ void Systick_Interrupt() {
   if (!SET_PID_MANUALLY){
     CURRENT_CASE_PID = determine_PID_case();
   }
-  PID_values = calc_correction(CURRENT_CASE_PID);
+  PID_values = calc_correction(1);
+  PID_values_encoder = calc_correction(11);
+  PID_values = determine_correction_needed();
   calc_average_PID_values();
 }
 
