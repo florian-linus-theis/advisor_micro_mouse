@@ -235,11 +235,12 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
         int distance_remaining = desired_distance - avg_distance_traveled;
         int braking_distance = calc_braking_distance(end_duty_cycle);
         // if we detect front wall while driving, we hand over to PID controlled braking
-        if (front_wall_detected()){
-            ble->println("Front wall detected, handing over to PID controlled braking");
-            pid_move_function(50);
-            break;
-        } 
+        // TODO: improve y error function such that braking becomes smooth
+        // if (front_wall_detected()){
+        //     ble->println("Front wall detected, handing over to PID controlled braking");
+        //     pid_move_function(50);
+        //     break;
+        // } 
         if (side_walls_disappearing() && !disappearing_wall_detected){
             desired_distance = 84154 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
             disappearing_wall_detected = true; // such that we only set the distance once
