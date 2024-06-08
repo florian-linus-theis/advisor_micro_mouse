@@ -175,7 +175,6 @@ void accelerate_different(int desired_duty_cycle){
     int target_duty_cycle = current_duty_cycle + static_cast<int>(std::round((desired_duty_cycle - current_duty_cycle) * 2.0 / 3.0));
     if (abs(current_duty_cycle - desired_duty_cycle) < 5) {
         target_duty_cycle = desired_duty_cycle;
-        ble->println("Close enough to desired duty cycle, setting to desired duty cycle");
     }
     ForwardBoth(target_duty_cycle); // Update motors to the new duty cycle
 }
@@ -203,7 +202,6 @@ int decelerate_different(int end_duty_cycle, int remaining_distance_ticks){
 
     if (abs(end_duty_cycle - target_duty_cycle) < 5 || (end_duty_cycle != 0 && target_duty_cycle < end_duty_cycle)){
         target_duty_cycle = end_duty_cycle;
-        ble->println("Close enough to end duty cycle, setting to end duty cycle");
     }
     ForwardBoth(target_duty_cycle);
     return 1; 
@@ -223,8 +221,10 @@ void printer_debugger(int average_distance_travelled, int distance_remaining, in
 void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, float squares){
     // first reset distances
     int desired_distance = static_cast<int>(round(squares * tick_forward));
+    int half_distance = desired_distance / 2;
     int last_distance_traveled = 1;	// setting the distance to one so that we can enter the loop and not skip first iteration
     int counter = 0; 
+    bool disappearing_wall_detected = false;
     ble->println("Moving forward");
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
@@ -234,14 +234,24 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
         last_distance_traveled = avg_distance_traveled;
         int distance_remaining = desired_distance - avg_distance_traveled;
         int braking_distance = calc_braking_distance(end_duty_cycle);
+        // if we detect front wall while driving, we hand over to PID controlled braking
+        // TODO: improve y error function such that braking becomes smooth
+        // if (front_wall_detected()){
+        //     ble->println("Front wall detected, handing over to PID controlled braking");
+        //     pid_move_function(50);
+        //     break;
+        // } 
+        if (side_walls_disappearing() && !disappearing_wall_detected){
+            desired_distance = 84154 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
+            disappearing_wall_detected = true; // such that we only set the distance once
+            ble->println("Side walls disappearing, setting distance remaining to 84154");
+        }
         if (distance_remaining > braking_distance){
             if (current_duty_cycle < desired_max_duty_cycle){
                 accelerate_different(desired_max_duty_cycle);
-            }
-            else {
+            } else {
                 ForwardBoth(current_duty_cycle); // just normal driving with PID
             }
-        
         } else {
             if (decelerate_different(end_duty_cycle, distance_remaining) == 0){
                 break;

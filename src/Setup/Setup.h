@@ -120,6 +120,8 @@ extern std::vector<bool> find_walls();
 extern void pid_move_function(int);
 extern void calc_average_PID_values();
 extern void recalibrate_front_wall();
+extern bool front_wall_detected();
+extern bool side_wall_disappearing();
 extern double differential;
 extern double integral;
 extern double proportional; 
@@ -233,8 +235,10 @@ extern bool SENSOR_CALIBRATED;
 extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
 extern int Distance_Sensor[];
+extern int Last_Distance_Sensor[];
 extern int calibration_sensor[];
-
+extern int MinSensorValues[];
+extern int MaxSensorValues[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
@@ -263,7 +267,8 @@ extern void Timer7_Interrupt();
 
 // Before Start
 extern void calibrate_sensors(int, int);
-extern void start();
+extern void start(std::string);
+extern void wait_for_other_side(std::string);
 
 // Battery
 extern void getBattery();

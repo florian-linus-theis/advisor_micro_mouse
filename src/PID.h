@@ -9,7 +9,7 @@ signed int previous=0;
 int default_base_speed = 100;
 int default_max_correction_speed_x = 150;
 int max_correction_speed = 150;
-int default_max_correction_speed_y = 10;
+int default_max_correction_speed_y = 20;
 int current_state;
 int toggle_drive;
 int LAST_CASE_PID = -1;
@@ -240,20 +240,33 @@ std::vector<int> calc_correction(int PID_case){
 std::vector<bool> find_walls(){
     std::vector<bool> wallsVec = {false, false, false, false};
     // Left Wall Sensors
-    if(Distance_Sensor[0] > NeutralSensorValues[0] * 0.6 ){ // 100 und 40
+    if(Distance_Sensor[0] > MinSensorValues[0] ){ // 100 und 40
         wallsVec[3] = true;
     }
     // Front Wall
-    if(Distance_Sensor[2] > NeutralSensorValues[2] * 0.6 || Distance_Sensor[3] > NeutralSensorValues[3] * 0.6 || Distance_Sensor[6] > NeutralSensorValues[6] * 0.6){
+    if(Distance_Sensor[6] > MinSensorValues[6]){ // 70 und 150
         wallsVec[0] = true;
     }
 
     // Right Wall
-    if(Distance_Sensor[5] > NeutralSensorValues[5] * 0.6){ //70 und 150
+    if(Distance_Sensor[5] > MinSensorValues[5]) { //70 und 150
         wallsVec[1] = true;
     }
 
     return wallsVec;
+}
+
+bool front_wall_detected(){
+    return Distance_Sensor[6] > MinSensorValues[6];
+}
+
+bool side_walls_disappearing(){
+    // delta_sensors > typical sensor values - min sensor values when there is still a wall
+    int comp_left = Last_Distance_Sensor[0] - Distance_Sensor[0];
+    int comp_right = Last_Distance_Sensor[5] - Distance_Sensor[5];
+    // ble->println("L :" + comp_left);
+    ble->println(comp_right);
+    return Last_Distance_Sensor[0] - Distance_Sensor[0] > 50 || Last_Distance_Sensor[5] - Distance_Sensor[5] > 50;
 }
 
 int determine_PID_case(){
