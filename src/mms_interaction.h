@@ -80,6 +80,11 @@ void move_forward_mapping(int squares = 1){
     update_position();
 }
 
+void move_forward_mapping_fast(int squares = 1){
+    move_forward_different(DUTY_SLOW, DUTY_SLOW, squares);
+    update_position();
+}
+
 // Function to take all actions to turn left and update belief state
 void fast_turn_left() {
     left_curve(DUTY_FAST_CURVE);
@@ -98,14 +103,38 @@ void turn_right(){
 
 }
 
+void fast_turn_right(){
+    right_curve(DUTY_SLOW);
+    update_direction(1);
+}
+
+
 void turn_left(){
     rotate_left();
+    update_direction(-1);
+}
+
+void fast_turn_left(){
+    left_curve(DUTY_SLOW);
     update_direction(-1);
 }
 
 void turn_around(){
     turn_around_right();
     update_direction(+2);
+}
+
+void turn_around_fast_mapping(){
+    // brake 
+    stop();
+    delay(300);
+    // position to wall using y-error
+    // evtl zur wand fahren und von da aus wieder los
+    recalibrate_front_wall();
+    // turning around
+    turn_around_right();
+    // drive back to edge of next square 
+    move_forward_mapping_fast();
 }
 
 // Function to change current direction to a specific direction
@@ -123,6 +152,23 @@ void set_dir(int _dir) {
     }
     turn_left();  // If need to turn left once
 }
+
+void set_dir_fast_mapping(int _dir) {
+    if (_dir == cur_direction) {  // If already facing the correct direction
+        move_forward_mapping_fast();
+        return;
+    }
+    if (_dir == (cur_direction + 1) % 4) {  // If need to turn right once
+        right_curve(DUTY_SLOW);
+        return;
+    }
+    if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
+        turn_around();
+        return;
+    }
+    left_curve(DUTY_SLOW);  // If need to turn left once
+}
+
 
 // Function to turn toward an adjacent location object
 void turn_toward(Location loc) {
@@ -143,4 +189,25 @@ void turn_toward(Location loc) {
     }
     set_dir(_dir); // turning towards desired location
 }
+
+void turn_toward_fast_mapping(Location loc){
+    int _dir = cur_direction;
+    // Find direction of adjacent location
+    if (cur_position[0] == loc.position[0]) {  // If two locations have the same x coordinate
+        if ((cur_position[1] - loc.position[1]) == 1) {  // If mouse is "above" the next location, turn south
+            _dir = 2;
+        } else {  // Otherwise, mouse must be below the next location
+            _dir = 0;
+        }
+    } else {  // Two directions have the same y coordinate
+        if ((cur_position[0] - loc.position[0]) == 1) {  // If mouse is to the right of location, turn west
+            _dir = 3;
+        } else {  // Mouse must be to the left of the location
+            _dir = 1;
+        }
+    }
+    set_dir_fast_mapping(_dir); // turning towards desired location
+}
+
+
 
