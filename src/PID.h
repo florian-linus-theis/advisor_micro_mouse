@@ -19,26 +19,19 @@ std::vector<int> avg_PID_values(2, 0);
 std::vector<int> PID_values_encoder = {0,0};
 int remapped_error = 0;
 
-enum PID_CASES{
-    ROT_ERROR = 0,
-    X_ERROR = 1,
-    X_ERROR_LEFT_WALL_ONLY = 2,
-    X_ERROR_RIGHT_WALL_ONLY = 3,
-    Y_ERROR = 4,
-    ROTATE_LEFT = 5,
-    ROTATE_RIGHT = 6,
-    CURVE_LEFT_ERROR = 7,
-    CURVE_RIGHT_ERROR = 8,
-    TRANSITION = 9,
-    BLIND = 10,
-    X_ERROR_ENCODER_BASED = 11
-};
+
+
+std::vector<int> max_values_left(ENUM_END+1, 0);
+std::vector<int> max_values_right(ENUM_END+1, 0);
+std::vector<int> max_values_front(ENUM_END+1, 0);
+std::vector<int> max_values_back(ENUM_END+1, 0);
+std::vector<int> max_values_lower_boundary(ENUM_END+1, 0);
+std::vector<int> max_values_upper_boundary(ENUM_END+1, 0);
 
 int CURRENT_CASE_PID = X_ERROR_LEFT_WALL_ONLY;
 
 std::vector<int> NeutralSensorValues {532, 470, 803, 678, 672, 475, 1423};
 std::vector<int> ErrorSensorsVec {0,0,0,0,0,0};
-
 
 // Function to print the sensor values to the bluetooth module
  void debug_print(){
@@ -178,7 +171,7 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
-        remapped_error = give_percent(calcError(X_ERROR),max_value_left,max_value_right);
+        remapped_error = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]);
         output_G = applyPID(remapped_error, 1, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
@@ -187,8 +180,8 @@ std::vector<int> calc_correction(int PID_case){
 
     case Y_ERROR:
         max_correction_speed = default_max_correction_speed_y;
-        
-        output_G = applyPID(calcError(Y_ERROR), 2, 0.000, 0); // 0.8,0.0005,0.01
+        remapped_error = give_percent(calcError(Y_ERROR),max_values_lower_boundary[Y_ERROR],max_values_upper_boundary[Y_ERROR]);
+        output_G = applyPID(remapped_error, 2, 0.000, 0); // 0.8,0.0005,0.01
         // ble->println(integral);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
@@ -213,7 +206,8 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(calcError(X_ERROR_LEFT_WALL_ONLY), 1.8, 0, 0.02); // 12, 0.0001, 0.01
+        remapped_error = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]);
+        output_G = applyPID(remapped_error, 1.8, 0, 0.02); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -221,31 +215,33 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR_RIGHT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(calcError(X_ERROR_RIGHT_WALL_ONLY), 1.8, 0, 0.02);
+        remapped_error = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]);
+        output_G = applyPID(remapped_error, 1.8, 0, 0.02);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
         break;
 
-    case BLIND:
+    case BLIND: //<-- Can be deleted an replaced by X_ERROR_ENCODER BASED
+        remapped_error = 0;
         correction_left = avg_PID_values[0]; // using average PID values to just drive straight
         correction_right = avg_PID_values[1];
         break;
 
     case TRANSITION:
+        remapped_error = 0;
         correction_left = avg_PID_values[0]; // using average PID values to just drive straight
         correction_right = avg_PID_values[1];
         break;
 
      case X_ERROR_ENCODER_BASED:
         max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960), 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        remapped_error = give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960);
+        output_G = applyPID(remapped_error, 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = output_G;
         break;
-
-    
 
     default:
         correction_left = avg_PID_values[0];

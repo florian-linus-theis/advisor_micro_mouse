@@ -1,4 +1,5 @@
 //Include Librarys
+#pragma once //<-- Macht das hier faxen?
 #include <Arduino.h>
 #include "cmath"
 #include "vector"
@@ -128,9 +129,30 @@ extern double proportional;
 extern int CURRENT_CASE_PID; 
 extern bool SET_PID_MANUALLY;
 extern int remapped_error;
-extern int max_value_left;
-extern int max_value_right;
 extern int calcError(int);
+extern std::vector<int> max_values_left;
+extern std::vector<int> max_values_right;
+extern std::vector<int> max_values_back;
+extern std::vector<int> max_values_front;
+extern std::vector<int> max_values_lower_boundary;
+extern std::vector<int> max_values_upper_boundary;
+extern std::vector<int> calc_max_occuring_Errors();
+
+enum PID_CASES{
+    ROT_ERROR = 0,
+    X_ERROR = 1,
+    X_ERROR_LEFT_WALL_ONLY = 2,
+    X_ERROR_RIGHT_WALL_ONLY = 3,
+    Y_ERROR = 4,
+    ROTATE_LEFT = 5,
+    ROTATE_RIGHT = 6,
+    CURVE_LEFT_ERROR = 7,
+    CURVE_RIGHT_ERROR = 8,
+    TRANSITION = 9,
+    BLIND = 10,
+    X_ERROR_ENCODER_BASED = 11,
+    ENUM_END = 12
+};
 
 
 // ---------------------------------------
@@ -185,9 +207,9 @@ extern int Systick_Counter;
 extern int encoder_right_total; 
 extern int encoder_left_total;
 extern volatile int distance_traveled_L; // TODO: evtl float
-extern volatile int distance_traveled_L_encoder; // TODO: evtl float
+extern volatile int distance_traveled_L_PID; // TODO: evtl float
 extern volatile int distance_traveled_R; // TODO: evtl float
-extern volatile int distance_traveled_R_encoder; // TODO: evtl float
+extern volatile int distance_traveled_R_PID; // TODO: evtl float
 extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;

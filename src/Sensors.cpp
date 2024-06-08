@@ -5,13 +5,14 @@ int Channel_Sensoren[] = {IR_SENSOR_LS, IR_SENSOR_LD, IR_SENSOR_LF, IR_SENSOR_RF
 int Blind_Sensor[7] = {0};
 int Distance_Sensor[7] = {0};
 bool SENSORS_CALIBRATED = false;
-int max_value_left = 0, max_value_right = 0;
 // int calibration_sensor[7] = {370,374,583,247,630,372,0};
 //int calibration_sensor[7] = {137,221,168,175,241,182,337};    //Kalibierung fehlt
 //int calibration_sensor[7] = {370,374,583,247,630,372,0};
 int calibration_sensor[7] = {320, 516, 464, 200, 630, 348, 709};
 
 bool Walls_Flag[7] ={};
+
+std::vector<int> max_occuring_Errors_Vec;
 
 //Meassurement Data Vector
 volatile int interrupt_counter = 0;
@@ -83,7 +84,13 @@ void printDistanzSensoren(void) {
   }
 }
 
-
+std::vector<int> calc_max_occuring_Errors(){
+    std::vector<int> Error_Measurment;
+    for(int i=0; i < ENUM_END; i++){
+        Error_Measurment[i] = calcError(i);
+    }
+    return Error_Measurment;
+}
 
 // Function to calibrate the sensors - first in the air, then in the maze start cell.
 void calibrate_sensors(int measurements_air, int measurements_maze){
@@ -149,29 +156,68 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
     }
 
+    //Calibrate max values
     display_print("Now close to left wall", 1);
     digitalWrite(LED_GREEN, HIGH);
     start();
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
-        max_value_left += calcError(1);
+        max_occuring_Errors_Vec = calc_max_occuring_Errors();
+        for(int i=0; i < sizeof(max_values_left);i++){
+          max_values_left[i] += max_occuring_Errors_Vec[i];
+        }
     }
-    ble->println(max_value_left);
-    max_value_left = max_value_left / measurements_maze;
-    ble->println("max_value_left: " + String(max_value_left));
-
+    for(int i=0; i < sizeof(max_values_left); i++){
+      max_values_left[i] = max_values_left[i] / measurements_maze;
+    }
 
     display_print("Now close to right wall", 1);
     digitalWrite(LED_GREEN, HIGH);
     start();
-
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
-        max_value_right += calcError(1);
+        max_occuring_Errors_Vec = calc_max_occuring_Errors();
+        for(int i=0; i < sizeof(max_values_right);i++){
+          max_values_right[i] += max_occuring_Errors_Vec[i];
+        }
     }
-    max_value_right = max_value_right / measurements_maze;
-    ble->println("max_value_right: " + String(max_value_right));
+    for(int i=0; i < sizeof(max_values_right); i++){
+      max_values_right[i] = max_values_right[i] / measurements_maze;
+    }
 
-    
+    display_print("Now close to start of cell", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start();
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        max_occuring_Errors_Vec = calc_max_occuring_Errors();
+        for(int i=0; i < sizeof(max_values_back);i++){
+          max_values_back[i] += max_occuring_Errors_Vec[i];
+        }
+    }
+    for(int i=0; i < sizeof(max_values_back); i++){
+      max_values_back[i] = max_values_back[i] / measurements_maze;
+    }
+
+    display_print("Now close to front wall", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start();
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        max_occuring_Errors_Vec = calc_max_occuring_Errors();
+        for(int i=0; i < sizeof(max_values_front);i++){
+          max_values_front[i] += max_occuring_Errors_Vec[i];
+        }
+    }
+    for(int i=0; i < sizeof(max_values_front); i++){
+      max_values_front[i] = max_values_front[i] / measurements_maze;
+    }
+
+    //Combine different max-vectors to two final vectors holding all min and max values
+    max_values_lower_boundary = max_values_left;
+    max_values_lower_boundary[Y_ERROR] = max_values_back[Y_ERROR];
+    max_values_upper_boundary[Y_ERROR] = max_values_front[Y_ERROR];
+
+
 
 }

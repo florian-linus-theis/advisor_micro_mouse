@@ -13,9 +13,9 @@ int duty_interval = precompute_duty_intervals(); // for stepwise acceleration
 int duty_L = 0;
 int duty_R = 0;
 volatile int distance_traveled_L = 0; // TODO: evtl float
-volatile int distance_traveled_L_encoder = 0;
+volatile int distance_traveled_L_PID = 0;
 volatile int distance_traveled_R = 0; // TODO: evtl float
-volatile int distance_traveled_R_encoder = 0;
+volatile int distance_traveled_R_PID = 0;
 volatile int avg_distance_traveled = 0; // TODO: evtl float
 int current_speed = 0;
 int current_duty_cycle = 0;
@@ -53,6 +53,8 @@ void compute_avg_distance_traveled(){
 }
 
 void reset_distance_traveled(){
+    distance_traveled_L_PID = distance_traveled_L;
+    distance_traveled_R_PID = distance_traveled_R;
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
@@ -229,8 +231,6 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
     int counter = 0; 
     //ble->println("Moving forward");
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
-    distance_traveled_L_encoder = distance_traveled_L;
-    distance_traveled_R_encoder = distance_traveled_R;
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
     reset_PID_values();
     while(avg_distance_traveled < desired_distance){ 
@@ -252,8 +252,6 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
             }
         }
     }
-    distance_traveled_L_encoder = distance_traveled_L;
-    distance_traveled_R_encoder = distance_traveled_R;
     reset_distance_traveled();
 }
 // mapping movement

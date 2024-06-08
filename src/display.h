@@ -146,8 +146,8 @@ void handleModeSelection(Mode mode) {
             while(1){
                 //CURRENT_CASE_PID = 11;
                 move_forward_different(100, 100, 5);
-                distance_traveled_L_encoder = 0;
-                distance_traveled_R_encoder = 0;
+                distance_traveled_L_PID = 0;
+                distance_traveled_R_PID = 0;
                 // reset_distance_traveled();
                 // move_forward_different(100, 0, 3);
                 // CURRENT_CASE_PID = 4;
