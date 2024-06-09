@@ -4,21 +4,34 @@ int encoder_right = 0;
 int encoder_left = 0;
 int encoder_right_last_time = 0;
 int encoder_left_last_time = 0;
+volatile double current_delta_speed_L = 0;
+volatile double current_delta_speed_R = 0;
+volatile double current_avg_speed = 0;
+int current_micros = 0;
+int last_micros = 0;
 std::vector<int> PID_values = {0, 0};
 
 void update_encoders();
 void print_encoders();
 void print_sensors();
 void print_pid();
+void calc_speed();
+int system_clock_micros();
 
 
 void Systick_Interrupt() {
   if (!SETUP_COMPLETE) {return;}
 
   // first read encoder values 
-  // static int counter = 0; 
+  static int counter = 0; 
   update_encoders();
   
+  // setting old values for comparison (every 5th iteration)
+  if (counter % 5 == 0) {
+    for(int i=0; i < 7; i++){
+      Last_Distance_Sensor[i] = Distance_Sensor[i];
+    }
+  }
   // then read sensor values
   Distanz_Messung_Sensoren();
   // print_sensors(); // just for test purposes
@@ -35,7 +48,7 @@ void Systick_Interrupt() {
   //ble->println(calcError(X_ERROR_LEFT_WALL_ONLY));
   PID_values = determine_correction_needed();
   calc_average_PID_values();
-
+  counter++;
 }
 
 
@@ -45,6 +58,7 @@ void update_encoders() {
   distance_traveled_L += encoder_left - encoder_left_last_time;
   distance_traveled_R += encoder_right - encoder_right_last_time;
   avg_distance_traveled = (distance_traveled_L + distance_traveled_R) / 2;
+  calc_speed(); // calculate the speed of the robot before updating the last encoder values
   encoder_left_last_time = encoder_left;
   encoder_right_last_time = encoder_right;
 }
@@ -87,3 +101,25 @@ void print_pid(){
 }
 
 
+// calculate the speed of the robot
+// speed = delta distance / delta time [mm / s]
+// [mm / s], encoder resolution 592.65 [ticks / mm] --> 0.001687 = mm / tick
+// 1.000.000 microsecs / sec
+// Our systick interval is roughly at 11.65ms (is not a big issue if it is not exactly 11.65ms)
+void calc_speed() {
+  current_micros = system_clock_micros();
+  int delta_time = current_micros - last_micros;
+  // left wheel
+  int delta_s = encoder_left - encoder_left_last_time;
+  current_delta_speed_L = (static_cast<double>(delta_s) / delta_time ) * 1687.379; // [mm / s], encoder resolution 592.65 [ticks / mm], 0.001687 = mm / tick, -->  * 1000 ms / s
+  // right wheel
+  delta_s = encoder_right - encoder_right_last_time;
+  current_delta_speed_R = (static_cast<double>(delta_s) / delta_time) * 1687.379; // [mm / s]
+  current_avg_speed = (current_delta_speed_L + current_delta_speed_R) / 2; // [mm / s]
+  last_micros = current_micros;
+}
+
+// Function to get the current microseconds
+int system_clock_micros() {
+    return DWT->CYCCNT / (SystemCoreClock / 1000000);
+}

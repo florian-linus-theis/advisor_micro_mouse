@@ -99,7 +99,8 @@
 #define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
 #define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
 #define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
-
+#define SPEED_SLOW 365 // mm/s
+#define KNOWN_BRAKE_DIST_AT_SPEED_SLOW 20615 // actual: 20615 ticks but rounded to 21000
 
 // Global Variables 
 extern bool SETUP_COMPLETE;
@@ -123,6 +124,8 @@ extern std::vector<bool> find_walls();
 extern void pid_move_function(int);
 extern void calc_average_PID_values();
 extern void recalibrate_front_wall();
+extern bool front_wall_detected();
+extern bool side_wall_disappearing();
 extern double differential;
 extern double integral;
 extern double proportional; 
@@ -215,7 +218,9 @@ extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
-extern int current_speed; 
+extern volatile double current_delta_speed_L;
+extern volatile double current_delta_speed_R;
+extern volatile double current_avg_speed;
 extern void reset_distance_traveled(void);
 extern void reset_encoders(void);
 
@@ -240,6 +245,7 @@ extern void move_actual(int);
 extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
+extern void drive_forward(int, int, float);
 
 
 // Middle Layer Drving Functions
@@ -264,8 +270,10 @@ extern bool SENSOR_CALIBRATED;
 extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
 extern int Distance_Sensor[];
+extern int Last_Distance_Sensor[];
 extern int calibration_sensor[];
-
+extern int MinSensorValues[];
+extern int MaxSensorValues[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
@@ -294,7 +302,8 @@ extern void Timer7_Interrupt();
 
 // Before Start
 extern void calibrate_sensors(int, int);
-extern void start();
+extern void start(std::string);
+extern void wait_for_other_side(std::string);
 
 // Battery
 extern void getBattery();
