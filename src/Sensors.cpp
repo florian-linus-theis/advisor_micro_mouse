@@ -133,7 +133,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     // Light LED and Wait for user finger
     display_print("Now in start square...", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start("right");
+    start(5);
 
     // measure in the start cell of maze and add up to array
     for (int i=0; i<measurements_maze; i++){
@@ -147,7 +147,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     display_print("Move to LEFT side", 1);
     digitalWrite(LED_GREEN, HIGH);
     wait_for_other_side("left"); // move left
-    start("right"); // finger right
+    start(5); // finger right
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         min_values[4] += Distance_Sensor[4];
@@ -160,7 +160,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     display_print("Move to RIGHT side and wheels on edge", 1);
     digitalWrite(LED_GREEN, HIGH);
     wait_for_other_side("right"); // move right
-    start("left"); // finger left
+    start(0); // finger left
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         min_values[0] += Distance_Sensor[0];
@@ -172,7 +172,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     // Now Min values front
     display_print("Move to CENTER BACK wheels on edge", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start("left");
+    start(0);
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         min_values[2] += Distance_Sensor[2];
@@ -183,7 +183,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     // for ballgrabber calibration while drivig towards ballgrabber
     display_print("Now facing Ballgrabber, finger left", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start("left");
+    start(0);
 
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
@@ -196,7 +196,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     // ballgrabber calibration while driving back from ballgrabber
     display_print("Now facing away from Ballgrabber, finger right", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start("right");
+    start(0);
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         for(int j=0; j<7; j++) {
@@ -216,7 +216,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     //Calibrate max values
     display_print("Now close to left wall", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start();
+    start(5);
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
@@ -234,7 +234,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
 
     display_print("Now close to right wall", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start();
+    start(0);
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
@@ -252,7 +252,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
 
     display_print("Now close to start of cell", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start();
+    start(6);
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
@@ -270,7 +270,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
 
     display_print("Now close to front wall", 1);
     digitalWrite(LED_GREEN, HIGH);
-    start();
+    start(0);
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();

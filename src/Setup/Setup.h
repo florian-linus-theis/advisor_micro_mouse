@@ -302,7 +302,7 @@ extern void Timer7_Interrupt();
 
 // Before Start
 extern void calibrate_sensors(int, int);
-extern void start(std::string);
+extern void start(int);
 extern void wait_for_other_side(std::string);
 
 // Battery
