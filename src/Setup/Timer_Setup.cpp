@@ -21,7 +21,7 @@ HardwareTimer *timer1 = new HardwareTimer(TIM1);
 HardwareTimer *timer7 = new HardwareTimer(TIM7);
 
 
-
+void internal_clock_setup();
 void Systick_Setup();
 void Timer3_Setup();
 void Timer4_Setup_Motor();
@@ -56,9 +56,21 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
 
     // Enable Systick Timer
     Systick_Setup();
+
+    // Enable the internal clock
+    internal_clock_setup();
 }
 
 
+// we need to access the DWT registers to get the current time in microseconds because micros() does not work
+void internal_clock_setup(){
+    // Enable TRC (Trace Control) and DWT
+    CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
+    // Reset the cycle counter
+    DWT->CYCCNT = 0;
+    // Enable the cycle counter
+    DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
+}
 
 
 void Systick_Setup(void) {  //Systick Timer Setup
