@@ -141,7 +141,7 @@ void handleModeSelection(Mode mode) {
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); //enable motor
-            start(); 
+            start(5); 
             timer14->resume();
             delay(20);
             //resetting all values
@@ -178,7 +178,7 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             timer14->resume(); // starting systick timer
             delay(1000);
-            start("right");
+            start(5);
             SET_PID_MANUALLY = false;
             reset_encoders();
             reset_PID_values();
@@ -207,10 +207,9 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             display_print("BFS Mode selected");
             timer14->resume();
-            start("right");
+            start(5);
             reset_encoders();
             reset_PID_values();
-            start("right");
             dfs_mapping();
             delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
@@ -222,7 +221,7 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            start("right"); // wait for finger
+            start(5); // wait for finger
             timer14->resume(); // starting systick timer
             delay(200);
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
@@ -307,9 +306,6 @@ void Timer7_Interrupt(void) {
 
 // Function to start all driving modes 
 // Waits for finger to be in front of the sensor (front right), then starts the driving mode
-void start(){
-    while(Distance_Sensor[6] <= 1250){   //SENSOR_RD
-=======
 void start(int sensor = 6){
     if (sensor < 0 || sensor > 6) return;
     while(Distance_Sensor[sensor] <= 1250){   //SENSOR_RD
