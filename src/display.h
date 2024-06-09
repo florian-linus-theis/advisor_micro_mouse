@@ -225,7 +225,7 @@ void handleModeSelection(Mode mode) {
             //     if (side_wall_disappearing()) ble->println("Side wall disappearing");
             //     if(encoderTurned) break;
             // }
-            move_forward_different(100, 0, 1);
+            move_forward_different(200, 0, 3);
             // move_forward_different(100, 0, 1);
             // delay(300);
             // move_forward_different(100, 0, 1);
