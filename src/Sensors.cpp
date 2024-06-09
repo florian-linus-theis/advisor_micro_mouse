@@ -215,6 +215,7 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
 
     //Combine different max-vectors to two final vectors holding all min and max values
     max_values_lower_boundary = max_values_left;
+    max_values_upper_boundary = max_values_right;
     max_values_lower_boundary[Y_ERROR] = max_values_back[Y_ERROR];
     max_values_upper_boundary[Y_ERROR] = max_values_front[Y_ERROR];
 
