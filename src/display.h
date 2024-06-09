@@ -205,33 +205,7 @@ void handleModeSelection(Mode mode) {
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
-            // int Last_Distance_Sensor_1 = Distance_Sensor[1];
-            // while(1){
-            //     if (Distance_Sensor[1] == Last_Distance_Sensor_1){   //SENSOR_RD
-            //         continue;
-            //     }
-            //     Last_Distance_Sensor_1 = Distance_Sensor[1];
-
-            //     // Distanz_Messung_Sensoren();
-            //     // std::vector<bool> current_walls = find_walls();
-            //     // ble->println("Current Walls:");
-            //     // ble->println("N:" + String(current_walls[0]) + " O:" + String(current_walls[1]) + " S:" + String(current_walls[2]) + " W:" + String(current_walls[3]));
-            //     // ble->println("Distance Sensors:");
-            //     // ble->println("0:" + String(Distance_Sensor[0]) + " 1:" + String(Distance_Sensor[1]) + " 2:" + String(Distance_Sensor[2]) + " 3:" + String(Distance_Sensor[3]) + " 4:" + String(Distance_Sensor[4]) + " 5:" + String(Distance_Sensor[5]) + " 6:" + String(Distance_Sensor[6]));
-            //     // ble->println("Neutral Sensor Values:");
-            //     // ble->println("0:" + String(NeutralSensorValues[0]) + " 1:" + String(NeutralSensorValues[1]) + " 2:" + String(NeutralSensorValues[2]) + " 3:" + String(NeutralSensorValues[3]) + " 4:" + String(NeutralSensorValues[4]) + " 5:" + String(NeutralSensorValues[5]) + " 6:" + String(NeutralSensorValues[6]));
-            //     // ble->println("Min Sensor Values:");
-            //     // ble->println("0:" + String(MinSensorValues[0]) + " 1:" + String(MinSensorValues[1]) + " 2:" + String(MinSensorValues[2]) + " 3:" + String(MinSensorValues[3]) + " 4:" + String(MinSensorValues[4]) + " 5:" + String(MinSensorValues[5]) + " 6:" + String(MinSensorValues[6]));
-            //     if (side_wall_disappearing()) ble->println("Side wall disappearing");
-            //     if(encoderTurned) break;
-            // }
-            move_forward_different(200, 0, 3);
-            // move_forward_different(100, 0, 1);
-            // delay(300);
-            // move_forward_different(100, 0, 1);
-            // delay(300);
-            // move_forward_different(100, 0, 1);
-            // delay(500);
+            drive_forward(365, 0, 3);
             timer14->pause();
             // display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
