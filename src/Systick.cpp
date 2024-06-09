@@ -42,6 +42,11 @@ void Systick_Interrupt() {
     CURRENT_CASE_PID = determine_PID_case();
   }
   PID_values = calc_correction(CURRENT_CASE_PID);
+  PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
+  //ble->println("PID: " + String(CURRENT_CASE_PID));
+  //ble->println("RE: " + String(remapped_error));
+  //ble->println(calcError(X_ERROR_LEFT_WALL_ONLY));
+  PID_values = determine_correction_needed();
   calc_average_PID_values();
   counter++;
 }

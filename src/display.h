@@ -140,9 +140,32 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
-            delay(1000); 
-            getBattery();
-            drawBatteryStatus();
+            digitalWrite(MOTOR_ENABLE, LOW); //enable motor
+            start(); 
+            timer14->resume();
+            delay(20);
+            //resetting all values
+            reset_encoders();
+            reset_PID_values();
+            while(1){
+                //CURRENT_CASE_PID = 11;
+                move_forward_different(100, 100, 1);
+                distance_traveled_L_PID = 0;
+                distance_traveled_R_PID = 0;
+                // reset_distance_traveled();
+                // move_forward_different(100, 0, 3);
+                // CURRENT_CASE_PID = 4;
+                // pid_move_function(50);
+                // reset_PID_values();
+                // delay(500);
+
+                //encoder_based_move_function(100);
+                delay(10);
+                if(encoderTurned) break;
+            }
+            delay(500);
+            timer14->pause();
+            digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
             delay(1000);
             display->clearDisplay();
             delay(1000);
@@ -284,24 +307,23 @@ void Timer7_Interrupt(void) {
 
 // Function to start all driving modes 
 // Waits for finger to be in front of the sensor (front right), then starts the driving mode
-void start(std::string side = "right"){
-    int i = 5;
-    if (side == "left"){
-        i = 0;
-    }
-    
-    while(Distance_Sensor[i] <= 1250){   //SENSOR_RD
+void start(){
+    while(Distance_Sensor[6] <= 1250){   //SENSOR_RD
+=======
+void start(int sensor = 6){
+    if (sensor < 0 || sensor > 6) return;
+    while(Distance_Sensor[sensor] <= 1250){   //SENSOR_RD
         Distanz_Messung_Sensoren();
         delay(50);
     }
-
     digitalWrite(LED_GREEN, LOW);       //SENSOR_RD
-    while(Distance_Sensor[i] > 1250){
+    
+    while(Distance_Sensor[sensor] > 1250){
         Distanz_Messung_Sensoren();
         delay(50);
     }
 
-    delay(1000);
+    delay(800);
     Buzzer_beep(4000, 2, 50);
     digitalWrite(LED_GREEN, HIGH);
 }

@@ -13,7 +13,9 @@ int duty_interval = precompute_duty_intervals(); // for stepwise acceleration
 int duty_L = 0;
 int duty_R = 0;
 volatile int distance_traveled_L = 0; // TODO: evtl float
+volatile int distance_traveled_L_PID = 0;
 volatile int distance_traveled_R = 0; // TODO: evtl float
+volatile int distance_traveled_R_PID = 0;
 volatile int avg_distance_traveled = 0; // TODO: evtl float
 int current_duty_cycle = 0;
 enum state{slow, fast};
@@ -54,6 +56,8 @@ void compute_avg_distance_traveled(){
 }
 
 void reset_distance_traveled(){
+    distance_traveled_L_PID = distance_traveled_L;
+    distance_traveled_R_PID = distance_traveled_R;
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
