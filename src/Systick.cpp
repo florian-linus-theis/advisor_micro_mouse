@@ -4,9 +4,9 @@ int encoder_right = 0;
 int encoder_left = 0;
 int encoder_right_last_time = 0;
 int encoder_left_last_time = 0;
-double current_delta_speed_L = 0;
-double current_delta_speed_R = 0;
-double current_avg_speed = 0;
+volatile double current_delta_speed_L = 0;
+volatile double current_delta_speed_R = 0;
+volatile double current_avg_speed = 0;
 int current_micros = 0;
 int last_micros = 0;
 std::vector<int> PID_values = {0, 0};
@@ -25,8 +25,6 @@ void Systick_Interrupt() {
   // first read encoder values 
   static int counter = 0; 
   update_encoders();
-  ble->println("Current Speed: " + String(current_avg_speed));
-  // ble->println("Current Micros: " + String(system_clock_micros()));
   
   // setting old values for comparison (every 5th iteration)
   if (counter % 5 == 0) {
