@@ -6,13 +6,13 @@ std::vector<int> determine_correction_needed(){
     std::vector<int> chosen_correction = {0,0};
     if(abs(remapped_error) > 5){
         chosen_correction = PID_values;
-        ble->println("IR");
+        //ble->println("IR");
     }
     else{
         chosen_correction = PID_values_encoder;
         distance_traveled_L = 0;
         distance_traveled_R = 0;
-        ble->println("ENC");
+        //ble->println("ENC");
     }
     return chosen_correction;
 }

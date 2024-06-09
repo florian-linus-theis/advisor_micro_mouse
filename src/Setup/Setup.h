@@ -129,6 +129,7 @@ extern double proportional;
 extern int CURRENT_CASE_PID; 
 extern bool SET_PID_MANUALLY;
 extern int remapped_error;
+extern int remapped_error_encoder;
 extern int calcError(int);
 extern std::vector<int> max_values_left;
 extern std::vector<int> max_values_right;

@@ -12,7 +12,15 @@ int calibration_sensor[7] = {320, 516, 464, 200, 630, 348, 709};
 
 bool Walls_Flag[7] ={};
 
-std::vector<int> max_occuring_Errors_Vec;
+
+std::vector<int> max_values_left(ENUM_END, 0);
+std::vector<int> max_values_right(ENUM_END, 0);
+std::vector<int> max_values_front(ENUM_END, 0);
+std::vector<int> max_values_back(ENUM_END, 0);
+std::vector<int> max_values_lower_boundary(ENUM_END, 0);
+std::vector<int> max_values_upper_boundary(ENUM_END, 0);
+
+std::vector<int> max_occuring_Errors_Vec(ENUM_END, 0);
 
 //Meassurement Data Vector
 volatile int interrupt_counter = 0;
@@ -85,7 +93,8 @@ void printDistanzSensoren(void) {
 }
 
 std::vector<int> calc_max_occuring_Errors(){
-    std::vector<int> Error_Measurment;
+    Distanz_Messung_Sensoren();
+    std::vector<int> Error_Measurment(12,0);
     for(int i=0; i < ENUM_END; i++){
         Error_Measurment[i] = calcError(i);
     }
@@ -163,12 +172,16 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < sizeof(max_values_left);i++){
-          max_values_left[i] += max_occuring_Errors_Vec[i];
+        for(int i=0; i < ENUM_END;i++){
+          max_values_left[i] = max_values_left[i] + max_occuring_Errors_Vec[i];
         }
     }
-    for(int i=0; i < sizeof(max_values_left); i++){
+    for(int i=0; i < ENUM_END; i++){
       max_values_left[i] = max_values_left[i] / measurements_maze;
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      ble->println(max_values_left[i]);
     }
 
     display_print("Now close to right wall", 1);
@@ -177,12 +190,16 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < sizeof(max_values_right);i++){
+        for(int i=0; i < ENUM_END;i++){
           max_values_right[i] += max_occuring_Errors_Vec[i];
         }
     }
-    for(int i=0; i < sizeof(max_values_right); i++){
+    for(int i=0; i < ENUM_END; i++){
       max_values_right[i] = max_values_right[i] / measurements_maze;
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      ble->println(String(i) + " " + String(max_values_right[i]));
     }
 
     display_print("Now close to start of cell", 1);
@@ -191,12 +208,16 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < sizeof(max_values_back);i++){
+        for(int i=0; i < ENUM_END;i++){
           max_values_back[i] += max_occuring_Errors_Vec[i];
         }
     }
-    for(int i=0; i < sizeof(max_values_back); i++){
+    for(int i=0; i < ENUM_END; i++){
       max_values_back[i] = max_values_back[i] / measurements_maze;
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      ble->println(String(i) + " " + String(max_values_back[i]));
     }
 
     display_print("Now close to front wall", 1);
@@ -205,20 +226,17 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     for(int i=0; i<measurements_maze; i++){
         Distanz_Messung_Sensoren();
         max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < sizeof(max_values_front);i++){
+        for(int i=0; i < ENUM_END;i++){
           max_values_front[i] += max_occuring_Errors_Vec[i];
         }
     }
-    for(int i=0; i < sizeof(max_values_front); i++){
+    for(int i=0; i < ENUM_END; i++){
       max_values_front[i] = max_values_front[i] / measurements_maze;
     }
 
+    for(int i=0; i < ENUM_END; i++){
+      ble->println(String(i) + " " + String(max_values_front[i]));
+    }
+
     //Combine different max-vectors to two final vectors holding all min and max values
-    max_values_lower_boundary = max_values_left;
-    max_values_upper_boundary = max_values_right;
-    max_values_lower_boundary[Y_ERROR] = max_values_back[Y_ERROR];
-    max_values_upper_boundary[Y_ERROR] = max_values_front[Y_ERROR];
-
-
-
 }

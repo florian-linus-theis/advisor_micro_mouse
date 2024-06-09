@@ -145,7 +145,7 @@ void handleModeSelection(Mode mode) {
             reset_PID_values();
             while(1){
                 //CURRENT_CASE_PID = 11;
-                move_forward_different(100, 100, 5);
+                move_forward_different(100, 100, 1);
                 distance_traveled_L_PID = 0;
                 distance_traveled_R_PID = 0;
                 // reset_distance_traveled();
@@ -155,8 +155,7 @@ void handleModeSelection(Mode mode) {
                 // reset_PID_values();
                 // delay(500);
 
-                
-                encoder_based_move_function(100);
+                //encoder_based_move_function(100);
                 delay(10);
                 if(encoderTurned) break;
             }

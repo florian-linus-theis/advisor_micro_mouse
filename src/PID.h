@@ -17,16 +17,7 @@ int LAST_CASE_PID = -1;
 bool SET_PID_MANUALLY = false;
 std::vector<int> avg_PID_values(2, 0);
 std::vector<int> PID_values_encoder = {0,0};
-int remapped_error = 0;
-
-
-
-std::vector<int> max_values_left(ENUM_END+1, 0);
-std::vector<int> max_values_right(ENUM_END+1, 0);
-std::vector<int> max_values_front(ENUM_END+1, 0);
-std::vector<int> max_values_back(ENUM_END+1, 0);
-std::vector<int> max_values_lower_boundary(ENUM_END+1, 0);
-std::vector<int> max_values_upper_boundary(ENUM_END+1, 0);
+int remapped_error = 0, remapped_error_encoder = 0;
 
 int CURRENT_CASE_PID = X_ERROR_LEFT_WALL_ONLY;
 
@@ -62,7 +53,7 @@ void calc_Sensor_Errors(){
 }
 
 //adjust possible correction according to speed
-double give_percent(double value, int istart = 0, int istop = 0) {
+double give_percent(double value, int istart = 0, int istop = 1) {
     return -100 + 200 * ((value - istart) / (istop - istart));
 }
 
@@ -171,8 +162,10 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
+        max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
+        max_values_upper_boundary[X_ERROR] = max_values_right[X_ERROR];
         remapped_error = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]);
-        output_G = applyPID(remapped_error, 1, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = applyPID(remapped_error, 0.4, 0.0003, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -180,8 +173,10 @@ std::vector<int> calc_correction(int PID_case){
 
     case Y_ERROR:
         max_correction_speed = default_max_correction_speed_y;
+        max_values_lower_boundary[Y_ERROR] = max_values_front[Y_ERROR];
+        max_values_upper_boundary[Y_ERROR] = max_values_back[Y_ERROR];
         remapped_error = give_percent(calcError(Y_ERROR),max_values_lower_boundary[Y_ERROR],max_values_upper_boundary[Y_ERROR]);
-        output_G = applyPID(remapped_error, 2, 0.000, 0); // 0.8,0.0005,0.01
+        output_G = applyPID(remapped_error, 2, 0, 0); // 0.8,0.0005,0.01
         // ble->println(integral);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
@@ -206,8 +201,10 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
-        remapped_error = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]);
-        output_G = applyPID(remapped_error, 1.8, 0, 0.02); // 12, 0.0001, 0.01
+        max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_left[X_ERROR_LEFT_WALL_ONLY];
+        max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY];
+        remapped_error = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY])+70;
+        output_G = applyPID(remapped_error, 0.4, 0.0003, 0); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -215,8 +212,11 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR_RIGHT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
-        remapped_error = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]);
-        output_G = applyPID(remapped_error, 1.8, 0, 0.02);
+        max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_left[X_ERROR_RIGHT_WALL_ONLY];
+        max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY];
+        remapped_error = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY])-60;
+        ble->println(remapped_error);
+        output_G = applyPID(remapped_error, 0.4, 0.0003, 0);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -236,8 +236,8 @@ std::vector<int> calc_correction(int PID_case){
 
      case X_ERROR_ENCODER_BASED:
         max_correction_speed = default_max_correction_speed_x;
-        remapped_error = give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960);
-        output_G = applyPID(remapped_error, 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        remapped_error_encoder = give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960);
+        output_G = applyPID(remapped_error_encoder, 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = output_G;
@@ -276,7 +276,7 @@ std::vector<bool> find_walls(){
 int determine_PID_case(){
     std::vector<bool> walls_compare_threshold(7, false);
     for (int i = 0; i < 6; i++){
-        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.5); // threshold of 50% of the neutral value
+        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.3); // threshold of 50% of the neutral value
     }
     if (walls_compare_threshold[0] && walls_compare_threshold[5] && walls_compare_threshold[1] && walls_compare_threshold[4] ){
         return X_ERROR;
@@ -285,9 +285,9 @@ int determine_PID_case(){
     } else if (walls_compare_threshold[4] && walls_compare_threshold[5] && (!walls_compare_threshold[0] || !walls_compare_threshold[1])){
         return X_ERROR_RIGHT_WALL_ONLY;
     } else if (!walls_compare_threshold[0] && !walls_compare_threshold[1] && !walls_compare_threshold[4] && !walls_compare_threshold[5]){
-        return BLIND;
+        return X_ERROR_ENCODER_BASED;
     } else {
-        return TRANSITION;
+        return X_ERROR_ENCODER_BASED;
     }
     return 10; // just default but will not be reached
 }
