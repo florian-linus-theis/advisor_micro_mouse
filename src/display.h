@@ -228,20 +228,11 @@ void handleModeSelection(Mode mode) {
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
-            drive_forward(350, 350, 1);
-            curve_left();
-            curve_left();
-            drive_forward(350, 0, 1);
-            
-            // delay(1);
-            // curve_right();
-            // delay(1);
-            // drive_forward(365, 365, 1);
-            // delay(1);
-            //curve_right();
-            // while(encoderTurned == false){}
-            // delay(500);
-            // stop();
+            while(!encoderTurned){
+                drive_forward(350, 350, 2);
+                curve_left();
+            }
+            stop();
             timer14->pause();
             // display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
