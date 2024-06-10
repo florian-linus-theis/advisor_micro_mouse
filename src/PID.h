@@ -94,7 +94,7 @@ int calcError(int PID_case){
         break;
 
     case X_ERROR_ENCODER_BASED:
-        error = distance_traveled_L - distance_traveled_R;
+        error = distance_traveled_L_PID - distance_traveled_R_PID;
         break;
 
     default:
@@ -146,8 +146,8 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
         max_values_upper_boundary[X_ERROR] = max_values_right[X_ERROR];
-        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]);
-        output_G = applyPID(remapped_error[X_ERROR], 0.4, 0.0003, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]); //-7;
+        output_G = applyPID(remapped_error[X_ERROR], 0.35, 0.0003, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -168,9 +168,9 @@ std::vector<int> calc_correction(int PID_case){
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
         max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_left[X_ERROR_LEFT_WALL_ONLY];
-        max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY];
-        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY])+70;
-        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.4, 0.0003, 0); // 12, 0.0001, 0.01
+        max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY]-100;
+        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]); //+59;
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.35, 0.0003, 0.001); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -179,9 +179,9 @@ std::vector<int> calc_correction(int PID_case){
     case X_ERROR_RIGHT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
         max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_left[X_ERROR_RIGHT_WALL_ONLY];
-        max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY];
-        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY])-60;
-        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.4, 0.0003, 0);
+        max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY]-100;
+        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]); //-68;
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.35, 0.0003, 0.001);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -254,7 +254,7 @@ bool side_walls_disappearing(){
 int determine_PID_case(){
     std::vector<bool> walls_compare_threshold(7, false);
     for (int i = 0; i < 6; i++){
-        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.5); // threshold of 50% of the neutral value
+        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.3); // threshold of 50% of the neutral value
     }
     if (walls_compare_threshold[0] && walls_compare_threshold[5] && walls_compare_threshold[1] && walls_compare_threshold[4] ){
         return X_ERROR;

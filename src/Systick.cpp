@@ -45,11 +45,9 @@ void Systick_Interrupt() {
   }
   PID_values = calc_correction(CURRENT_CASE_PID);
   PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
-  //ble->println("PID: " + String(CURRENT_CASE_PID));
-  //ble->println("RE: " + String(remapped_error));
-  //ble->println(calcError(X_ERROR_LEFT_WALL_ONLY));
   PID_values = determine_correction_needed();
   calc_average_PID_values();
+  ble->println(remapped_error[CURRENT_CASE_PID]);
   counter++;
 }
 
@@ -130,9 +128,12 @@ int system_clock_micros() {
 // 
 
 void calc_angle(){
-  int encoder_diff = distance_traveled_R - distance_traveled_L;
+  int current_encoder_distance = distance_traveled_R - distance_traveled_L;
   // int encoder_sum = distance_traveled_L + distance_traveled_R;
 
   // current_distance = encoder_sum * MM_PER_TICK;
-  current_angle = encoder_diff * DEGREE_PER_TICK;
+  current_angle = current_encoder_distance * DEGREE_PER_TICK;
 }
+
+
+

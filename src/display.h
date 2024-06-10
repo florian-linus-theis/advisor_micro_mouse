@@ -184,8 +184,11 @@ void handleModeSelection(Mode mode) {
             start(5);
             reset_encoders();
             reset_PID_values();
-            dfs_mapping();
-            delay(1000);
+            delay(50);
+            drive_forward(365, 365, 1); // drive forward one cell
+            ble->println("backing up to wall");
+            backup_to_wall(); // backup to wall
+            delay(500);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             //Imperial_March();
@@ -203,10 +206,11 @@ void handleModeSelection(Mode mode) {
             reset_encoders();
             reset_PID_values();
             delay(50);
-            drive_forward(365, 365, 1); // drive forward one cell
-            ble->println("backing up to wall");
-            backup_to_wall(); // backup to wall
-            delay(500);
+            while(!encoderTurned){
+                drive_forward(350, 350, 2);
+                curve_left();
+            }
+            stop();
             timer14->pause();
             // display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor

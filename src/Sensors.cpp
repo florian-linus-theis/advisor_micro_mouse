@@ -143,75 +143,75 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         }
     }
 
-    // Min values for right wall & Max values for left wall
-    display_print("Move to LEFT side", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    wait_for_other_side("left"); // move left
-    start(5); // finger right
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        min_values[4] += Distance_Sensor[4];
-        min_values[5] += Distance_Sensor[5];
-        max_values[0] += Distance_Sensor[0];
-        max_values[1] += Distance_Sensor[1];
-    }
+    // // Min values for right wall & Max values for left wall
+    // display_print("Move to LEFT side", 1);
+    // digitalWrite(LED_GREEN, HIGH);
+    // wait_for_other_side("left"); // move left
+    // start(5); // finger right
+    // for(int i=0; i<measurements_maze; i++){
+    //     Distanz_Messung_Sensoren();
+    //     min_values[4] += Distance_Sensor[4];
+    //     min_values[5] += Distance_Sensor[5];
+    //     max_values[0] += Distance_Sensor[0];
+    //     max_values[1] += Distance_Sensor[1];
+    // }
 
-    // Min values for left wall & Max values for right wall
-    display_print("Move to RIGHT side and wheels on edge", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    wait_for_other_side("right"); // move right
-    start(0); // finger left
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        min_values[0] += Distance_Sensor[0];
-        min_values[1] += Distance_Sensor[1];
-        max_values[4] += Distance_Sensor[4];
-        max_values[5] += Distance_Sensor[5];
-    }
+    // // Min values for left wall & Max values for right wall
+    // display_print("Move to RIGHT side and wheels on edge", 1);
+    // digitalWrite(LED_GREEN, HIGH);
+    // wait_for_other_side("right"); // move right
+    // start(0); // finger left
+    // for(int i=0; i<measurements_maze; i++){
+    //     Distanz_Messung_Sensoren();
+    //     min_values[0] += Distance_Sensor[0];
+    //     min_values[1] += Distance_Sensor[1];
+    //     max_values[4] += Distance_Sensor[4];
+    //     max_values[5] += Distance_Sensor[5];
+    // }
 
-    // Now Min values front
-    display_print("Move to CENTER BACK wheels on edge", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(0);
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        min_values[2] += Distance_Sensor[2];
-        min_values[3] += Distance_Sensor[3];
-        min_values[6] += Distance_Sensor[6];
-    }
+    // // Now Min values front
+    // display_print("Move to CENTER BACK wheels on edge", 1);
+    // digitalWrite(LED_GREEN, HIGH);
+    // start(0);
+    // for(int i=0; i<measurements_maze; i++){
+    //     Distanz_Messung_Sensoren();
+    //     min_values[2] += Distance_Sensor[2];
+    //     min_values[3] += Distance_Sensor[3];
+    //     min_values[6] += Distance_Sensor[6];
+    // }
 
-    // for ballgrabber calibration while drivig towards ballgrabber
-    display_print("Now facing Ballgrabber, finger left", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(0);
+    // // for ballgrabber calibration while drivig towards ballgrabber
+    // display_print("Now facing Ballgrabber, finger left", 1);
+    // digitalWrite(LED_GREEN, HIGH);
+    // start(0);
 
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        for(int j=0; j<7; j++) {
-            if (j == 4 || j == 5) continue;
-            ballgrabber_values[j] += Distance_Sensor[j];
-        }
-    }
+    // for(int i=0; i<measurements_maze; i++){
+    //     Distanz_Messung_Sensoren();
+    //     for(int j=0; j<7; j++) {
+    //         if (j == 4 || j == 5) continue;
+    //         ballgrabber_values[j] += Distance_Sensor[j];
+    //     }
+    // }
 
-    // ballgrabber calibration while driving back from ballgrabber
-    display_print("Now facing away from Ballgrabber, finger right", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(0);
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        for(int j=0; j<7; j++) {
-            if (j != 4 || j != 5) continue;
-            ballgrabber_values[j] += Distance_Sensor[j];
-        }
-    }
+    // // ballgrabber calibration while driving back from ballgrabber
+    // display_print("Now facing away from Ballgrabber, finger right", 1);
+    // digitalWrite(LED_GREEN, HIGH);
+    // start(0);
+    // for(int i=0; i<measurements_maze; i++){
+    //     Distanz_Messung_Sensoren();
+    //     for(int j=0; j<7; j++) {
+    //         if (j != 4 || j != 5) continue;
+    //         ballgrabber_values[j] += Distance_Sensor[j];
+    //     }
+    // }
 
-    // calculate average by dividing through # of measurements
-    for(int i=0 ; i<7 ; i++){
-        NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(neutral_values[i]) / measurements_maze));
-        ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
-        MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
-        MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
-    }
+    // // calculate average by dividing through # of measurements
+    // for(int i=0 ; i<7 ; i++){
+    //     NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(neutral_values[i]) / measurements_maze));
+    //     ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
+    //     MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
+    //     MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
+    // }
 
     //Calibrate max values
     display_print("Now close to left wall", 1);
