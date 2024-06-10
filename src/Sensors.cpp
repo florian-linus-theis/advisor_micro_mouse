@@ -206,12 +206,12 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     // }
 
     // // calculate average by dividing through # of measurements
-    // for(int i=0 ; i<7 ; i++){
-    //     NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(neutral_values[i]) / measurements_maze));
-    //     ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
-    //     MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
-    //     MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
-    // }
+    for(int i=0 ; i<7 ; i++){
+        NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(neutral_values[i]) / measurements_maze));
+        ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
+        MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
+        MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
+    }
 
     //Calibrate max values
     display_print("Now close to left wall", 1);
