@@ -7,14 +7,14 @@ std::vector<int> determine_correction_needed(){
     if(PID_ENABLED == false){
         chosen_correction = {0,0};
     }
-    else if(abs(remapped_error[CURRENT_CASE_PID]) > 5){
+    else if(abs(remapped_error[CURRENT_CASE_PID]) > 0){
         chosen_correction = PID_values;
         //ble->println("IR");
     }
     else{
         chosen_correction = PID_values_encoder;
-        distance_traveled_L = 0;
-        distance_traveled_R = 0;
+        distance_traveled_L_PID = 0;
+        distance_traveled_R_PID = 0;
         //ble->println("ENC");
     }
     return chosen_correction;
@@ -29,7 +29,6 @@ void BackwardLeft(int dutyCycle) {
 }
 
 void ForwardLeft(int dutyCycle) {
-    ble->print("L: " + String(dutyCycle));
     timer3->setCount(0);
     timer3->resume();
     timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
@@ -38,7 +37,6 @@ void ForwardLeft(int dutyCycle) {
 }
 
 void ForwardRight(int dutyCycle) {
-    ble->print("R: " + String(dutyCycle));
     timer4->setCount(0);
     timer4->resume();
     timer4->setCaptureCompare(1, dutyCycle, TICK_COMPARE_FORMAT);
