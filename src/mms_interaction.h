@@ -108,6 +108,14 @@ void turn_around(){
     update_direction(+2);
 }
 
+void turn_around_and_back_up(){
+    backup_to_wall();
+    update_direction(+2);
+    drive_forward(365, 365, 0.933); // 93.3% is distance from wall to edge of cell 
+    update_position();
+}
+
+
 // Function to change current direction to a specific direction
 void set_dir(int _dir) {
     if (_dir == cur_direction) {  // If already facing the correct direction

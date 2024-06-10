@@ -114,6 +114,19 @@ void stop(){
     // delay(1); // added small delay here such that the values have time to settle before the robot starts next move
 }
 
+void backup_to_wall(){
+    drive_forward(365, 0, 0.5); // drive forward half a cell
+    turn_around_right(); // turn around 
+    BackwardBoth(90); // back up to wall with duty 90
+    reset_distance_traveled();
+    delay(20);
+    while(current_avg_speed < 0){};
+    stop();
+    delay(20);
+    reset_distance_traveled();
+    drive_forward(365, 0, 0.93); // drive forward to the edge of the cell
+}
+
 // Middle layer function to move forwards
 // Stay in this function until we have reached a multiple of one tick forward (square center to square center)
 void move_forward_middle_level(int duty_cycle, float squares = 1.0){

@@ -141,35 +141,9 @@ void handleModeSelection(Mode mode) {
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); //enable motor
-            start(5); 
-            timer14->resume();
-            delay(20);
-            //resetting all values
-            reset_encoders();
-            reset_PID_values();
-            while(1){
-                //CURRENT_CASE_PID = 11;
-                move_forward_different(100, 100, 1);
-                distance_traveled_L_PID = 0;
-                distance_traveled_R_PID = 0;
-                // reset_distance_traveled();
-                // move_forward_different(100, 0, 3);
-                // CURRENT_CASE_PID = 4;
-                // pid_move_function(50);
-                // reset_PID_values();
-                // delay(500);
-
-                //encoder_based_move_function(100);
-                delay(10);
-                if(encoderTurned) break;
-            }
-            delay(500);
-            timer14->pause();
-            digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-            delay(1000);
-            display->clearDisplay();
-            delay(1000);
-           
+            getBattery();
+            drawBatteryStatus();
+            delay(3000);
             // always keep this last
             displayOptions(MODE_SHOW_DATA, false);
             break;
@@ -210,8 +184,11 @@ void handleModeSelection(Mode mode) {
             start(5);
             reset_encoders();
             reset_PID_values();
-            dfs_mapping();
-            delay(1000);
+            delay(50);
+            drive_forward(365, 365, 1); // drive forward one cell
+            ble->println("backing up to wall");
+            backup_to_wall(); // backup to wall
+            delay(500);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             //Imperial_March();
@@ -228,6 +205,7 @@ void handleModeSelection(Mode mode) {
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
+            delay(50);
             while(!encoderTurned){
                 drive_forward(350, 350, 2);
                 curve_left();
