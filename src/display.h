@@ -198,14 +198,28 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
+            ble->println("A* Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             start("right"); // wait for finger
             timer14->resume(); // starting systick timer
-            delay(200);
+            delay(100);
             // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
-            drive_forward(365, 0, 3);
+            drive_forward(350, 350, 1);
+            curve_left();
+            curve_left();
+            drive_forward(350, 0, 1);
+            
+            // delay(1);
+            // curve_right();
+            // delay(1);
+            // drive_forward(365, 365, 1);
+            // delay(1);
+            //curve_right();
+            // while(encoderTurned == false){}
+            // delay(500);
+            // stop();
             timer14->pause();
             // display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor

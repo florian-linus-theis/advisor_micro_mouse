@@ -93,13 +93,15 @@
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 100
 #define MINIMUM_DUTY 50
-#define TICKS_INNER_WHEEL 23750
-#define TICKS_OUTER_WHEEL 50000
+#define TICKS_INNER_WHEEL 31000 // thorugh testing
+#define TICKS_OUTER_WHEEL 62000 // through testing
 #define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
 #define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
-#define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
+#define DUTY_TO_SPEED_FACTOR 0.25 // Duty 100 -> Speed Reached 350mm/s; Duty 150 -> Speed Reached 600 mm/s; Duty 200 -> Speed Reached 800 mm/s
 #define SPEED_SLOW 365 // mm/s
 #define KNOWN_BRAKE_DIST_AT_SPEED_SLOW 20615 // actual: 20615 ticks but rounded to 21000
+#define MM_PER_TICK 0.000843628 // mm per tick during curves (already adding mean of both wheels) -> actual value: 0.0016873
+#define DEGREE_PER_TICK 0.0016112  // degree per tick during curves (= 360 * MM_PER_TICK / (PI * 60))
 
 // Global Variables 
 extern bool SETUP_COMPLETE;
@@ -190,6 +192,7 @@ extern int duty_R;
 extern volatile double current_delta_speed_L;
 extern volatile double current_delta_speed_R;
 extern volatile double current_avg_speed;
+extern volatile double current_angle; 
 extern void reset_distance_traveled(void);
 extern void reset_encoders(void);
 
@@ -210,7 +213,9 @@ extern void accelerate();
 extern void decelerate();
 extern void left_curve(int);
 extern void right_curve(int);
-extern void move_actual(int);
+extern void curve_right();
+extern void curve_left();
+extern void move_actual();
 extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
