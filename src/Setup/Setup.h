@@ -131,8 +131,7 @@ extern double integral;
 extern double proportional; 
 extern int CURRENT_CASE_PID; 
 extern bool SET_PID_MANUALLY;
-extern int remapped_error;
-extern int remapped_error_encoder;
+extern std::vector<int> remapped_error;
 extern int calcError(int);
 extern std::vector<int> max_values_left;
 extern std::vector<int> max_values_right;
@@ -141,21 +140,19 @@ extern std::vector<int> max_values_front;
 extern std::vector<int> max_values_lower_boundary;
 extern std::vector<int> max_values_upper_boundary;
 extern std::vector<int> calc_max_occuring_Errors();
+extern bool PID_ENABLED;
+extern void enable_PID();
+extern void disable_PID();
 
 enum PID_CASES{
-    ROT_ERROR = 0,
-    X_ERROR = 1,
-    X_ERROR_LEFT_WALL_ONLY = 2,
-    X_ERROR_RIGHT_WALL_ONLY = 3,
+    X_ERROR = 0,
+    X_ERROR_LEFT_WALL_ONLY = 1,
+    X_ERROR_RIGHT_WALL_ONLY = 2,
+    X_ERROR_ENCODER_BASED = 3,
     Y_ERROR = 4,
-    ROTATE_LEFT = 5,
-    ROTATE_RIGHT = 6,
-    CURVE_LEFT_ERROR = 7,
-    CURVE_RIGHT_ERROR = 8,
-    TRANSITION = 9,
-    BLIND = 10,
-    X_ERROR_ENCODER_BASED = 11,
-    ENUM_END = 12
+    TRANSITION = 5,
+    BLIND = 6,
+    ENUM_END = 7
 };
 
 

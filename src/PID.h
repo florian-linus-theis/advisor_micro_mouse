@@ -2,7 +2,7 @@
 #include "Setup\Setup.h"
 #include <cmath>
 
-
+//Variable definitons
 double last_time=0;
 double dt, kp_default=2, ki_default=0, kd_default=0.001;
 double proportional, integral, differential;
@@ -17,12 +17,20 @@ int LAST_CASE_PID = -1;
 bool SET_PID_MANUALLY = false;
 std::vector<int> avg_PID_values(2, 0);
 std::vector<int> PID_values_encoder = {0,0};
-int remapped_error = 0, remapped_error_encoder = 0;
-
+std::vector<int> remapped_error(ENUM_END,0); //, remapped_error_encoder = 0;
 int CURRENT_CASE_PID = X_ERROR_LEFT_WALL_ONLY;
-
 std::vector<int> NeutralSensorValues {532, 470, 803, 678, 672, 475, 1423};
 std::vector<int> ErrorSensorsVec {0,0,0,0,0,0};
+
+//toggle PID on and off
+void enable_PID(){
+    PID_ENABLED = true;
+}
+
+void disable_PID(){
+    PID_ENABLED = false;
+}
+
 
 // Function to print the sensor values to the bluetooth module
  void debug_print(){
@@ -63,9 +71,6 @@ int calcError(int PID_case){
     int error, desired_distance_L, desired_distance_R;
     switch (PID_case)
     {
-    case ROT_ERROR:
-        error = 0;
-        break;
 
     case X_ERROR:
         error = -(ErrorSensorsVec[0]+ErrorSensorsVec[1])+(ErrorSensorsVec[4]+ErrorSensorsVec[5]);
@@ -87,45 +92,22 @@ int calcError(int PID_case){
         error = error/2;
         break;
 
-    case ROTATE_LEFT:
-        error = 0;
-        break;
-
-    case ROTATE_RIGHT:
-        error = 0;
-        break;
-
-    case CURVE_LEFT_ERROR:
-        desired_distance_L = 0.475 * distance_traveled_R;
-        error = distance_traveled_L - desired_distance_L;
-        break;
-
-    case CURVE_RIGHT_ERROR:
-        desired_distance_R = (TICKS_INNER_WHEEL/TICKS_OUTER_WHEEL)*distance_traveled_L;
-        error = distance_traveled_R - desired_distance_R;
-        break;
-
     case X_ERROR_ENCODER_BASED:
         error = distance_traveled_L - distance_traveled_R;
-        // ble->println(distance_traveled_L);
-        // ble->println(distance_traveled_R);
         break;
 
     default:
         error = 0;
         break;
     }
-    //ble->println(error);
     return error;
 }
 
-//Apply PID to the error
-// original values kp = 3, ki = 0.0001, kd = 0.002
-// last values kp = 3, ki = 0, kd = 0
+//Apply PID to given error
 int applyPID(signed int error, double kp = 0.5 , double ki = 0, double kd = 0){
-    // for PID function change
-    proportional = error;
 
+    proportional = error;
+    // cap the integral value
     if(abs(integral) < 100000){
         integral += error * dt;
     }
@@ -148,6 +130,7 @@ int cap_output(int output_G, int max_correction_speed = 15){
     return output_G;
 }
 
+//Calculate correction vector
 std::vector<int> calc_correction(int PID_case){
     dt = calc_dt();
 
@@ -157,15 +140,13 @@ std::vector<int> calc_correction(int PID_case){
 
     switch (PID_case)
     {
-    case ROT_ERROR:
-        break;
 
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
         max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
         max_values_upper_boundary[X_ERROR] = max_values_right[X_ERROR];
-        remapped_error = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]);
-        output_G = applyPID(remapped_error, 0.4, 0.0003, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]);
+        output_G = applyPID(remapped_error[X_ERROR], 0.4, 0.0003, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -175,36 +156,20 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_y;
         max_values_lower_boundary[Y_ERROR] = max_values_front[Y_ERROR];
         max_values_upper_boundary[Y_ERROR] = max_values_back[Y_ERROR];
-        remapped_error = give_percent(calcError(Y_ERROR),max_values_lower_boundary[Y_ERROR],max_values_upper_boundary[Y_ERROR]);
-        output_G = applyPID(remapped_error, 2, 0, 0); // 0.8,0.0005,0.01
+        remapped_error[Y_ERROR] = give_percent(calcError(Y_ERROR),max_values_lower_boundary[Y_ERROR],max_values_upper_boundary[Y_ERROR]);
+        output_G = applyPID(remapped_error[Y_ERROR], 2, 0, 0); // 0.8,0.0005,0.01
         // ble->println(integral);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = -output_G;
         break;
 
-    case CURVE_LEFT_ERROR:
-        max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(calcError(CURVE_LEFT_ERROR));
-        output_G = cap_output(output_G, max_correction_speed);
-        correction_left = output_G;
-        correction_right = 0;
-        break;
-
-    case CURVE_RIGHT_ERROR:
-        max_correction_speed = default_max_correction_speed_x;
-        output_G = applyPID(calcError(CURVE_RIGHT_ERROR));
-        output_G = cap_output(output_G, max_correction_speed);
-        correction_left = 0;
-        correction_right = output_G;
-        break;
-
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
         max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_left[X_ERROR_LEFT_WALL_ONLY];
         max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY];
-        remapped_error = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY])+70;
-        output_G = applyPID(remapped_error, 0.4, 0.0003, 0); // 12, 0.0001, 0.01
+        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY])+70;
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.4, 0.0003, 0); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -214,30 +179,29 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_left[X_ERROR_RIGHT_WALL_ONLY];
         max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY];
-        remapped_error = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY])-60;
-        ble->println(remapped_error);
-        output_G = applyPID(remapped_error, 0.4, 0.0003, 0);
+        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY])-60;
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.4, 0.0003, 0);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
         break;
 
     case BLIND: //<-- Can be deleted an replaced by X_ERROR_ENCODER BASED
-        remapped_error = 0;
+        remapped_error[BLIND] = 0;
         correction_left = avg_PID_values[0]; // using average PID values to just drive straight
         correction_right = avg_PID_values[1];
         break;
 
     case TRANSITION:
-        remapped_error = 0;
+        remapped_error[TRANSITION] = 0;
         correction_left = avg_PID_values[0]; // using average PID values to just drive straight
         correction_right = avg_PID_values[1];
         break;
 
      case X_ERROR_ENCODER_BASED:
         max_correction_speed = default_max_correction_speed_x;
-        remapped_error_encoder = give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960);
-        output_G = applyPID(remapped_error_encoder, 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        remapped_error[X_ERROR_ENCODER_BASED] = give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960);
+        output_G = applyPID(remapped_error[X_ERROR_ENCODER_BASED], 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = output_G;
@@ -253,7 +217,7 @@ std::vector<int> calc_correction(int PID_case){
     return correction_output;
 }
 
-
+//Determine where Walls are
 std::vector<bool> find_walls(){
     std::vector<bool> wallsVec = {false, false, false, false};
     // Left Wall Sensors
@@ -289,7 +253,7 @@ bool side_walls_disappearing(){
 int determine_PID_case(){
     std::vector<bool> walls_compare_threshold(7, false);
     for (int i = 0; i < 6; i++){
-        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.3); // threshold of 50% of the neutral value
+        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.5); // threshold of 50% of the neutral value
     }
     if (walls_compare_threshold[0] && walls_compare_threshold[5] && walls_compare_threshold[1] && walls_compare_threshold[4] ){
         return X_ERROR;
@@ -307,17 +271,9 @@ int determine_PID_case(){
 
 
 void pid_move_function(int base_speed){
-    // ForwardLeft(default_base_speed + correction[0]);
-    // ForwardRight(default_base_speed + correction[1]);
     std::vector<int> old_pid = PID_values;
     int counter = 0;
     while(1){
-        // if((abs(PID_values[0]) <= 5 && abs(PID_values[1]) <= 5)){
-        //     break;
-        // }
-        // if (old_pid == PID_values){
-        //     continue;
-        // }
         delay(8);
         old_pid = PID_values;
 
@@ -345,7 +301,6 @@ void pid_move_function(int base_speed){
     return;
 }
 
-
 // Function to calculate the average PID values
 void calc_average_PID_values() {
   static int counter = 0;
@@ -366,7 +321,6 @@ void reset_PID_values(){
     proportional = 0;
 }
 
-
 // Function that is called if there is a wall in front of the robot such that we can use the front wall to recalibrate position
 void recalibrate_front_wall(){
     // if the front wall is detected, we can use the front wall to recalibrate the position of the robot
@@ -384,8 +338,6 @@ void recalibrate_front_wall(){
 
 void encoder_based_move_function(int base_speed){
     reset_distance_traveled();
-    // ForwardLeft(base_speed + correction_left[0]);
-    // ForwardRight(base_speed + correction_right[1]);
 
     while(1){
         delay(8);
