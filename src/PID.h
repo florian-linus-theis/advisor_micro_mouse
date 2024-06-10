@@ -15,6 +15,7 @@ int current_state;
 int toggle_drive;
 int LAST_CASE_PID = -1;
 bool SET_PID_MANUALLY = false;
+bool PID_ENABLED = true;
 std::vector<int> avg_PID_values(2, 0);
 std::vector<int> PID_values_encoder = {0,0};
 std::vector<int> remapped_error(ENUM_END,0); //, remapped_error_encoder = 0;

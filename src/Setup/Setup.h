@@ -248,6 +248,7 @@ extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
 extern void drive_forward(int, int, float);
+extern void backup_to_wall();
 
 
 // Middle Layer Drving Functions
