@@ -146,8 +146,8 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
         max_values_upper_boundary[X_ERROR] = max_values_right[X_ERROR];
-        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]); //-7;
-        output_G = applyPID(remapped_error[X_ERROR], 0.35, 0.0003, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) -7;
+        output_G = applyPID(remapped_error[X_ERROR], 0.3, 0.0003, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -169,8 +169,8 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_left[X_ERROR_LEFT_WALL_ONLY];
         max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY]-100;
-        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]); //+59;
-        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.35, 0.0003, 0.001); // 12, 0.0001, 0.01
+        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) +59;
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.3, 0.0003, 0.001); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -180,8 +180,8 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_left[X_ERROR_RIGHT_WALL_ONLY];
         max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY]-100;
-        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]); //-68;
-        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.35, 0.0003, 0.001);
+        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) -68;
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.3, 0.0003, 0.001);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
