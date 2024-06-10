@@ -40,6 +40,7 @@ void accelerate(int desired_max_speed);
 void break_immediately();
 int calculate_braking_distance(int end_speed);
 void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R);
+void right_turn_around();
 
 
 // placeholder for sensor values
@@ -116,15 +117,15 @@ void stop(){
 
 void backup_to_wall(){
     drive_forward(365, 0, 0.5); // drive forward half a cell
-    turn_around_right(); // turn around 
+    right_turn_around(); // turn around 
     BackwardBoth(90); // back up to wall with duty 90
     reset_distance_traveled();
     delay(20);
     while(current_avg_speed < 0){};
     stop();
-    delay(20);
+    delay(30);
     reset_distance_traveled();
-    drive_forward(365, 0, 0.93); // drive forward to the edge of the cell
+    drive_forward(365, 0, 0.7778); // drive forward to the edge of the cell
 }
 
 // Middle layer function to move forwards
@@ -451,6 +452,29 @@ void rotate_right(){
 //     current_duty_cycle = 0;
 //     reset_distance_traveled();
 // }
+
+void right_turn_around(){
+    disable_PID()
+    volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
+    current_duty_cycle = DUTY_SLOW_ROTATION;
+    int full_rotation_ticks = tick_rotate * 2;
+    reset_distance_traveled();
+    BackwardRight(DUTY_SLOW_ROTATION + 50); // start moving wheels in opposite directions (turning right)
+    ForwardLeft(DUTY_SLOW_ROTATION + 50);
+    // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
+    while(abs(distance_traveled_R) < full_rotation_ticks && abs(distance_traveled_L) < full_rotation_ticks){
+        if (distance_travelled_right == distance_traveled_R) continue;
+        distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
+        if (abs(distance_traveled_R) > full_rotation_ticks * 0.95 || abs(distance_traveled_L) > full_rotation_ticks * 0.95) {
+            stop();
+            break;
+        }
+    }
+    delay(200);
+    enable_PID();
+    reset_distance_traveled();
+}
+
 
 void turn_around_right(){
     rotate_right();
