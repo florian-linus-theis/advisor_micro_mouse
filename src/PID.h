@@ -230,7 +230,6 @@ std::vector<bool> find_walls(){
         wallsVec[0] = true;
     }
 
-    // Right Wall
     if(Distance_Sensor[5] > MinSensorValues[5]) { //70 und 150
         wallsVec[1] = true;
     }
