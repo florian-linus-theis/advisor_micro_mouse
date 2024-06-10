@@ -4,7 +4,10 @@
 
 std::vector<int> determine_correction_needed(){
     std::vector<int> chosen_correction = {0,0};
-    if(abs(remapped_error) > 5){
+    if(PID_ENABLED == false){
+        chosen_correction = {0,0};
+    }
+    else if(abs(remapped_error[CURRENT_CASE_PID]) > 5){
         chosen_correction = PID_values;
         //ble->println("IR");
     }
