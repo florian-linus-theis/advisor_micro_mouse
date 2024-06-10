@@ -1,4 +1,5 @@
 //Include Librarys
+#pragma once //<-- Macht das hier faxen?
 #include <Arduino.h>
 #include "cmath"
 #include "vector"
@@ -93,12 +94,15 @@
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 100
 #define MINIMUM_DUTY 50
-#define TICKS_INNER_WHEEL 23750
-#define TICKS_OUTER_WHEEL 50000
+#define TICKS_INNER_WHEEL 31000 // thorugh testing
+#define TICKS_OUTER_WHEEL 62000 // through testing
 #define DISTANCE_DUTY_MIN_TO_ZERO 10000 // bit less than half braking distance -> approx 2cm
 #define KNOWN_BRAKE_DIST_AT_DUTY_SLOW 24000 // ukmars has 27mm braking distance at their exploration speed, assuming we have 40mm braking distance -> 24000 ticks (rounded at 600 ticks per mm) wanna over estimate that
-#define SPEED_TO_DUTY_FACTOR 3 // TODO: adjust this
-
+#define DUTY_TO_SPEED_FACTOR 0.25 // Duty 100 -> Speed Reached 350mm/s; Duty 150 -> Speed Reached 600 mm/s; Duty 200 -> Speed Reached 800 mm/s
+#define SPEED_SLOW 365 // mm/s
+#define KNOWN_BRAKE_DIST_AT_SPEED_SLOW 20615 // actual: 20615 ticks but rounded to 21000
+#define MM_PER_TICK 0.000843628 // mm per tick during curves (already adding mean of both wheels) -> actual value: 0.0016873
+#define DEGREE_PER_TICK 0.0016112  // degree per tick during curves (= 360 * MM_PER_TICK / (PI * 60))
 
 // Global Variables 
 extern bool SETUP_COMPLETE;
@@ -112,19 +116,46 @@ extern void a_star_algorithm();
 // PID 
 extern std::vector<int> NeutralSensorValues;
 extern std::vector<int> PID_constants; // Global variable to store the PID constants
-extern std::vector<int> PID_values; 
+extern std::vector<int> PID_values;
+extern std::vector<int> PID_values_encoder;
 extern std::vector<int> calc_correction(int);
+extern std::vector<int> determine_correction_needed();
 extern void reset_PID_values();
 extern int determine_PID_case();
 extern std::vector<bool> find_walls();
 extern void pid_move_function(int);
 extern void calc_average_PID_values();
 extern void recalibrate_front_wall();
+extern bool front_wall_detected();
+extern bool side_wall_disappearing();
 extern double differential;
 extern double integral;
 extern double proportional; 
 extern int CURRENT_CASE_PID; 
 extern bool SET_PID_MANUALLY;
+extern std::vector<int> remapped_error;
+extern int calcError(int);
+extern std::vector<int> max_values_left;
+extern std::vector<int> max_values_right;
+extern std::vector<int> max_values_back;
+extern std::vector<int> max_values_front;
+extern std::vector<int> max_values_lower_boundary;
+extern std::vector<int> max_values_upper_boundary;
+extern std::vector<int> calc_max_occuring_Errors();
+extern bool PID_ENABLED;
+extern void enable_PID();
+extern void disable_PID();
+
+enum PID_CASES{
+    X_ERROR = 0,
+    X_ERROR_LEFT_WALL_ONLY = 1,
+    X_ERROR_RIGHT_WALL_ONLY = 2,
+    X_ERROR_ENCODER_BASED = 3,
+    Y_ERROR = 4,
+    TRANSITION = 5,
+    BLIND = 6,
+    ENUM_END = 7
+};
 
 
 // ---------------------------------------
@@ -179,12 +210,17 @@ extern int Systick_Counter;
 extern int encoder_right_total; 
 extern int encoder_left_total;
 extern volatile int distance_traveled_L; // TODO: evtl float
+extern volatile int distance_traveled_L_PID; // TODO: evtl float
 extern volatile int distance_traveled_R; // TODO: evtl float
+extern volatile int distance_traveled_R_PID; // TODO: evtl float
 extern volatile int avg_distance_traveled; // TODO: evtl float
 extern int current_duty_cycle;
 extern int duty_L;
 extern int duty_R;
-extern int current_speed; 
+extern volatile double current_delta_speed_L;
+extern volatile double current_delta_speed_R;
+extern volatile double current_avg_speed;
+extern volatile double current_angle; 
 extern void reset_distance_traveled(void);
 extern void reset_encoders(void);
 
@@ -205,10 +241,14 @@ extern void accelerate();
 extern void decelerate();
 extern void left_curve(int);
 extern void right_curve(int);
-extern void move_actual(int);
+extern void curve_right();
+extern void curve_left();
+extern void move_actual();
 extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
+extern void drive_forward(int, int, float);
+extern void backup_to_wall();
 
 
 // Middle Layer Drving Functions
@@ -233,8 +273,10 @@ extern bool SENSOR_CALIBRATED;
 extern int Channel_Emitter[];
 extern int Channel_Sensoren[];
 extern int Distance_Sensor[];
+extern int Last_Distance_Sensor[];
 extern int calibration_sensor[];
-
+extern int MinSensorValues[];
+extern int MaxSensorValues[];
 extern int Distance_Sensor_Mid_MM;
 extern double Abs_Sensor_Calibration;
 
@@ -263,7 +305,8 @@ extern void Timer7_Interrupt();
 
 // Before Start
 extern void calibrate_sensors(int, int);
-extern void start();
+extern void start(int);
+extern void wait_for_other_side(std::string);
 
 // Battery
 extern void getBattery();

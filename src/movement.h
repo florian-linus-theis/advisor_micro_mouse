@@ -13,9 +13,10 @@ int duty_interval = precompute_duty_intervals(); // for stepwise acceleration
 int duty_L = 0;
 int duty_R = 0;
 volatile int distance_traveled_L = 0; // TODO: evtl float
+volatile int distance_traveled_L_PID = 0;
 volatile int distance_traveled_R = 0; // TODO: evtl float
+volatile int distance_traveled_R_PID = 0;
 volatile int avg_distance_traveled = 0; // TODO: evtl float
-int current_speed = 0;
 int current_duty_cycle = 0;
 enum state{slow, fast};
 
@@ -29,11 +30,17 @@ int encoder_R = 0;
 // int tick_rotate = 7460 * 4;
 // int tick_accelerate = 13355 * 4;
 
-int tick_forward = 26668 * 4 - 7000;
+int tick_forward = 26668 * 4;
 int tick_start = 6889 * 4;
 int tick_rotate = 23000; // --> works for us with 90 duty rotate cycle
 int tick_accelerate = 35000;
 
+
+void accelerate(int desired_max_speed);
+void break_immediately();
+int calculate_braking_distance(int end_speed);
+void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R);
+void right_turn_around();
 
 
 // placeholder for sensor values
@@ -51,20 +58,28 @@ void compute_avg_distance_traveled(){
 }
 
 void reset_distance_traveled(){
+    distance_traveled_L_PID = distance_traveled_L;
+    distance_traveled_R_PID = distance_traveled_R;
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
+    current_angle = 0;
 }
 
 
 // convert speed to duty cycle
 double duty_to_speed(int duty_cycle){
-    return  SPEED_TO_DUTY_FACTOR * duty_cycle;
+    return duty_cycle / DUTY_TO_SPEED_FACTOR;
 }
 
 // convert duty cycle to speed
 int speed_to_duty(double speed){
-    return static_cast<int>(speed / SPEED_TO_DUTY_FACTOR);
+    return static_cast<int>(speed * DUTY_TO_SPEED_FACTOR);
+}
+
+int speedToDutyCycle(int speed) {
+    // Map speed (0 to 800 mm/s) to duty cycle (0 to 200) duty cycle that we reach 200 with
+    return static_cast<int>(speed * DUTY_TO_SPEED_FACTOR);
 }
 
 // running wall-array overwrites values of each cell every few ticks
@@ -98,6 +113,19 @@ void stop(){
     ForwardRight(0);
     current_duty_cycle = 0;
     // delay(1); // added small delay here such that the values have time to settle before the robot starts next move
+}
+
+void backup_to_wall(){
+    drive_forward(365, 0, 0.5); // drive forward half a cell
+    right_turn_around(); // turn around 
+    BackwardBoth(90); // back up to wall with duty 90
+    reset_distance_traveled();
+    delay(20);
+    while(current_avg_speed < 0){};
+    stop();
+    delay(30);
+    reset_distance_traveled();
+    drive_forward(365, 0, 0.7778); // drive forward to the edge of the cell
 }
 
 // Middle layer function to move forwards
@@ -175,7 +203,6 @@ void accelerate_different(int desired_duty_cycle){
     int target_duty_cycle = current_duty_cycle + static_cast<int>(std::round((desired_duty_cycle - current_duty_cycle) * 2.0 / 3.0));
     if (abs(current_duty_cycle - desired_duty_cycle) < 5) {
         target_duty_cycle = desired_duty_cycle;
-        ble->println("Close enough to desired duty cycle, setting to desired duty cycle");
     }
     ForwardBoth(target_duty_cycle); // Update motors to the new duty cycle
 }
@@ -203,7 +230,6 @@ int decelerate_different(int end_duty_cycle, int remaining_distance_ticks){
 
     if (abs(end_duty_cycle - target_duty_cycle) < 5 || (end_duty_cycle != 0 && target_duty_cycle < end_duty_cycle)){
         target_duty_cycle = end_duty_cycle;
-        ble->println("Close enough to end duty cycle, setting to end duty cycle");
     }
     ForwardBoth(target_duty_cycle);
     return 1; 
@@ -223,8 +249,10 @@ void printer_debugger(int average_distance_travelled, int distance_remaining, in
 void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, float squares){
     // first reset distances
     int desired_distance = static_cast<int>(round(squares * tick_forward));
+    int half_distance = desired_distance / 2;
     int last_distance_traveled = 1;	// setting the distance to one so that we can enter the loop and not skip first iteration
     int counter = 0; 
+    bool disappearing_wall_detected = false;
     ble->println("Moving forward");
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
@@ -234,14 +262,24 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
         last_distance_traveled = avg_distance_traveled;
         int distance_remaining = desired_distance - avg_distance_traveled;
         int braking_distance = calc_braking_distance(end_duty_cycle);
+        // if we detect front wall while driving, we hand over to PID controlled braking
+        // TODO: improve y error function such that braking becomes smooth
+        // if (front_wall_detected()){
+        //     ble->println("Front wall detected, handing over to PID controlled braking");
+        //     pid_move_function(50);
+        //     break;
+        // } 
+        if (side_walls_disappearing() && !disappearing_wall_detected){
+            desired_distance = 84154 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
+            disappearing_wall_detected = true; // such that we only set the distance once
+            ble->println("Side walls disappearing, setting distance remaining to 84154");
+        }
         if (distance_remaining > braking_distance){
             if (current_duty_cycle < desired_max_duty_cycle){
                 accelerate_different(desired_max_duty_cycle);
-            }
-            else {
+            } else {
                 ForwardBoth(current_duty_cycle); // just normal driving with PID
             }
-        
         } else {
             if (decelerate_different(end_duty_cycle, distance_remaining) == 0){
                 break;
@@ -250,6 +288,104 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
     }
     reset_distance_traveled();
 }
+
+// ------------------------------------------------------------------------------------
+
+
+void drive_forward(int desired_max_speed, int end_speed, float squares){
+    // first reset distances
+    int desired_distance = static_cast<int>(round(squares * tick_forward));
+    int ticks_until_walls_disappearing = static_cast<int>(round((squares-1) * tick_forward)); // start looking for walls 1 square before end
+    int last_distance_traveled = 1;	// setting the distance to one so that we can enter the loop and not skip first iteration
+    int counter = 0; 
+    bool disappearing_wall_detected = false;
+    ble->println("Moving forward");
+    // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
+    reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
+    reset_PID_values();
+    while(avg_distance_traveled < desired_distance){ 
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        last_distance_traveled = avg_distance_traveled;
+        int distance_remaining = desired_distance - avg_distance_traveled;
+        int braking_distance = calculate_braking_distance(end_speed);
+        // if (remaining_distance < ticks_until_wall_disappearing && side_walls_disappearing()){
+        //     desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
+        //     disappearing_wall_detected = true; // such that we only set the distance once
+        // }
+        if (distance_remaining > braking_distance){
+                accelerate(desired_max_speed);
+        } else {
+           break_immediately();
+           break;
+        }
+    }
+    // ble->println("Reached destination");
+    // reset_distance_traveled();
+}
+
+// calculate the duty needed for correcting
+int calc_duty_correction(int desired_speed){
+    // calculate the error in speed
+    int duty_base = speedToDutyCycle(desired_speed);
+    if (current_avg_speed < 0){
+        return duty_base;
+    }
+    double error_speed = desired_speed - current_avg_speed;
+    // calculate the correction needed
+    if (error_speed > 0){
+        return duty_base + speedToDutyCycle(abs(error_speed));
+    } else {
+        return duty_base - speedToDutyCycle(abs(error_speed));
+    }
+}
+
+
+
+// speed in mm/s
+// aceeleration in mm/s^2
+// basically P-controller for speed
+void accelerate(int desired_max_speed){
+    ForwardBoth(calc_duty_correction(desired_max_speed)); // Update motors to the new duty cycle
+}
+
+
+void break_immediately(){
+    ble->println("Breaking immediately");
+    ForwardLeft(0);
+    ForwardRight(0);
+    while(current_avg_speed > 0){};
+}
+
+
+int calculate_braking_distance(int end_speed){
+    // Check if the desired speed is higher than the current speed
+    if (end_speed > 0) {
+        return -10000; // we only calculate braking distance if we want to stop otherwise return super low value that we do not break
+    }
+    if (end_speed > current_avg_speed) {
+        return -10000; // same as above
+    }
+    // If the end speed is the same as the current, no braking distance is needed
+
+    // Calculate the scaling factors based on the squares of the speeds
+    double current_speed_square = static_cast<double>(current_avg_speed * current_avg_speed);
+    double end_speed_square = static_cast<double>(end_speed * end_speed);
+    double speed_slow_square = static_cast<double>(SPEED_SLOW * SPEED_SLOW);
+
+    // Calculate the braking distance using the known distance and the scaling factors
+    double braking_distance = KNOWN_BRAKE_DIST_AT_SPEED_SLOW * (current_speed_square - end_speed_square) / speed_slow_square;
+
+    return static_cast<int>(std::round(braking_distance));
+}
+
+
+
+
+
+
+
+
+
 // mapping movement
 
 void go_to_start(int duty_cycle){
@@ -280,17 +416,6 @@ void rotate_left(){
             BackwardLeft(DUTY_SLOW_ROTATION);  // 
         }
     }
-    // if (abs(distance_traveled_R) < abs(distance_traveled_R)){
-    //     ForwardRight(0);
-    //     BackwardLeft(DUTY_SLOW_ROTATION);
-    //     while (abs(distance_traveled_R) < abs(distance_traveled_L)){
-    //     }
-    // } else {
-    //     ForwardRight(0);
-    //     BackwardLeft(DUTY_SLOW_ROTATION);
-    //     while (abs(distance_traveled_L) < abs(distance_traveled_R)){
-    //     }
-    // }
     stop();
     delay(400);
     reset_distance_traveled();
@@ -306,16 +431,6 @@ void rotate_right(){
     while(abs(distance_traveled_R) < tick_rotate && abs(distance_traveled_L) < tick_rotate){
         if (distance_travelled_right == distance_traveled_R) continue;
         distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
-        
-        // // calculate the ratio of the distance traveled by the two wheels and adjust pwm values accordingly
-        // double wheel_ratio = static_cast<double>(abs(distance_traveled_L)) / static_cast<double>(abs(distance_traveled_R));
-        // if (wheel_ratio > 1){
-        //     BackwardRight(DUTY_SLOW_ROTATION + static_cast<int>(wheel_ratio * 3.7)); 
-        //     ForwardLeft(DUTY_SLOW_ROTATION);  // 
-        // } else {
-        //     BackwardRight(DUTY_SLOW_ROTATION - static_cast<int>(1 / wheel_ratio * 3.7)); 
-        //     ForwardLeft(DUTY_SLOW_ROTATION);  // 
-        // }
     }
     stop();
     delay(400);
@@ -337,6 +452,29 @@ void rotate_right(){
 //     current_duty_cycle = 0;
 //     reset_distance_traveled();
 // }
+
+void right_turn_around(){
+    disable_PID()
+    volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
+    current_duty_cycle = DUTY_SLOW_ROTATION;
+    int full_rotation_ticks = tick_rotate * 2;
+    reset_distance_traveled();
+    BackwardRight(DUTY_SLOW_ROTATION + 50); // start moving wheels in opposite directions (turning right)
+    ForwardLeft(DUTY_SLOW_ROTATION + 50);
+    // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
+    while(abs(distance_traveled_R) < full_rotation_ticks && abs(distance_traveled_L) < full_rotation_ticks){
+        if (distance_travelled_right == distance_traveled_R) continue;
+        distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
+        if (abs(distance_traveled_R) > full_rotation_ticks * 0.95 || abs(distance_traveled_L) > full_rotation_ticks * 0.95) {
+            stop();
+            break;
+        }
+    }
+    delay(200);
+    enable_PID();
+    reset_distance_traveled();
+}
+
 
 void turn_around_right(){
     rotate_right();
@@ -383,54 +521,69 @@ void left_curve(int duty_cycle){
     reset_distance_traveled();
 }
 
-void right_curve(int duty_cycle){
-    int correction = static_cast<int>(static_cast<double>(duty_cycle) * (4.0/ 150.0));
-    duty_L = duty_cycle; 
-    duty_R = static_cast<int>(round(0.475 * duty_cycle)); // curve speed ratio
-    ForwardRight(duty_R);
-    ForwardLeft(duty_L);
-    int last_distance_traveled = 0;
-    while(distance_traveled_L < TICKS_OUTER_WHEEL || distance_traveled_R < TICKS_INNER_WHEEL){
+void curve_right(){
+    int start_speed = current_avg_speed;
+    // trying to fix any angle errors during curve 
+    int start_angle = current_angle;
+    // speed calculation
+    int speed_L = static_cast<int>((start_speed / 3) * 4);
+    int speed_R = static_cast<int>((start_speed / 3) * 1.9);
+    ble->println("Curve right");
+    disable_PID();
+    reset_distance_traveled();
+    int last_distance_traveled = avg_distance_traveled;
+    int distance_right_wheel = distance_traveled_R;
+    accelerate_each_wheel_in_curve(speed_L, speed_R);
+    // less than 90 degrees because we do not want to oversteer
+    while(current_angle > (-86 - start_angle) || distance_right_wheel < TICKS_INNER_WHEEL){
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ForwardRight(duty_L);  // TODO: add PID values here
-        BackwardLeft(duty_R);  //
-    }
-    reset_distance_traveled();
-}
-
-
-// VERALTET
-// ----------------------------------------------------------------------------------------------------
-void accelerate(){ 
-    while(avg_distance_traveled < tick_accelerate){
-        int duty_cycle = DUTY_SLOW;
-        for(int n = 1; n < 4; n++){
-            duty_cycle += duty_interval;      // stepwise acceleration
-            int start_time = millis();
-            move_actual(duty_cycle);
-            delay(50); // TODO: improve this
+        distance_right_wheel = distance_traveled_R - distance_right_wheel;
+        if (current_angle < -67 - start_angle){
+            // start to accelerate the wheels to the same speed in curve exit
+            accelerate_each_wheel_in_curve(start_speed, start_speed);
+            continue;
         }
-        move_actual(DUTY_FAST);
+        accelerate_each_wheel_in_curve(speed_L, speed_R);
     }
     reset_distance_traveled();
+    enable_PID();
+    reset_PID_values();
 }
 
-void decelerate(int start_duty_cycle, int end_duty_cycle){
-
-    while(avg_distance_traveled < tick_accelerate){
-        int duty_cycle = start_duty_cycle;
-        for(int n = 1; n < 4; n++){
-            duty_cycle -= duty_interval;      // stepwise deceleration
-            int start_time = millis();
-            move_actual(duty_cycle);
-            delay(4); // TODO: improve this
+void curve_left(){
+    int start_speed = current_avg_speed;
+    int start_angle = current_angle;
+    int speed_L = static_cast<int>((start_speed / 3) * 1.9);
+    int speed_R = static_cast<int>((start_speed / 3) * 4);
+    disable_PID();
+    reset_distance_traveled();
+    int last_distance_traveled = avg_distance_traveled;
+    int distance_left_wheel = distance_traveled_L;
+    accelerate_each_wheel_in_curve(speed_L, speed_R);
+    // less than 90 degrees because we do not want to oversteer
+    while(current_angle < (86 - start_angle) || distance_left_wheel < TICKS_INNER_WHEEL - 2000){
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
+        distance_left_wheel = distance_traveled_L - distance_left_wheel;
+        if (current_angle > (67 - start_angle)){
+            // start to accelerate the wheels to the same speed in curve exit
+            accelerate_each_wheel_in_curve(start_speed, start_speed);
+            continue;
         }
-        move_actual(DUTY_SLOW);
+        accelerate_each_wheel_in_curve(speed_L, speed_R);
     }
     reset_distance_traveled();
+    enable_PID();
+    // reset_PID_values();
 }
 
+
+// accelerate each wheel to the desired speed
+void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R){
+    ForwardLeft(calc_duty_correction(desired_speed_L));
+    ForwardRight(calc_duty_correction(desired_speed_R));
+}
 
 // ----------------------------------------------------------------------------------------------------
 // Function to drive to front wall
@@ -442,3 +595,5 @@ void drive_to_wall(){
     pid_move_function(50);
     delay(500);
 }
+
+
