@@ -9,6 +9,7 @@ volatile double current_delta_speed_R = 0;
 volatile double current_avg_speed = 0;
 int current_micros = 0;
 int last_micros = 0;
+volatile double current_angle = 0;
 std::vector<int> PID_values = {0, 0};
 
 void update_encoders();
@@ -16,6 +17,7 @@ void print_encoders();
 void print_sensors();
 void print_pid();
 void calc_speed();
+void calc_angle();
 int system_clock_micros();
 
 
@@ -59,6 +61,7 @@ void update_encoders() {
   distance_traveled_R += encoder_right - encoder_right_last_time;
   avg_distance_traveled = (distance_traveled_L + distance_traveled_R) / 2;
   calc_speed(); // calculate the speed of the robot before updating the last encoder values
+  calc_angle(); // calcualte the angle of the robot
   encoder_left_last_time = encoder_left;
   encoder_right_last_time = encoder_right;
 }
@@ -122,4 +125,14 @@ void calc_speed() {
 // Function to get the current microseconds
 int system_clock_micros() {
     return DWT->CYCCNT / (SystemCoreClock / 1000000);
+}
+
+// 
+
+void calc_angle(){
+  int encoder_diff = distance_traveled_R - distance_traveled_L;
+  // int encoder_sum = distance_traveled_L + distance_traveled_R;
+
+  // current_distance = encoder_sum * MM_PER_TICK;
+  current_angle = encoder_diff * DEGREE_PER_TICK;
 }

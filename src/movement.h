@@ -39,6 +39,7 @@ int tick_accelerate = 35000;
 void accelerate(int desired_max_speed);
 void break_immediately();
 int calculate_braking_distance(int end_speed);
+void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R);
 
 
 // placeholder for sensor values
@@ -61,17 +62,23 @@ void reset_distance_traveled(){
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
+    current_angle = 0;
 }
 
 
 // convert speed to duty cycle
 double duty_to_speed(int duty_cycle){
-    return  SPEED_TO_DUTY_FACTOR * duty_cycle;
+    return duty_cycle / DUTY_TO_SPEED_FACTOR;
 }
 
 // convert duty cycle to speed
 int speed_to_duty(double speed){
-    return static_cast<int>(speed / SPEED_TO_DUTY_FACTOR);
+    return static_cast<int>(speed * DUTY_TO_SPEED_FACTOR);
+}
+
+int speedToDutyCycle(int speed) {
+    // Map speed (0 to 800 mm/s) to duty cycle (0 to 200) duty cycle that we reach 200 with
+    return static_cast<int>(speed * DUTY_TO_SPEED_FACTOR);
 }
 
 // running wall-array overwrites values of each cell every few ticks
@@ -271,11 +278,6 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
 // ------------------------------------------------------------------------------------
 
 
-int speedToDutyCycle(int speed) {
-    // Map speed (0 to 800 mm/s) to duty cycle (0 to 200) duty cycle that we reach 200 with
-    return static_cast<int>(map(speed, 0, 800, 0, 200));
-}
-
 void drive_forward(int desired_max_speed, int end_speed, float squares){
     // first reset distances
     int desired_distance = static_cast<int>(round(squares * tick_forward));
@@ -292,17 +294,10 @@ void drive_forward(int desired_max_speed, int end_speed, float squares){
         last_distance_traveled = avg_distance_traveled;
         int distance_remaining = desired_distance - avg_distance_traveled;
         int braking_distance = calculate_braking_distance(end_speed);
-        // if we detect front wall while driving, we hand over to PID controlled braking
-        // TODO: improve y error function such that braking becomes smooth
-        // if (front_wall_detected()){
-        //     ble->println("Front wall detected, handing over to PID controlled braking");
-        //     pid_move_function(50);
-        //     break;
-        // } 
-        if (side_walls_disappearing() && !disappearing_wall_detected){
-            desired_distance = 84154 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
-            disappearing_wall_detected = true; // such that we only set the distance once
-        }
+        // if (side_walls_disappearing()){
+        //     desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
+        //     disappearing_wall_detected = true; // such that we only set the distance once
+        // }
         if (distance_remaining > braking_distance){
                 accelerate(desired_max_speed);
         } else {
@@ -310,20 +305,25 @@ void drive_forward(int desired_max_speed, int end_speed, float squares){
            break;
         }
     }
-    reset_distance_traveled();
+    ble->println("Reached destination");
+    // reset_distance_traveled();
 }
 
 // calculate the duty needed for correcting
 int calc_duty_correction(int desired_speed){
     // calculate the error in speed
+    int duty_base = speedToDutyCycle(desired_speed);
+    if (current_avg_speed < 0){
+        return duty_base;
+    }
     double error_speed = desired_speed - current_avg_speed;
     // 
-    int duty_base = speedToDutyCycle(desired_speed);
+    ble->println("Duty base: " + String(duty_base) + " Error speed: " + String(error_speed) + " Current avg speed: " + String(current_avg_speed) + " Desired speed: " + String(desired_speed));
     // calculate the correction needed
     if (error_speed > 0){
-        return duty_base + speedToDutyCycle(error_speed);
+        return duty_base + speedToDutyCycle(abs(error_speed));
     } else {
-        return duty_base - speedToDutyCycle(error_speed);
+        return duty_base - speedToDutyCycle(abs(error_speed));
     }
 }
 
@@ -338,7 +338,9 @@ void accelerate(int desired_max_speed){
 
 
 void break_immediately(){
-    ForwardBoth(0);
+    ble->println("Breaking immediately");
+    ForwardLeft(0);
+    ForwardRight(0);
     while(current_avg_speed > 0){};
 }
 
@@ -346,10 +348,10 @@ void break_immediately(){
 int calculate_braking_distance(int end_speed){
     // Check if the desired speed is higher than the current speed
     if (end_speed > 0) {
-        return 0; // we only calculate braking distance if we want to stop
+        return -10000; // we only calculate braking distance if we want to stop otherwise return super low value that we do not break
     }
     if (end_speed > current_avg_speed) {
-        return -1; // No braking distance if the desired speed is higher
+        return -10000; // same as above
     }
     // If the end speed is the same as the current, no braking distance is needed
 
@@ -484,22 +486,62 @@ void left_curve(int duty_cycle){
     reset_distance_traveled();
 }
 
-void right_curve(int duty_cycle){
-    int correction = static_cast<int>(static_cast<double>(duty_cycle) * (4.0/ 150.0));
-    duty_L = duty_cycle; 
-    duty_R = static_cast<int>(round(0.475 * duty_cycle)); // curve speed ratio
-    ForwardRight(duty_R);
-    ForwardLeft(duty_L);
-    int last_distance_traveled = 0;
-    while(distance_traveled_L < TICKS_OUTER_WHEEL || distance_traveled_R < TICKS_INNER_WHEEL){
+void curve_right(){
+    int start_speed = current_avg_speed;
+    int start_angle = current_angle;
+    int speed_L = static_cast<int>((start_speed / 3) * 4);
+    int speed_R = static_cast<int>((start_speed / 3) * 1.9);
+    reset_distance_traveled();
+    int last_distance_traveled = avg_distance_traveled;
+    int distance_right_wheel = distance_traveled_R;
+    accelerate_each_wheel_in_curve(speed_L, speed_R);
+    // less than 90 degrees because we do not want to oversteer
+    while(current_angle > (-86 - start_angle) || distance_right_wheel < TICKS_INNER_WHEEL){
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ForwardRight(duty_L);  // TODO: add PID values here
-        BackwardLeft(duty_R);  //
+        distance_right_wheel = distance_traveled_R - distance_right_wheel;
+        if (current_angle < -67 - start_angle){
+            // start to accelerate the wheels to the same speed in curve exit
+            accelerate_each_wheel_in_curve(start_speed, start_speed);
+            continue;
+        }
+        accelerate_each_wheel_in_curve(speed_L, speed_R);
     }
     reset_distance_traveled();
+    // reset_PID_values();
 }
 
+void curve_left(){
+    int start_speed = current_avg_speed;
+    int start_angle = current_angle;
+    int speed_L = static_cast<int>((start_speed / 3) * 1.9);
+    int speed_R = static_cast<int>((start_speed / 3) * 4);
+    reset_distance_traveled();
+    int last_distance_traveled = avg_distance_traveled;
+    int distance_left_wheel = distance_traveled_L;
+    accelerate_each_wheel_in_curve(speed_L, speed_R);
+    // less than 90 degrees because we do not want to oversteer
+    while(current_angle < (86 - start_angle) || distance_left_wheel < TICKS_INNER_WHEEL){
+        if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
+        last_distance_traveled = avg_distance_traveled; // update the last distance traveled
+        distance_left_wheel = distance_traveled_L - distance_left_wheel;
+        if (current_angle > (67 - start_angle)){
+            // start to accelerate the wheels to the same speed in curve exit
+            accelerate_each_wheel_in_curve(start_speed, start_speed);
+            continue;
+        }
+        accelerate_each_wheel_in_curve(speed_L, speed_R);
+    }
+    reset_distance_traveled();
+    // reset_PID_values();
+}
+
+
+// accelerate each wheel to the desired speed
+void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R){
+    ForwardLeft(calc_duty_correction(desired_speed_L));
+    ForwardRight(calc_duty_correction(desired_speed_R));
+}
 
 // ----------------------------------------------------------------------------------------------------
 // Function to drive to front wall
@@ -511,3 +553,5 @@ void drive_to_wall(){
     pid_move_function(50);
     delay(500);
 }
+
+
