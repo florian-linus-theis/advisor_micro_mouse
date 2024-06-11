@@ -3,7 +3,7 @@
 #include <cmath> // abs()
 #include <vector>
 #include <robin.h>
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 
 int precompute_duty_intervals();
 

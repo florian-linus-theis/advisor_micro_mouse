@@ -6,7 +6,7 @@
 #include <ballgrabber.h>
 #include "display.h"
 #include <movement.h>
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 
 
 // For tracking current global direction

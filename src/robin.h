@@ -1,5 +1,5 @@
 #pragma once
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 #include <display.h>
 
 std::vector<int> determine_correction_needed(){
