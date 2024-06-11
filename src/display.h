@@ -1,5 +1,5 @@
 #pragma once
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 #include <robin.h>
 #include <ballgrabber.h>
 //#include "battery.h"
@@ -186,25 +186,34 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            digitalWrite(MOTOR_ENABLE, LOW); // disable motor
+            timer14->resume();
             start(5); // wait for finger
-            timer14->resume(); // starting systick timer
-            delay(100);
-            // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
             reset_encoders();
             reset_PID_values();
-            delay(50);
-            while(!encoderTurned){
-                drive_forward(350, 350, 2);
-                curve_left();
-            }
+            delay(100);
+            grab_ball();
             stop();
+            delay(100);
+            digitalWrite(MOTOR_ENABLE, HIGH);
+            // timer14->resume(); // starting systick timer
+            // delay(100);
+            // // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
+            // reset_encoders();
+            // reset_PID_values();
+            // delay(50);
+            // while(!encoderTurned){
+            //     drive_forward(350, 350, 2);
+            //     curve_left();
+            // }
+            // stop();
+            // timer14->pause();
+            // // display_print("A* Mode completed");
+            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            // // always keep this last
+            // break;
             timer14->pause();
-            // display_print("A* Mode completed");
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            // always keep this last
             displayOptions(MODE_ASTAR, false);
-            break;
         // default:
         //     display_print("Invalid mode");
         //     break;
