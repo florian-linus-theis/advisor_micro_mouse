@@ -169,18 +169,73 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     //     max_values[5] += Distance_Sensor[5];
     // }
 
-    // // Now Min values front
-    // display_print("Move to CENTER BACK wheels on edge", 1);
-    // digitalWrite(LED_GREEN, HIGH);
-    // start(0);
-    // for(int i=0; i<measurements_maze; i++){
-    //     Distanz_Messung_Sensoren();
-    //     min_values[2] += Distance_Sensor[2];
-    //     min_values[3] += Distance_Sensor[3];
-    //     min_values[6] += Distance_Sensor[6];
-    // }
+   
 
-    // // for ballgrabber calibration while drivig towards ballgrabber
+    // // calculate average by dividing through # of measurements
+    for(int i=0 ; i<7 ; i++){
+        NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(neutral_values[i]) / measurements_maze));
+    }
+
+    //Calibrate max values
+    display_print("Now close to left wall", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start(5);
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        max_occuring_Errors_Vec = calc_max_occuring_Errors();
+        // updating min values
+        min_values[4] += Distance_Sensor[4];
+        min_values[5] += Distance_Sensor[5];
+        max_values[0] += Distance_Sensor[0];
+        max_values[1] += Distance_Sensor[1];
+        // updating pid values
+        for(int i=0; i < ENUM_END;i++){
+          max_values_left[i] = max_values_left[i] + max_occuring_Errors_Vec[i];
+        }
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      max_values_left[i] = max_values_left[i] / measurements_maze;
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      ble->println(max_values_left[i]);
+    }
+
+    display_print("Now close to right wall", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start(0);
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        max_occuring_Errors_Vec = calc_max_occuring_Errors();
+        min_values[0] += Distance_Sensor[0];
+        min_values[1] += Distance_Sensor[1];
+        max_values[4] += Distance_Sensor[4];
+        max_values[5] += Distance_Sensor[5];
+        for(int i=0; i < ENUM_END;i++){
+          max_values_right[i] += max_occuring_Errors_Vec[i];
+        }
+    }
+    for(int i=0; i < ENUM_END; i++){
+      max_values_right[i] = max_values_right[i] / measurements_maze;
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      ble->println(String(i) + " " + String(max_values_right[i]));
+    }
+
+    // Now Min values front
+    display_print("CENTER BACK wheels slightly behind edge", 1);
+    digitalWrite(LED_GREEN, HIGH);
+    start(0);
+    for(int i=0; i<measurements_maze; i++){
+        Distanz_Messung_Sensoren();
+        min_values[2] += Distance_Sensor[2];
+        min_values[3] += Distance_Sensor[3];
+        min_values[6] += Distance_Sensor[6];
+    }
+
+     // // for ballgrabber calibration while drivig towards ballgrabber
     // display_print("Now facing Ballgrabber, finger left", 1);
     // digitalWrite(LED_GREEN, HIGH);
     // start(0);
@@ -205,86 +260,11 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
     //     }
     // }
 
-    // // calculate average by dividing through # of measurements
-    for(int i=0 ; i<7 ; i++){
-        NeutralSensorValues[i] = static_cast<int>(std::round(static_cast<double>(neutral_values[i]) / measurements_maze));
+    // calculate average by dividing through # of measurements
+     for(int i=0 ; i<7 ; i++){
         ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
         MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
         MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
     }
 
-    //Calibrate max values
-    display_print("Now close to left wall", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(5);
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < ENUM_END;i++){
-          max_values_left[i] = max_values_left[i] + max_occuring_Errors_Vec[i];
-        }
-    }
-    for(int i=0; i < ENUM_END; i++){
-      max_values_left[i] = max_values_left[i] / measurements_maze;
-    }
-
-    for(int i=0; i < ENUM_END; i++){
-      ble->println(max_values_left[i]);
-    }
-
-    display_print("Now close to right wall", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(0);
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < ENUM_END;i++){
-          max_values_right[i] += max_occuring_Errors_Vec[i];
-        }
-    }
-    for(int i=0; i < ENUM_END; i++){
-      max_values_right[i] = max_values_right[i] / measurements_maze;
-    }
-
-    for(int i=0; i < ENUM_END; i++){
-      ble->println(String(i) + " " + String(max_values_right[i]));
-    }
-
-    display_print("Now close to start of cell", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(6);
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < ENUM_END;i++){
-          max_values_back[i] += max_occuring_Errors_Vec[i];
-        }
-    }
-    for(int i=0; i < ENUM_END; i++){
-      max_values_back[i] = max_values_back[i] / measurements_maze;
-    }
-
-    for(int i=0; i < ENUM_END; i++){
-      ble->println(String(i) + " " + String(max_values_back[i]));
-    }
-
-    display_print("Now close to front wall", 1);
-    digitalWrite(LED_GREEN, HIGH);
-    start(0);
-    for(int i=0; i<measurements_maze; i++){
-        Distanz_Messung_Sensoren();
-        max_occuring_Errors_Vec = calc_max_occuring_Errors();
-        for(int i=0; i < ENUM_END;i++){
-          max_values_front[i] += max_occuring_Errors_Vec[i];
-        }
-    }
-    for(int i=0; i < ENUM_END; i++){
-      max_values_front[i] = max_values_front[i] / measurements_maze;
-    }
-
-    for(int i=0; i < ENUM_END; i++){
-      ble->println(String(i) + " " + String(max_values_front[i]));
-    }
-
-    //Combine different max-vectors to two final vectors holding all min and max values
 }

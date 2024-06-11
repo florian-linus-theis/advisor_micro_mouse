@@ -122,10 +122,10 @@ void backup_to_wall(){
     reset_distance_traveled();
     delay(20);
     while(current_avg_speed < 0){};
+    delay(50);
     stop();
-    delay(30);
+    delay(50);
     reset_distance_traveled();
-    drive_forward(365, 0, 0.7778); // drive forward to the edge of the cell
 }
 
 // Middle layer function to move forwards
@@ -454,22 +454,17 @@ void rotate_right(){
 // }
 
 void right_turn_around(){
-    disable_PID()
+    disable_PID();
     volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
     current_duty_cycle = DUTY_SLOW_ROTATION;
-    int full_rotation_ticks = tick_rotate * 2;
+    int full_rotation_ticks = tick_rotate * 1.9;
     reset_distance_traveled();
     BackwardRight(DUTY_SLOW_ROTATION + 50); // start moving wheels in opposite directions (turning right)
     ForwardLeft(DUTY_SLOW_ROTATION + 50);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
     while(abs(distance_traveled_R) < full_rotation_ticks && abs(distance_traveled_L) < full_rotation_ticks){
-        if (distance_travelled_right == distance_traveled_R) continue;
-        distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
-        if (abs(distance_traveled_R) > full_rotation_ticks * 0.95 || abs(distance_traveled_L) > full_rotation_ticks * 0.95) {
-            stop();
-            break;
-        }
     }
+    stop();
     delay(200);
     enable_PID();
     reset_distance_traveled();
@@ -523,6 +518,9 @@ void left_curve(int duty_cycle){
 
 void curve_right(){
     int start_speed = current_avg_speed;
+    if (start_speed < 365){
+        start_speed = 365;
+    }
     // trying to fix any angle errors during curve 
     int start_angle = current_angle;
     // speed calculation
@@ -553,6 +551,9 @@ void curve_right(){
 
 void curve_left(){
     int start_speed = current_avg_speed;
+    if (start_speed < 365){
+        start_speed = 380;
+    }
     int start_angle = current_angle;
     int speed_L = static_cast<int>((start_speed / 3) * 1.9);
     int speed_R = static_cast<int>((start_speed / 3) * 4);

@@ -36,6 +36,21 @@ void dfs_mapping(){
     return;
 }
 
+
+void soft_reset(){
+    // iterate through maze and set every location to unvisited
+    for (int i = 0; i < maze.size(); ++i) {
+        for (int j = 0; j < maze[i].size(); ++j) {
+            maze[i][j].set_visited(false);
+            maze[i][j].set_walls({false, false, false, false});
+        }
+    }
+    if (BALLGREIFER == true) {
+        initialize_maze_with_ballgreifer();
+    }
+    MAPPING_COMPLETE = false;
+}
+
 void bfs_algorithm(){
     if (MAPPING_COMPLETE == false) {
         display->clearDisplay();

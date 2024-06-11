@@ -47,7 +47,6 @@ void Systick_Interrupt() {
   PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
   PID_values = determine_correction_needed();
   calc_average_PID_values();
-  ble->println(remapped_error[CURRENT_CASE_PID]);
   counter++;
 }
 

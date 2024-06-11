@@ -128,13 +128,11 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
-            timer14->resume(); // starting systick timer
-            delay(1000);
-            SET_PID_MANUALLY = false;
-            while(encoderTurned == false){}
-            delay(1000);
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            timer14->pause(); // stopping systick timer
+            // execute soft reset
+            soft_reset();
+            delay(1000); // Delay to allow the user to read the message
+            display_print("Soft Reset completed");
+            delay(1000); // Delay to allow the user to read the message
             // always keep this last
             displayOptions(MODE_SOFT_RESET, false);
             break;
@@ -151,23 +149,12 @@ void handleModeSelection(Mode mode) {
             display_print("DFS Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             timer14->resume(); // starting systick timer
-            delay(1000);
-            start(5);
-            SET_PID_MANUALLY = false;
             reset_encoders();
             reset_PID_values();
-            move_forward_mapping(6);
-            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
-            rotate_right();
-            move_forward_mapping(1);
-            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
-            rotate_right();
-            move_forward_mapping(3);
-            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
-            rotate_right();
-            move_forward_mapping(1);
-            move_forward_mapping(1);
-            ble->println("Current Position: " "(" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+            delay(100);
+            start(5);
+            dfs_mapping(); // start mapping maze
+            delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             delay(200);
@@ -185,10 +172,11 @@ void handleModeSelection(Mode mode) {
             reset_encoders();
             reset_PID_values();
             delay(50);
-            drive_forward(365, 365, 1); // drive forward one cell
-            ble->println("backing up to wall");
-            backup_to_wall(); // backup to wall
-            delay(500);
+            while(!encoderTurned){
+                backup_to_wall(); // backup to wall
+                drive_forward(365, 365, 0.778); // drive forward one cell
+            }
+            delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             //Imperial_March();

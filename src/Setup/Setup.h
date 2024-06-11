@@ -325,3 +325,6 @@ extern void grab_ball();
 extern std::vector<int> cur_position;
 extern int cur_direction;
 extern void move_forward_mapping(int);	
+
+// softreset
+extern void soft_reset();
