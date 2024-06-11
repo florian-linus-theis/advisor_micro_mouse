@@ -19,6 +19,7 @@ std::vector<int> max_values_front(ENUM_END, 0);
 std::vector<int> max_values_back(ENUM_END, 0);
 std::vector<int> max_values_lower_boundary(ENUM_END, 0);
 std::vector<int> max_values_upper_boundary(ENUM_END, 0);
+std::vector<int> correction_offset(ENUM_END,0);
 
 std::vector<int> max_occuring_Errors_Vec(ENUM_END, 0);
 
@@ -94,7 +95,7 @@ void printDistanzSensoren(void) {
 
 std::vector<int> calc_max_occuring_Errors(){
     Distanz_Messung_Sensoren();
-    std::vector<int> Error_Measurment(12,0);
+    std::vector<int> Error_Measurment(ENUM_END,0);
     for(int i=0; i < ENUM_END; i++){
         Error_Measurment[i] = calcError(i);
     }
@@ -198,10 +199,6 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
       max_values_left[i] = max_values_left[i] / measurements_maze;
     }
 
-    for(int i=0; i < ENUM_END; i++){
-      ble->println(max_values_left[i]);
-    }
-
     display_print("Now close to right wall", 1);
     digitalWrite(LED_GREEN, HIGH);
     start(0);
@@ -224,6 +221,19 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
       ble->println(String(i) + " " + String(max_values_right[i]));
     }
 
+    //Compose needed upper- and loewer boundarys
+    max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
+    max_values_upper_boundary[X_ERROR] = max_values_right[X_ERROR];
+
+    max_values_lower_boundary[Y_ERROR] = max_values_front[Y_ERROR];
+    max_values_upper_boundary[Y_ERROR] = max_values_back[Y_ERROR];
+
+    max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_left[X_ERROR_LEFT_WALL_ONLY];
+    max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY];
+
+    max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_left[X_ERROR_RIGHT_WALL_ONLY];
+    max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY];
+
     // Now Min values front
     display_print("CENTER BACK wheels slightly behind edge", 1);
     digitalWrite(LED_GREEN, HIGH);
@@ -233,7 +243,19 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         min_values[2] += Distance_Sensor[2];
         min_values[3] += Distance_Sensor[3];
         min_values[6] += Distance_Sensor[6];
+
+        for(int i=0; i < ENUM_END;i++){
+          correction_offset[i] += give_percent(calcError(i),max_values_lower_boundary[i],max_values_upper_boundary[i]);
+        }
     }
+
+    for(int i=0; i < ENUM_END; i++){
+      correction_offset[i] = correction_offset[i] / measurements_maze;
+    }
+
+    for(int i=0; i < ENUM_END; i++){
+      ble->println("E" + String(i) + " " + String(correction_offset[i]));
+
 
      // // for ballgrabber calibration while drivig towards ballgrabber
     // display_print("Now facing Ballgrabber, finger left", 1);
@@ -266,5 +288,5 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
         MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
     }
-
+  }
 }

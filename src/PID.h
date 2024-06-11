@@ -144,9 +144,7 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
-        max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
-        max_values_upper_boundary[X_ERROR] = max_values_right[X_ERROR];
-        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) -7;
+        remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) - correction_offset[X_ERROR];
         output_G = applyPID(remapped_error[X_ERROR], 0.3, 0.0003, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
@@ -155,8 +153,6 @@ std::vector<int> calc_correction(int PID_case){
 
     case Y_ERROR:
         max_correction_speed = default_max_correction_speed_y;
-        max_values_lower_boundary[Y_ERROR] = max_values_front[Y_ERROR];
-        max_values_upper_boundary[Y_ERROR] = max_values_back[Y_ERROR];
         remapped_error[Y_ERROR] = give_percent(calcError(Y_ERROR),max_values_lower_boundary[Y_ERROR],max_values_upper_boundary[Y_ERROR]);
         output_G = applyPID(remapped_error[Y_ERROR], 2, 0, 0); // 0.8,0.0005,0.01
         // ble->println(integral);
@@ -167,9 +163,7 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
-        max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_left[X_ERROR_LEFT_WALL_ONLY];
-        max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY] = max_values_right[X_ERROR_LEFT_WALL_ONLY]-100;
-        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) +59;
+        remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) - correction_offset[X_ERROR_LEFT_WALL_ONLY];
         output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.3, 0.0003, 0.001); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
@@ -178,9 +172,7 @@ std::vector<int> calc_correction(int PID_case){
 
     case X_ERROR_RIGHT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
-        max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_left[X_ERROR_RIGHT_WALL_ONLY];
-        max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY] = max_values_right[X_ERROR_RIGHT_WALL_ONLY]-100;
-        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) -68;
+        remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) - correction_offset[X_ERROR_RIGHT_WALL_ONLY];
         output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.3, 0.0003, 0.001);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
@@ -240,7 +232,7 @@ std::vector<bool> find_walls(){
 std::vector<bool> find_walls_forward_looking(){
     std::vector<bool> wallsVec = {false, false, false, false};
     // Left Wall Sensors:
-    if((Distance_Sensor[0] > MinSensorValues[0] && Distance_Sensor[1] > MinSensorValues[1] * 0.7) || (Distance_Sensor[0] > MinSensorValues[0] * 0.7 && Distance_Sensor[1] > MinSensorValues[1])){ 
+    if((Distance_Sensor[0] > MinSensorValues[0] * 0.9 && Distance_Sensor[1] > MinSensorValues[1] * 0.7) || (Distance_Sensor[0] > MinSensorValues[0] * 0.7 && Distance_Sensor[1] > MinSensorValues[1] * 0.9)){ 
         wallsVec[3] = true;
     }
     // Front Wall: either front and front-right or front and front-left 
@@ -248,7 +240,7 @@ std::vector<bool> find_walls_forward_looking(){
         wallsVec[0] = true;
     }
     // Right Wall: both left and right sensor must be above threshold
-    if((Distance_Sensor[5] > MinSensorValues[5] && Distance_Sensor[4] > MinSensorValues[4] * 0.7)|| (Distance_Sensor[5] > MinSensorValues[5] * 0.7 && Distance_Sensor[4] > MinSensorValues[4])) { 
+    if((Distance_Sensor[5] > MinSensorValues[5] * 0.9 && Distance_Sensor[4] > MinSensorValues[4] * 0.7)|| (Distance_Sensor[5] > MinSensorValues[5] * 0.7 && Distance_Sensor[4] > MinSensorValues[4] * 0.9)) { 
         wallsVec[1] = true;
     }
     return wallsVec;

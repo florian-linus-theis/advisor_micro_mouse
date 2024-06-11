@@ -28,11 +28,11 @@ void dfs_mapping(){
         return;
     } 
     cur_position = {0,0}; // Set the current position to the start position
+    cur_direction = 0; // Set the current direction to north
     ble->println("Mapping maze using DFS");	
     dfs_map_maze(); // Mapping the maze using depth-first search 
     set_dir(0); // Reset heading to north
     display_print("Mapping complete");
-    ble->println("Mapping complete");
     return;
 }
 
