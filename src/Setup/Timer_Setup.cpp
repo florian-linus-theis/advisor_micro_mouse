@@ -72,8 +72,8 @@ void internal_clock_setup(){
 
 
 void Systick_Setup(void) {  //Systick Timer Setup
-    timer14->setPrescaleFactor(30);          // Set prescaler to 122000
-    timer14->setOverflow(32535);                 // Set overflow to 65535 = 2 ms intervals
+    timer14->setPrescaleFactor(84);          //set prescaler so that 1 tick equals 1us
+    timer14->setOverflow(4000);                 // Set overflow to 4000 = 4 ms intervals
     timer14->attachInterrupt(Systick_Interrupt);  
     timer14->refresh();
     timer14->pause();
@@ -215,7 +215,7 @@ void Timer10_Setup() {      //Servo1 PWM TImer
 
 void Timer1_Setup() {       //Buzzer PWM TImer
     timer1->setMode(4, TIMER_OUTPUT_COMPARE_PWM1, BUZZER);
-    timer1->setPrescaleFactor(186);    // Set prescaler so that 1 tick equals 1us
+    timer1->setPrescaleFactor(168);    // Set prescaler so that 1 tick equals 1us
     //freq = 1/T = 1/(Overflow*1us)
     //Overflow = 1/(freq*1us) = 100000/freq
     int freq = 2000;
