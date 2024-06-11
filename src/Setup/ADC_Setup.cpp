@@ -1,4 +1,4 @@
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 
 
 void ADC_Setup() {

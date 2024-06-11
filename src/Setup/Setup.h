@@ -199,8 +199,6 @@ extern HardwareTimer *timer1;
 extern HardwareTimer *timer7;
 
 extern void Timer_Setup(void);
-extern void Timer4_Setup_Motor(void); // needed for manual resetting of the motor timers after ballgrabbing
-extern void Timer4_Setup_Servo(void); // needed for manual setting of the servo timer after driving to the ball
 extern void set_Interrupt_Priority(void);
 
 
@@ -233,6 +231,8 @@ extern void ForwardLeft(int);
 extern void ForwardRight(int);
 extern void BackwardLeft(int);
 extern void BackwardRight(int);
+extern void ForwardBoth(int);
+extern void BackwardBoth(int);
 extern void rotate_left();
 extern void rotate_right();
 extern void turn_around_right();

@@ -1,4 +1,4 @@
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 
 /*
 Clock Overview:
@@ -16,7 +16,7 @@ HardwareTimer *timer4 = new HardwareTimer(TIM4);
 HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer5 = new HardwareTimer(TIM5);
 HardwareTimer *timer6 = new HardwareTimer(TIM6);
-//HardwareTimer *timer10 = new HardwareTimer(TIM10);
+HardwareTimer *timer10 = new HardwareTimer(TIM10);
 HardwareTimer *timer1 = new HardwareTimer(TIM1);
 HardwareTimer *timer7 = new HardwareTimer(TIM7);
 
@@ -24,8 +24,7 @@ HardwareTimer *timer7 = new HardwareTimer(TIM7);
 void internal_clock_setup();
 void Systick_Setup();
 void Timer3_Setup();
-void Timer4_Setup_Motor();
-void Timer4_Setup_Servo();
+void Timer4_Setup();
 void Timer2_Setup();
 void Timer5_Setup();
 void Timer6_Setup();
@@ -38,8 +37,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
 
     //Motor Timers
     Timer3_Setup();         //PWM Timer Left        
-    Timer4_Setup_Motor();   //PWM Timer Right 
-  //Timer4_Setup_Servo();   //PWM Timer Servo   
+    Timer4_Setup();         //PWM Timer Right   
     Timer2_Setup();         //Encoder Timer Left
     Timer5_Setup();         //Encoder Timer Right
 
@@ -48,7 +46,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     
 
     //Servo1 PWM Timer
-    //Timer10_Setup();                        //CHECK WHY NOT WORKING ?!
+    Timer10_Setup();
 
     //Buzzer PWM and Delay Timer
     Timer1_Setup();
@@ -74,8 +72,8 @@ void internal_clock_setup(){
 
 
 void Systick_Setup(void) {  //Systick Timer Setup
-    timer14->setPrescaleFactor(30);          // Set prescaler to 122000
-    timer14->setOverflow(32535);                 // Set overflow to 65535 = 2 ms intervals
+    timer14->setPrescaleFactor(84);          //set prescaler so that 1 tick equals 1us
+    timer14->setOverflow(4000);                 // Set overflow to 4000 = 4 ms intervals
     timer14->attachInterrupt(Systick_Interrupt);  
     timer14->refresh();
     timer14->pause();
@@ -97,8 +95,7 @@ void Timer3_Setup() {   // Motor PWM Left
 
 
 // Timer 4 setup for motor PWM Right
-void Timer4_Setup_Motor() {   // Motor PWM Right
-    timer4->pause(); // Pause the timer while (re-)configuring
+void Timer4_Setup() {   // Motor PWM Right
     timer4->setMode(2, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_1);
     timer4->setMode(1, TIMER_OUTPUT_COMPARE_PWM2, MOTOR_RIGHT_PWM_2);
     timer4->setPrescaleFactor(8);
@@ -108,28 +105,6 @@ void Timer4_Setup_Motor() {   // Motor PWM Right
     timer4->refresh();
     timer4->resume();
 }
-
-
-
-// Timer4 calculations
-const uint16_t PRESCALER = 1680 - 1; // Prescaler to get 100 kHz timer frequency
-const uint16_t PERIOD = 2000 - 1; // Period to get 50 Hz PWM frequency
-
-
-
-// Timer 4 setup for servo ballgrabber
-void Timer4_Setup_Servo() {      //Servo1 PWM TImer
-    timer4->pause(); // Pause the timer while (re-)configuring
-    timer4->setMode(3, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1); // Channel 1 for PB8
-    timer4->setPrescaleFactor(PRESCALER); // Set prescaler to divide by 1680
-    timer4->setOverflow(PERIOD); // Set overflow to 2000 for 50 Hz PWM
-    // Configure PWM mode on channel 3
-    timer4->setCaptureCompare(3, 500, MICROSEC_COMPARE_FORMAT); // 500 is Initial pulse width for having it directly in front of mouse (saves time)
-    // Refresh and start the timer
-    timer4->refresh();
-    timer4->resume(); // Start the timer
-}
-
 
 
 void Timer2_Setup(void) {                // Konfiguration für PB3 und PA15
@@ -210,18 +185,37 @@ void Timer6_Setup(void) {   //Main Infrared Sensor Interrupt Timer
 
 
 void Timer10_Setup() {      //Servo1 PWM TImer
-    // timer10->setMode(1, TIMER_OUTPUT_COMPARE_PWM1, SERVO_PWM_1); -- broken as fuck
-    timer10->setPrescaleFactor(26); // Set prescaler to 26
-    timer10->setOverflow(64615); // Set overflow to 64615
-    timer10->setCaptureCompare(1, 0, PERCENT_COMPARE_FORMAT);
-    timer10->refresh();
-    timer10->resume();
+    // Takt für GPIOB und Timer 10 aktivieren
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOBEN;
+    RCC->APB2ENR |= RCC_APB2ENR_TIM10EN;
+
+    // GPIOB Pin PB8 als Alternate Function konfigurieren
+    GPIOB->MODER &= ~(3 << (8 * 2));    // Lösche die aktuellen Modi für PB8
+    GPIOB->MODER |= (2 << (8 * 2));     // Setze PB8 auf Alternate Function Modus
+    GPIOB->AFR[1] &= ~(0xF << ((8 - 8) * 4)); // Lösche die aktuellen Alternate Function Einstellungen für PB8
+    GPIOB->AFR[1] |= (3 << ((8 - 8) * 4));    // Setze Alternate Function 3 (AF3) für PB8
+
+    // Timer 10 konfigurieren
+    TIM10->PSC = 168 - 1;           // Setze den Prescaler auf 168 (PSC Wert ist Prescaler - 1) -> 1 Tick / uS
+    TIM10->ARR = 20000;             // Setze den Auto-Reload-Wert auf 2000
+    TIM10->CCR1 = 0;              // Setze den Capture/Compare-Wert für Kanal 1 auf 0 (initial 0% Duty Cycle)
+
+    // PWM Mode 1 für Kanal 1 konfigurieren
+    TIM10->CCMR1 &= ~TIM_CCMR1_OC1M;          // Lösche die OC1M Bits
+    TIM10->CCMR1 |= (6 << TIM_CCMR1_OC1M_Pos);// Setze PWM Mode 1 (110) für OC1M Bits
+    TIM10->CCMR1 |= TIM_CCMR1_OC1PE;          // Output Compare 1 preload enable
+
+    // Capture/Compare 1 Output Enable
+    TIM10->CCER |= TIM_CCER_CC1E;
+
+    // Timer 10 starten
+    TIM10->CR1 |= TIM_CR1_CEN;    // Timer starten
 }
 
 
 void Timer1_Setup() {       //Buzzer PWM TImer
     timer1->setMode(4, TIMER_OUTPUT_COMPARE_PWM1, BUZZER);
-    timer1->setPrescaleFactor(186);    // Set prescaler so that 1 tick equals 1us
+    timer1->setPrescaleFactor(168);    // Set prescaler so that 1 tick equals 1us
     //freq = 1/T = 1/(Overflow*1us)
     //Overflow = 1/(freq*1us) = 100000/freq
     int freq = 2000;

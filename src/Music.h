@@ -1,5 +1,5 @@
 #pragma once
-#include "Setup\Setup.h"
+#include "Setup/Setup.h"
 
 
 //frequencies
