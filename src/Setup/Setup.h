@@ -145,6 +145,8 @@ extern std::vector<int> calc_max_occuring_Errors();
 extern bool PID_ENABLED;
 extern void enable_PID();
 extern void disable_PID();
+extern std::vector<int> correction_offset;
+extern double give_percent(double, int, int);
 
 enum PID_CASES{
     X_ERROR = 0,

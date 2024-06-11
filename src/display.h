@@ -138,7 +138,7 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
-            digitalWrite(MOTOR_ENABLE, LOW); //enable motor
+            digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
             getBattery();
             drawBatteryStatus();
             delay(3000);
@@ -172,10 +172,7 @@ void handleModeSelection(Mode mode) {
             reset_encoders();
             reset_PID_values();
             delay(50);
-            while(!encoderTurned){
-                backup_to_wall(); // backup to wall
-                drive_forward(365, 365, 0.778); // drive forward one cell
-            }
+            drive_forward(350, 0, 2);
             delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
