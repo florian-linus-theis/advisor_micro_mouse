@@ -226,7 +226,7 @@ std::vector<bool> find_walls(){
         wallsVec[3] = true;
     }
     // Front Wall
-    if(Distance_Sensor[6] > MinSensorValues[6]){ // 70 und 150
+    if(Distance_Sensor[6] > MinSensorValues[6] && (Distance_Sensor[2] > MinSensorValues[2] || Distance_Sensor[3] > MinSensorValues[3])){ // 70 und 150
         wallsVec[0] = true;
     }
 
@@ -234,6 +234,23 @@ std::vector<bool> find_walls(){
         wallsVec[1] = true;
     }
 
+    return wallsVec;
+}
+
+std::vector<bool> find_walls_forward_looking(){
+    std::vector<bool> wallsVec = {false, false, false, false};
+    // Left Wall Sensors:
+    if((Distance_Sensor[0] > MinSensorValues[0] && Distance_Sensor[1] > MinSensorValues[1] * 0.7) || (Distance_Sensor[0] > MinSensorValues[0] * 0.7 && Distance_Sensor[1] > MinSensorValues[1])){ 
+        wallsVec[3] = true;
+    }
+    // Front Wall: either front and front-right or front and front-left 
+    if(Distance_Sensor[6] > MinSensorValues[6] && ( Distance_Sensor[2] > MinSensorValues[2] || Distance_Sensor[3] > MinSensorValues[3])){ 
+        wallsVec[0] = true;
+    }
+    // Right Wall: both left and right sensor must be above threshold
+    if((Distance_Sensor[5] > MinSensorValues[5] && Distance_Sensor[4] > MinSensorValues[4] * 0.7)|| (Distance_Sensor[5] > MinSensorValues[5] * 0.7 && Distance_Sensor[4] > MinSensorValues[4])) { 
+        wallsVec[1] = true;
+    }
     return wallsVec;
 }
 

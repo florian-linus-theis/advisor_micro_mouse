@@ -28,8 +28,12 @@ std::stack<int> dir_stack;
 // This process repeats until all reachable locations in the maze have been visited.
 
 void dfs_map_maze() {
+    if (encoderTurned == true) {
+        return;
+    }
     Location& cur_loc = maze[cur_position[0]][cur_position[1]]; // Create a reference to the current location object for easier reference (added)
     ble->println("Current Cell: (" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+    ble->println("Current Direction: " + String(cur_direction));
 
     if (!cur_loc.visited) { // If current location has not been visited
         cur_loc.set_visited(true); // Mark location as visited
@@ -68,9 +72,9 @@ void dfs_map_maze() {
         if (loc_stack.empty()) {
             // if we are not at the origin yet, we move back and try again
             if (!(cur_position == std::vector<int>{0, 0})) {
-                set_dir((dir_stack.top() + 2) % 4); // Turn around and follow direction stack in reverse order
+                set_dir_fast_mapping((dir_stack.top() + 2) % 4); // Turn around and follow direction stack in reverse order
                 dir_stack.pop(); // Remove top element (added)
-                move_forward_mapping(); // muss raus für fast movememt
+                // move_forward_mapping(); // muss raus für fast movememt
                 dfs_map_maze(); // Try to move again, recursive
             }
             return;
@@ -84,14 +88,14 @@ void dfs_map_maze() {
 
     // If I can move to that location from where I am, turn toward new location, save that direction, and move forward
     if (cur_loc.can_move_to(next_loc)) {
-        turn_toward(next_loc);
+        turn_toward_fast_mapping(next_loc);
         dir_stack.push(cur_direction); // Save current direction for backtracking on the direction stack
-        move_forward_mapping(); // muss raus für fast movement
+        // move_forward_mapping(); // muss raus für fast movement
     } else { // Put the target location back on the loc_stack, back up one square, then try again
         loc_stack.push(next_loc);
-        set_dir((dir_stack.top() + 2) % 4); // Turn toward last position
+        set_dir_fast_mapping((dir_stack.top() + 2) % 4); // Turn toward last position
         dir_stack.pop(); // Remove top element (added)
-        move_forward_mapping(); // muss raus für fast movement
+        // move_forward_mapping(); // muss raus für fast movement
     }
     dfs_map_maze(); // Try to move again
 }

@@ -42,7 +42,7 @@ void update_direction(int turn_direction) {
 // returns values relative to direction we come from
 std::vector<bool> get_walls() {
     std::vector<bool> walls_absolute(4, false); // initializing list containing 4 walls each to be false by default
-    std::vector<bool> walls_relative_cur_dir = find_walls(); // initializing list containing 4 walls each to be false by default
+    std::vector<bool> walls_relative_cur_dir = find_walls_forward_looking(); // initializing list containing 4 walls each to be false by default
     // Check for walls in each direction independent of the current direction 
     walls_absolute[cur_direction] = walls_relative_cur_dir[0]; // Is there a wall in front
     walls_absolute[(cur_direction + 1) % 4] = walls_relative_cur_dir[1]; // Is there a wall to the right
@@ -81,20 +81,17 @@ void move_forward_mapping(int squares = 1){
 }
 
 void move_forward_mapping_fast(int squares = 1){
-    move_forward_different(DUTY_SLOW, DUTY_SLOW, squares);
+    if (cur_position == std::vector<int>{0, 0}) {
+        if (cur_direction == 0){
+            drive_forward(365, 365, 0.7778); // drive forward until edge of the cell 
+            update_position();
+        } else {
+            backup_to_wall();   
+        }
+        return;
+    }
+    drive_forward(365, 365, squares);
     update_position();
-}
-
-// Function to take all actions to turn left and update belief state
-void fast_turn_left() {
-    left_curve(DUTY_FAST_CURVE);
-    update_direction(-1);  // We are turning left
-}
-
-// Function to take all actions to turn right and update belief state
-void fast_turn_right() {
-    right_curve(DUTY_FAST_CURVE);
-    update_direction(+1);  // We are turning right
 }
 
 void turn_right(){
@@ -104,8 +101,9 @@ void turn_right(){
 }
 
 void fast_turn_right(){
-    right_curve(DUTY_SLOW);
+    curve_right();
     update_direction(1);
+    update_position();
 }
 
 
@@ -115,8 +113,9 @@ void turn_left(){
 }
 
 void fast_turn_left(){
-    left_curve(DUTY_SLOW);
+    curve_left();
     update_direction(-1);
+    update_position();
 }
 
 void turn_around(){
@@ -125,24 +124,24 @@ void turn_around(){
 }
 
 
-void turn_around_fast_mapping(){
-    // brake 
-    stop();
-    delay(300);
-    // position to wall using y-error
-    // evtl zur wand fahren und von da aus wieder los
-    recalibrate_front_wall();
-    // turning around
-    turn_around_right();
-    // drive back to edge of next square 
-    move_forward_mapping_fast();
-}
+// void turn_around_fast_mapping(){
+//     // brake 
+//     stop();
+//     delay(300);
+//     // position to wall using y-error
+//     // evtl zur wand fahren und von da aus wieder los
+//     recalibrate_front_wall();
+//     // turning around
+//     turn_around_right();
+//     // drive back to edge of next square 
+//     move_forward_mapping_fast();
+// }
 
 void turn_around_and_back_up(){
     backup_to_wall();
     update_direction(+2);
-    drive_forward(365, 365, 0.933); // 93.3% is distance from wall to edge of cell 
     update_position();
+    drive_forward(365, 365, 0.7778); // drive forward to the edge of the cell
 }
 
 
@@ -168,14 +167,14 @@ void set_dir_fast_mapping(int _dir) {
         return;
     }
     if (_dir == (cur_direction + 1) % 4) {  // If need to turn right once
-        right_curve(DUTY_SLOW);
+        fast_turn_right();
         return;
     }
     if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
-        turn_around();
+        turn_around_and_back_up();
         return;
     }
-    left_curve(DUTY_SLOW);  // If need to turn left once
+    fast_turn_left();  // If need to turn left once
 }
 
 
