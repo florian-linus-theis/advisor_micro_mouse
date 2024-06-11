@@ -36,6 +36,7 @@ enum Frequencies {
     e5 = 659,
     es5 = 622,
     c5 = 523,
+    h4 = 493,
     as4 = 415,
     pa = 0
 };
@@ -48,6 +49,11 @@ double PA = 281/1.5;    //punktierte achtel
 double A = 187/1.5;     //achtel
 double S = 93/1.5;      //sechzehntel
 
+double VT = 250/1.5;    //Viertel triole
+double SQ = 75/1.5;     //Sechzehntel Quintole
+double ST = 63/1.5;     //Sechzehntel Triole
+
+
 //pause
 double U = 360/1.5;
 double Z = 270/1.5;
@@ -55,6 +61,11 @@ double L = 180/1.5;
 double X = 135/1.5;
 double M = 90/1.5;
 double K = 45/1.5;
+
+double VTP = 60/1.5;
+double SQP = 36/1.5;
+double STP = 30/1.5;
+
 
 //Running in the 90s------------------------------------------------
 
@@ -388,13 +399,46 @@ void G_beat10(){
         }
 }
 void G_beat11(){
-        int G_beat11 [] {};
-        double G_length11 [] {};
-        double G_pause11 [] {};
+        int G_beat11 []      {es6, b6, as6, cis7, b6, as6, cis7, b6, es6, h5, es6, h5, b6, es6, h5, es6, h5, ges6, des6};
+        double G_length11 [] {V, V, A, S, A, S, S, S, A, S, S, S, S, A, S, S, S, S, A, A};
+        double G_pause11 []  {L, L, M, K, M, K, K, K, M, K, K, K, K, M, K, K, K, K, M, M};
 
          for(int i = 0; i < sizeof(G_beat11) / sizeof(G_beat11[0]); i++){
         Buzzer_beep(G_beat11[i], 1, G_length11[i]);
         delay(G_pause11[i]);
+        }
+}
+
+void G_beat12(){
+        int G_beat12 []      {as6, ges6, f6, es6, as6, ges6, f6, es6, as6, ges6, f6, es6, as6, ges6, f6, es6};
+        double G_length12 [] {S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S, S};
+        double G_pause12 []  {K, K, K, K, K, K, K, K, K, K, K, K, K, K, K, K, K, K, K, K};
+
+         for(int i = 0; i < sizeof(G_beat12) / sizeof(G_beat12[0]); i++){
+        Buzzer_beep(G_beat12[i], 1, G_length12[i]);
+        delay(G_pause12[i]);
+        }
+}
+
+void G_beat13(){
+        int G_beat13 []      {b6, ges6, f6, b6, ges6, f6, b6, ges6, f6, b6, ges6, f6, as7, ges7, f7, dis7, cis7, as7, ges7, f7, dis7, cis7};
+        double G_length13 [] {ST, ST, ST, ST, ST, ST, ST, ST, ST, ST, ST, ST, SQ, SQ, SQ, SQ, SQ, SQ, SQ, SQ, SQ, SQ};
+        double G_pause13 []  {STP, STP, STP, STP, STP, STP, STP, STP, STP, STP, STP, STP, SQP, SQP, SQP, SQP, SQP, SQP, SQP, SQP, SQP, SQP};
+
+         for(int i = 0; i < sizeof(G_beat13) / sizeof(G_beat13[0]); i++){
+        Buzzer_beep(G_beat13[i], 1, G_length13[i]);
+        delay(G_pause13[i]);
+        }
+}
+
+void G_beat14(){
+        int G_beat14 []      {as6, des6, des6, ges6, des6, des6, f6, b5, b5, b5, b5, es6, b5, b5, ges6, f6, f6, ges5, h4, h4, ges5, h4, h4, ges5, ges6, ges6, ges6, ges7, ges7, ges7};
+        double G_length14 [] {A, S, S, A, S, S, A, S, S, S, S, A, S, S, A, H, V, A, A, A, A, A, A, V, VT, VT, VT, VT, VT, VT};
+        double G_pause14 []  {M, K, K, M, K, K, M, K, K, K, K, M, K, K, M, U, L, M, M, M, M, M, M, L, VTP, VTP, VTP, VTP, VTP, VTP};
+
+         for(int i = 0; i < sizeof(G_beat14) / sizeof(G_beat14[0]); i++){
+        Buzzer_beep(G_beat14[i], 1, G_length14[i]);
+        delay(G_pause14[i]);
         }
 }
 
@@ -415,6 +459,9 @@ void Gas_song(){
         G_beat10();
         G_beat9();
         G_beat10();
+        G_beat11();
+        G_beat12();
+        G_beat13();
         G_beat0();
         G_beat1();
         G_beat0();
