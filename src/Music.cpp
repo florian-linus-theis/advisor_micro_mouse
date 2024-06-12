@@ -1,4 +1,3 @@
-#pragma once
 #include "Setup\Setup.h"
 
 
@@ -410,9 +409,11 @@ void Running_in_the_90s(){
     note_cnt = 0;
     beat_cnt = 0;
     bool SONG_COMPLETE = false;
+    SETUP_COMPLETE = false;
     timer8->setCount(0);
     timer8->refresh();
     timer8->resume();
+    SETUP_COMPLETE = true;
 
     while (!SONG_COMPLETE);
     timer8->pause();
