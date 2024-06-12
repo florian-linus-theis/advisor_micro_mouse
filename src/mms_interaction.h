@@ -171,8 +171,16 @@ void set_dir_fast_mapping(int _dir) {
         return;
     }
     if (_dir == (cur_direction + 2) % 4) {  // If need to turn around
-        turn_around_and_back_up();
-        return;
+        if (maze[cur_position[0]][cur_position[1]].walls[cur_direction]) {
+            turn_around_and_back_up();
+            return;
+        } else {
+            drive_forward(365, 0, 0.5);
+            right_turn_around();
+            update_direction(+2);
+            update_position();
+            drive_forward(365, 365, 0.5);
+        }
     }
     fast_turn_left();  // If need to turn left once
 }
