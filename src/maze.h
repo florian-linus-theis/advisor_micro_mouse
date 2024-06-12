@@ -6,7 +6,6 @@
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
-
 // Initialize the maze with Location objects
 // maze is a global variable so no need to pass it here
 void initialize_maze(){
@@ -63,3 +62,42 @@ void maze_setup(){
         initialize_maze_with_ballgreifer();
     }
 }
+
+void safeMazeToFlash(const std::vector<std::vector<Location>>& maze, int baseAddress) {
+    // Store the dimensions first
+    int height = maze.size();
+    int width = maze[0].size();
+    EEPROM.put(baseAddress, height);
+    baseAddress += sizeof(height);
+    EEPROM.put(baseAddress, width);
+    baseAddress += sizeof(width);
+
+    // Store each Location object
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            maze[i][j].serialize(baseAddress);
+        }
+    }
+    EEPROM.commit();
+}
+
+void loadMazeFromFlash(std::vector<std::vector<Location>>& maze, int baseAddress) {
+    int height;
+    int width;
+
+    // Read the dimensions first
+    EEPROM.get(baseAddress, height);
+    baseAddress += sizeof(height);
+    EEPROM.get(baseAddress, width);
+    baseAddress += sizeof(width);
+
+    maze.resize(height, std::vector<Location>(width));
+
+    // Read each Location object
+    for (int i = 0; i < height; ++i) {
+        for (int j = 0; j < width; ++j) {
+            maze[i][j].deserialize(baseAddress);
+        }
+    }
+}
+

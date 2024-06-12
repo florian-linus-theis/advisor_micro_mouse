@@ -13,6 +13,7 @@
 #include "./location.h"
 #include <stm32f4xx_hal.h> //probably not neccessary
 
+
 //Pin Naming
 //System
 #define POWER_ENABLE    PC10  //Main Power Latch - enable directly after startup to keep Robot ON
@@ -330,3 +331,10 @@ extern void move_forward_mapping(int);
 
 // softreset
 extern void soft_reset();
+
+//Flash Memory 
+extern const int baseAddress = 0; // Address for storing Maze on Flash 
+extern void safeMazeToFlash(const std::vector<std::vector<Location>>&, int); 
+extern void loadMazeFromFlash(std::vector<std::vector<Location>>&, int);
+extern bool MAPPING_COMPLETE; 
+   

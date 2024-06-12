@@ -33,6 +33,9 @@ void dfs_mapping(){
     dfs_map_maze(); // Mapping the maze using depth-first search 
     set_dir(0); // Reset heading to north
     display_print("Mapping complete");
+    delay(2000);
+    
+    safeMazeToFlash(maze, baseAddress);
     return;
 }
 

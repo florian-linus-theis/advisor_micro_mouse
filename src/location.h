@@ -2,11 +2,12 @@
 #pragma once
 #include <vector>
 #include <iostream>
+#include <FlashStorage_STM32.hpp>
 
 
 class Location {
     public:
-    std::vector<bool> walls; // list of 4 booleans (north, east, south, west)
+    std::array<bool, 4> walls; // list of 4 booleans (north, east, south, west)
     std::vector<int> position; // order pair list [x, y]
     bool visited; // boolean if the location has been visited
     bool ballgreifer;
@@ -19,6 +20,34 @@ class Location {
             position[1] = pos[1];
         }
     }
+    // Serialization method
+    void serialize(int& address) const {
+        for (bool wall : walls) {
+            EEPROM.put(address, wall);
+            address += sizeof(wall);
+        }
+        for (int pos : position) {
+            EEPROM.put(address, pos);
+            address += sizeof(pos);
+        }
+        EEPROM.put(address, visited);
+        address += sizeof(visited);
+    }
+
+    // Deserialization method
+    void deserialize(int& address) {
+        for (bool& wall : walls) {
+            EEPROM.get(address, wall);
+            address += sizeof(wall);
+        }
+        for (int& pos : position) {
+            EEPROM.get(address, pos);
+            address += sizeof(pos);
+        }
+        EEPROM.get(address, visited);
+        address += sizeof(visited);
+    }
+
 
     // takes position as order pair list [x, y]
     void set_position(std::vector<int> pos) {
@@ -27,7 +56,7 @@ class Location {
     }
 
     // takes walls as list of 4 booleans, e.g. [true, false, true, false] and updates walls property
-    void set_walls(std::vector<bool> walls) {
+    void set_walls(std::array<bool, 4> walls) {
         this->walls = walls; // this-> is used to differentiate between the class attribute and the parameter that was passed
     }
 

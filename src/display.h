@@ -14,7 +14,8 @@ enum Mode {
     MODE_MAP_MAZE,
     MODE_BFS,
     MODE_ASTAR,
-    MODE_MAX // This can be used to determine the number of modes
+    MODE_STORE_FLASH,
+    MODE_MAX, // This can be used to determine the number of modes
 };
 
 // Rotary encoder debouncing variables
@@ -62,7 +63,7 @@ void updateEncoderState() {
 
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
-    const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*"};
+    const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*", "STF"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
@@ -183,7 +184,7 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
-            digitalWrite(MOTOR_ENABLE, LOW); // disable motor
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             timer14->resume();
             start(5); // wait for finger
             reset_encoders();
@@ -192,28 +193,18 @@ void handleModeSelection(Mode mode) {
             grab_ball();
             stop();
             delay(100);
-            digitalWrite(MOTOR_ENABLE, HIGH);
-            // timer14->resume(); // starting systick timer
-            // delay(100);
-            // // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
-            // reset_encoders();
-            // reset_PID_values();
-            // delay(50);
-            // while(!encoderTurned){
-            //     drive_forward(350, 350, 2);
-            //     curve_left();
-            // }
-            // stop();
-            // timer14->pause();
-            // // display_print("A* Mode completed");
-            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            // // always keep this last
-            // break;
+            digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
             timer14->pause();
             displayOptions(MODE_ASTAR, false);
         // default:
         //     display_print("Invalid mode");
         //     break;
+        case MODE_STORE_FLASH:
+            display_print("Store Flash Mode selected.");
+            if(MAPPING_COMPLETE == true) {
+                loadMazeFromFlash(maze, baseAddress);
+            }
+
     }
 }
 

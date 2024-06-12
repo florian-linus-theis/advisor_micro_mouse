@@ -229,8 +229,8 @@ std::vector<bool> find_walls(){
     return wallsVec;
 }
 
-std::vector<bool> find_walls_forward_looking(){
-    std::vector<bool> wallsVec = {false, false, false, false};
+std::array<bool,4> find_walls_forward_looking(){
+    std::array<bool,4> wallsVec = {false, false, false, false};
     ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
     // Left Wall Sensors:
     if((Distance_Sensor[0] > MinSensorValues[0] * 0.9 && Distance_Sensor[1] > MinSensorValues[1] * 0.7) || (Distance_Sensor[0] > MinSensorValues[0] * 0.7 && Distance_Sensor[1] > MinSensorValues[1] * 0.9)){ 
