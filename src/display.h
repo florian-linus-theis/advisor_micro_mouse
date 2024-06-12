@@ -184,27 +184,59 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            timer14->resume();
-            start(5); // wait for finger
-            reset_encoders();
-            reset_PID_values();
-            delay(100);
-            grab_ball();
-            stop();
-            delay(100);
-            digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-            timer14->pause();
+            // Initialize the maze with some data
+            for (int i = 0; i < MAZE_HEIGHT; ++i) {
+                for (int j = 0; j < MAZE_WIDTH; ++j) {
+                    maze[i][j] = Location({i, j});
+                    maze[i][j].set_walls({true, false, true, false});
+                    maze[i][j].set_visited(true);
+                }
+            }
+            // Save the maze to flash memory
+            saveMazeToFlash(maze, baseAddress);
+            ble->println("Maze saved");
+            // Clear the maze to demonstrate loading from flash
+            maze.clear();
+            ble->println("Maze cleared");
+
+            // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            // timer14->resume();
+            // start(5); // wait for finger
+            // reset_encoders();
+            // reset_PID_values();
+            // delay(100);
+            // grab_ball();
+            // stop();
+            // delay(100);
+            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
+            // timer14->pause();
             displayOptions(MODE_ASTAR, false);
         // default:
         //     display_print("Invalid mode");
         //     break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-                loadMazeFromFlash(maze, baseAddress);
-            ble->println("( )");
+            loadMazeFromFlash(maze, baseAddress);
+                // Print the loaded maze
+            for (const auto& row : maze) {
+                for (const auto& loc : row) {
+                    ble->print("(");
+                    ble->print(loc.position[0]);
+                    ble->print(", ");
+                    ble->print(loc.position[1]);
+                    ble->print(") Walls: ");
+                    for (bool wall : loc.walls) {
+                        ble->print(wall);
+                        ble->print(" ");
+                    }
+                    ble->println("Visited: ");
+                    ble->print(loc.visited);
+                }
+                ble->println();
+            }
+        }
+
     }
-}
 
 void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
     int overflow = 1000000/freq;

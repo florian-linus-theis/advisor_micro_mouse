@@ -35,7 +35,7 @@ void dfs_mapping(){
     display_print("Mapping complete");
     delay(2000);
     
-    safeMazeToFlash(maze, baseAddress);
+    saveMazeToFlash(maze, baseAddress);
     return;
 }
 

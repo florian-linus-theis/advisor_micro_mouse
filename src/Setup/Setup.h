@@ -334,7 +334,7 @@ extern void soft_reset();
 
 //Flash Memory 
 extern int baseAddress; // Address for storing Maze on Flash 
-extern void safeMazeToFlash(const std::vector<std::vector<Location>>&, int); 
+extern void saveMazeToFlash(const std::vector<std::vector<Location>>&, int); 
 extern void loadMazeFromFlash(std::vector<std::vector<Location>>&, int);
 extern bool MAPPING_COMPLETE; 
    

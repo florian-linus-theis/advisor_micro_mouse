@@ -64,7 +64,7 @@ void maze_setup(){
     }
 }
 
-void safeMazeToFlash(const std::vector<std::vector<Location>>& maze, int baseAddress) {
+void saveMazeToFlash(const std::vector<std::vector<Location>>& maze, int baseAddress) {
     // Store the dimensions first
     int height = maze.size();
     int width = maze[0].size();
