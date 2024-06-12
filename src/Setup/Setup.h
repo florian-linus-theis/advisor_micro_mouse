@@ -93,6 +93,8 @@
 #define DUTY_SLOW_ROTATION 100 // --> Tested - works with 24000 ticks for rotation
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 100
+#define SPEED_MAPPING 365
+#define SPEED_FAST 500
 #define MINIMUM_DUTY 50
 #define TICKS_INNER_WHEEL 31000 // thorugh testing
 #define TICKS_OUTER_WHEEL 62000 // through testing

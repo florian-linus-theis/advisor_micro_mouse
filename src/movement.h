@@ -308,11 +308,11 @@ void drive_forward(int desired_max_speed, int end_speed, float squares){
         last_distance_traveled = avg_distance_traveled;
         int distance_remaining = desired_distance - avg_distance_traveled;
         int braking_distance = calculate_braking_distance(end_speed);
-        // if (!disappearing_wall_detected &&  avg_distance_traveled > ticks_until_walls_disappearing && side_walls_disappearing()){
-        //     desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
-        //     disappearing_wall_detected = true; // such that we only set the distance once
-        //     ble->println("Side walls disappearing, setting distance remaining to 32400");
-        // }
+        if (!disappearing_wall_detected &&  avg_distance_traveled > ticks_until_walls_disappearing && side_walls_disappearing()){
+            desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
+            disappearing_wall_detected = true; // such that we only set the distance once
+            ble->println("Side walls disappearing, setting distance remaining to 32400");
+        }
         if (distance_remaining > braking_distance){
                 accelerate(desired_max_speed);
         } else {
@@ -527,7 +527,6 @@ void curve_right(){
     // speed calculation
     int speed_L = static_cast<int>((start_speed / 3) * 4);
     int speed_R = static_cast<int>((start_speed / 3) * 1.9);
-    ble->println("Curve right");
     disable_PID();
     reset_distance_traveled();
     int last_distance_traveled = avg_distance_traveled;

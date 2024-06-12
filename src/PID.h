@@ -256,7 +256,7 @@ bool side_walls_disappearing(){
     int comp_left = Last_Distance_Sensor[0] - Distance_Sensor[0];
     int comp_right = Last_Distance_Sensor[5] - Distance_Sensor[5];
     // ble->println("L :" + comp_left);
-    ble->println(comp_right);
+    // ble->println(comp_right);
     return Last_Distance_Sensor[0] - Distance_Sensor[0] > 50 || Last_Distance_Sensor[5] - Distance_Sensor[5] > 50;
 }
 
