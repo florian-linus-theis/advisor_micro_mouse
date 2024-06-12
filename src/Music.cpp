@@ -20,6 +20,7 @@ int vp = 0;
 int note_cnt = 0;
 int beat_cnt = 0;
 volatile bool SONG_COMPLETE = false;
+volatile bool trigger = false;
 
 //length
 int H = 500;     //halbe
@@ -415,27 +416,33 @@ void Running_in_the_90s(){
     timer8->resume();
     SETUP_COMPLETE = true;
 
-    while (!SONG_COMPLETE);
+    while (!SONG_COMPLETE) {
+        SETUP_COMPLETE = false;
+        if(trigger) {
+                timer8->pause();
+                timer8->setOverflow(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt], TICK_FORMAT);
+                timer8->refresh();
+                timer8->resume();
+                SETUP_COMPLETE = true;
+
+                Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
+                note_cnt++;
+
+                if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
+                        note_cnt = 0;
+                        beat_cnt++;
+                }
+                if (beat_cnt > 37) SONG_COMPLETE = true;
+
+                trigger = false;
+        }
+        
+    }
     timer8->pause();
 }
 
 
 void Timer8_Interrupt() {
-    if(!SETUP_COMPLETE) return;
-
-    SETUP_COMPLETE = false;
-    timer8->pause();
-    timer8->setOverflow(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt], TICK_FORMAT);
-    timer8->refresh();
-    timer8->resume();
-    SETUP_COMPLETE = true;
-
-    Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
-    note_cnt++;
-
-    if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
-        note_cnt = 0;
-        beat_cnt++;
-    }
-    if (beat_cnt > 37) SONG_COMPLETE = true;
+        if(!SETUP_COMPLETE) return;
+        trigger = true;    
 } 
