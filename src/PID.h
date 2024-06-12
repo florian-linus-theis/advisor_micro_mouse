@@ -229,19 +229,34 @@ std::vector<bool> find_walls(){
     return wallsVec;
 }
 
+// Function to determine if a wall is detected in front or either side of the robot
 std::vector<bool> find_walls_forward_looking(){
     std::vector<bool> wallsVec = {false, false, false, false};
-    ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
+    int counter = 1; 
+    int last_distance_traveled = avg_distance_traveled;
+    std::vector<int> avg_distance_sensors = {0,0,0,0,0,0,0};
+    // avergae 4 sensor values to get the most reliable results (period of 12ms ~ 3mm)
+    while (counter < 5){
+        if (last_distance_traveled  == avg_distance_traveled) continue; 
+        counter++;
+        for (int i = 0; i < 7; i++){
+            avg_distance_sensors[i] += Distance_Sensor[i];
+        }
+    }
+    // now averaging the sensor values
+    for (int i = 0; i < 7; i++){
+        avg_distance_sensors[i] = avg_distance_sensors[i] / counter;
+    }
     // Left Wall Sensors:
-    if((Distance_Sensor[0] > MinSensorValues[0] * 0.9 && Distance_Sensor[1] > MinSensorValues[1] * 0.7) || (Distance_Sensor[0] > MinSensorValues[0] * 0.7 && Distance_Sensor[1] > MinSensorValues[1] * 0.9)){ 
+    if(avg_distance_sensors[0] > MinSensorValues[0] * 0.7 && avg_distance_sensors[1] > MinSensorValues[1] * 0.7){ 
         wallsVec[3] = true;
     }
-    // Front Wall: either front and front-right or front and front-left 
-    if(Distance_Sensor[6] > MinSensorValues[6] * 0.8 && ( Distance_Sensor[2] > MinSensorValues[2] *0.8 || Distance_Sensor[3] > MinSensorValues[3] * 0.8)){ 
+    // Front Wall: only front sensor must be above threshold
+    if(avg_distance_sensors[6] > MinSensorValues[6] * 0.8){ 
         wallsVec[0] = true;
     }
     // Right Wall: both left and right sensor must be above threshold
-    if((Distance_Sensor[5] > MinSensorValues[5] * 0.9 && Distance_Sensor[4] > MinSensorValues[4] * 0.7)|| (Distance_Sensor[5] > MinSensorValues[5] * 0.7 && Distance_Sensor[4] > MinSensorValues[4] * 0.9)) { 
+    if(avg_distance_sensors[5] > MinSensorValues[5] * 0.7 && avg_distance_sensors[4] > MinSensorValues[4] * 0.7) { 
         wallsVec[1] = true;
     }
     return wallsVec;

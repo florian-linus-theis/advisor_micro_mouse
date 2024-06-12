@@ -28,9 +28,9 @@ void Systick_Interrupt() {
   static int counter = 0; 
   update_encoders();
   
-  // setting old values for comparison (every 15th iteration)
-  // every 45ms
-  if (counter % 15 == 0) {
+  // setting old values for comparison (every 10th iteration)
+  // every 30ms
+  if (counter % 10 == 0) {
     for(int i=0; i < 7; i++){
       Last_Distance_Sensor[i] = Distance_Sensor[i];
     }

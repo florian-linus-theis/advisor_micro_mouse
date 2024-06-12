@@ -211,9 +211,9 @@ void handleModeSelection(Mode mode) {
             // break;
             timer14->pause();
             displayOptions(MODE_ASTAR, false);
-        // default:
-        //     display_print("Invalid mode");
-        //     break;
+        default:
+            display_print("Invalid mode");
+            break;
     }
 }
 
