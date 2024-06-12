@@ -416,31 +416,26 @@ void Running_in_the_90s(){
     timer13->resume();
     SETUP_COMPLETE = true;
 
-    while (!SONG_COMPLETE) {
-        if(trigger) {
-                SETUP_COMPLETE = false;
-                TIM13->ARR = 10*(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
-                SETUP_COMPLETE = true;
-
-                Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
-                
-                note_cnt++;
-
-                if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
-                        note_cnt = 0;
-                        beat_cnt++;
-                }
-                if (beat_cnt > 37) SONG_COMPLETE = true;
-
-                trigger = false;
-        }
-        
-    }
+    while (!SONG_COMPLETE);
     timer13->pause();
 }
 
 
 void Timer13_Interrupt() {
         if(!SETUP_COMPLETE) return;
-        trigger = true;    
+        SETUP_COMPLETE = false;
+        TIM13->ARR = 10*(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
+        SETUP_COMPLETE = true;
+
+        Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
+        
+        note_cnt++;
+
+        if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
+                note_cnt = 0;
+                beat_cnt++;
+        }
+        if (beat_cnt > 37) SONG_COMPLETE = true;
+
+        trigger = false;   
 } 
