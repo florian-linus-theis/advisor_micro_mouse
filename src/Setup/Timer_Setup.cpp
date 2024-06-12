@@ -19,7 +19,7 @@ HardwareTimer *timer6 = new HardwareTimer(TIM6);
 //HardwareTimer *timer10 = new HardwareTimer(TIM10);
 HardwareTimer *timer1 = new HardwareTimer(TIM1);
 HardwareTimer *timer7 = new HardwareTimer(TIM7);
-HardwareTimer *timer8 = new HardwareTimer(TIM8);
+HardwareTimer *timer13 = new HardwareTimer(TIM13);
 
 
 
@@ -33,7 +33,7 @@ void Timer6_Setup();
 void Timer10_Setup();
 void Timer1_Setup(); 
 void Timer7_Setup(); 
-void Timer8_Setup();
+void Timer13_Setup();
 
 volatile bool SETUP_COMPLETE;
 
@@ -57,7 +57,7 @@ void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - -
     //Buzzer PWM and Delay Timer
     Timer1_Setup();
     Timer7_Setup();
-    Timer8_Setup();
+    Timer13_Setup();
 
     // Enable Systick Timer
     Systick_Setup();
@@ -234,12 +234,12 @@ void Timer7_Setup(void) {   //Buzzer Delay Timer
 }
 
 
-void Timer8_Setup(void) {   //Music Delay Timer
-    timer8->setPrescaleFactor(168000);              // Set prescaler so that 1 tick equals 1ms
-    timer8->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
-    timer8->attachInterrupt(Timer8_Interrupt);
-    timer8->refresh();
-    timer8->pause();
+void Timer13_Setup(void) {   //Music Delay Timer
+    timer13->setPrescaleFactor(84000);               // Set prescaler so that 1 tick equals 1ms
+    timer13->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
+    timer13->attachInterrupt(Timer13_Interrupt);
+    timer13->refresh();
+    timer13->pause();
 }
 
 

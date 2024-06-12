@@ -157,7 +157,7 @@ extern HardwareTimer *timer6;
 extern HardwareTimer *timer10;
 extern HardwareTimer *timer1;
 extern HardwareTimer *timer7;
-extern HardwareTimer *timer8;
+extern HardwareTimer *timer13;
 
 extern void Timer_Setup(void);
 extern void Timer4_Setup_Motor(void); // needed for manual resetting of the motor timers after ballgrabbing
@@ -253,7 +253,7 @@ extern void Buzzer_beep(int, int);
 extern void Buzzer_beep(int, int, int);
 extern void Buzzer_beep_noBlock(int, int, int);
 extern void Timer7_Interrupt();
-extern void Timer8_Interrupt();
+extern void Timer13_Interrupt();
 
 extern void calibrate_sensors(int, int);
 extern void start();

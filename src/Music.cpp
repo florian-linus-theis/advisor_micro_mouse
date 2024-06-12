@@ -411,14 +411,16 @@ void Running_in_the_90s(){
     beat_cnt = 0;
     SONG_COMPLETE = false;
     SETUP_COMPLETE = false;
-    timer8->setCount(0);
-    timer8->refresh();
-    timer8->resume();
+    timer13->setCount(0);
+    timer13->refresh();
+    timer13->resume();
     SETUP_COMPLETE = true;
 
     while (!SONG_COMPLETE) {
         if(trigger) {
-                TIM8->ARR = full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt];
+                SETUP_COMPLETE = false;
+                TIM13->ARR = full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt];
+                SETUP_COMPLETE = true;
 
                 Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
                 
@@ -434,11 +436,11 @@ void Running_in_the_90s(){
         }
         
     }
-    timer8->pause();
+    timer13->pause();
 }
 
 
-void Timer8_Interrupt() {
+void Timer13_Interrupt() {
         if(!SETUP_COMPLETE) return;
         trigger = true;    
 } 
