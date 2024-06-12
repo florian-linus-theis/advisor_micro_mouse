@@ -419,7 +419,7 @@ void Running_in_the_90s(){
     while (!SONG_COMPLETE) {
         if(trigger) {
                 SETUP_COMPLETE = false;
-                TIM13->ARR = full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt];
+                TIM13->ARR = 10*(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
                 SETUP_COMPLETE = true;
 
                 Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);

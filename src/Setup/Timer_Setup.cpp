@@ -226,7 +226,7 @@ void Timer1_Setup() {       //Buzzer PWM TImer
 
 
 void Timer7_Setup(void) {   //Buzzer Delay Timer
-    timer7->setPrescaleFactor(84000);               // Set prescaler so that 1 tick equals 1ms
+    timer7->setPrescaleFactor(84000);               // Set prescaler so that 1 tick equals 100us
     timer7->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
     timer7->attachInterrupt(Timer7_Interrupt);
     timer7->refresh();
@@ -235,8 +235,8 @@ void Timer7_Setup(void) {   //Buzzer Delay Timer
 
 
 void Timer13_Setup(void) {   //Music Delay Timer
-    timer13->setPrescaleFactor(84000);               // Set prescaler so that 1 tick equals 1ms
-    timer13->setOverflow(100);                       // Set overflow to 100 = 100ms intervals
+    timer13->setPrescaleFactor(8400);               // Set prescaler so that 1 tick equals 100us
+    timer13->setOverflow(1000);                       // Set overflow to 1000 = 100ms intervals
     timer13->attachInterrupt(Timer13_Interrupt);
     timer13->refresh();
     timer13->pause();
