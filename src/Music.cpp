@@ -17,8 +17,8 @@ int e6 = 1318;
 int a5 = 880;
 int vp = 0;
 
-int note_cnt = 0;
-int beat_cnt = 0;
+volatile int note_cnt = 0;
+volatile int beat_cnt = 0;
 volatile bool SONG_COMPLETE = false;
 volatile bool trigger = false;
 
