@@ -201,10 +201,8 @@ void handleModeSelection(Mode mode) {
         //     break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-            if(MAPPING_COMPLETE == true) {
                 loadMazeFromFlash(maze, baseAddress);
-            }
-
+            ble->println("( )");
     }
 }
 

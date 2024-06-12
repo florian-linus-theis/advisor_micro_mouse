@@ -333,7 +333,7 @@ extern void move_forward_mapping(int);
 extern void soft_reset();
 
 //Flash Memory 
-extern const int baseAddress = 0; // Address for storing Maze on Flash 
+extern int baseAddress; // Address for storing Maze on Flash 
 extern void safeMazeToFlash(const std::vector<std::vector<Location>>&, int); 
 extern void loadMazeFromFlash(std::vector<std::vector<Location>>&, int);
 extern bool MAPPING_COMPLETE; 

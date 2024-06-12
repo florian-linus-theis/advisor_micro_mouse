@@ -6,6 +6,7 @@
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
+int baseAddress = 0;
 // Initialize the maze with Location objects
 // maze is a global variable so no need to pass it here
 void initialize_maze(){
