@@ -7,7 +7,7 @@ std::vector<int> determine_correction_needed(){
     if(PID_ENABLED == false){
         chosen_correction = {0,0};
     }
-    else if(abs(remapped_error[CURRENT_CASE_PID]) > 0){
+    else if(abs(remapped_error[CURRENT_CASE_PID]) > 1){
         chosen_correction = PID_values;
         //ble->println("IR");
     }

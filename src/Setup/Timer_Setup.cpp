@@ -73,7 +73,7 @@ void internal_clock_setup(){
 
 void Systick_Setup(void) {  //Systick Timer Setup
     timer14->setPrescaleFactor(84);          //set prescaler so that 1 tick equals 1us
-    timer14->setOverflow(4000);                 // Set overflow to 4000 = 4 ms intervals
+    timer14->setOverflow(3000);                 // Set overflow to 4000 = 4 ms intervals
     timer14->attachInterrupt(Systick_Interrupt);  
     timer14->refresh();
     timer14->pause();
