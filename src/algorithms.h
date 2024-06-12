@@ -15,7 +15,7 @@
 
 bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
-std::vector<int> POSSIBLE_GOAL_POS_ONE = {0,2}; 
+std::vector<int> POSSIBLE_GOAL_POS_ONE = {7,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8, 8}; 
 std::vector<int> POSSIBLE_GOAL_POS_THREE = {8,7};
 std::vector<int> POSSIBLE_GOAL_POS_FOUR = {7,7}; 
@@ -33,6 +33,7 @@ void dfs_mapping(){
     dfs_map_maze(); // Mapping the maze using depth-first search 
     set_dir(0); // Reset heading to north
     display_print("Mapping complete");
+    MAPPING_COMPLETE = true; // Set mapping complete to true
     return;
 }
 
