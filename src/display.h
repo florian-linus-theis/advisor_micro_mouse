@@ -256,7 +256,7 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
     int overflow;
     int duty;
 
-    if (freq == 0) {
+    if (freq <= 0) {
         duty = 0;                   // 0% Duty Cycle -> OFF
         overflow = 1000000 / 2000;  // not important
     }
@@ -264,6 +264,8 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
         overflow = 1000000 / freq;
         duty = overflow / 2;      // 50% Duty Cycle - square wave
     }
+
+    SETUP_COMPLETE = false;
 
     timer1->setOverflow(overflow);
     timer1->setCaptureCompare(4, duty, TICK_COMPARE_FORMAT);
@@ -274,10 +276,13 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
     timer7->setOverflow(length*10);
     timer7->refresh();
     timer7->resume();
+
+    SETUP_COMPLETE = true;
 }
 
 
-void Timer7_Interrupt(void) { 
+void Timer7_Interrupt(void) {
+    if(!SETUP_COMPLETE) {return;}
     if ((buzzer_counter)%2 == 0) {
         timer1->pause();
         if(buzzer_counter == 0) timer7->pause();

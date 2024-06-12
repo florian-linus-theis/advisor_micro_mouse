@@ -20,7 +20,6 @@ int vp = 0;
 volatile int note_cnt = 0;
 volatile int beat_cnt = 0;
 volatile bool SONG_COMPLETE = false;
-volatile bool trigger = false;
 
 //length
 int H = 500;     //halbe
@@ -423,6 +422,7 @@ void Running_in_the_90s(){
 
 void Timer13_Interrupt() {
         if(!SETUP_COMPLETE) return;
+
         SETUP_COMPLETE = false;
         TIM13->ARR = 10*(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
         SETUP_COMPLETE = true;
@@ -435,7 +435,5 @@ void Timer13_Interrupt() {
                 note_cnt = 0;
                 beat_cnt++;
         }
-        if (beat_cnt > 37) SONG_COMPLETE = true;
-
-        trigger = false;   
+        if (beat_cnt > 37) SONG_COMPLETE = true;  
 } 
