@@ -65,8 +65,9 @@ void maze_setup(){
 
 //Flash memory---------------------------------------------------------------------
 
+
 //check if adress in flash is available
-bool isFlashWritable(uint32_t address) {
+bool is_flash_writable(uint32_t address) {
     const uint32_t FLASH_START_ADDRESS = 0x08000000;  // Flash memory start address
     const uint32_t FLASH_SECTOR_SIZE  = 131072;      // Flash memory sector size in bytes (128 KB)
     const uint32_t FLASH_SIZE = 1048576;            // Total Flash memory size in bytes (1 MB)
@@ -88,8 +89,8 @@ bool isFlashWritable(uint32_t address) {
     return false; // Address outside of Flash memory 
 }
 
-//transform "Maze-Matrix" into a vector
-void serializeMaze(const std::vector<std::vector<Location>>& maze, std::vector<uint8_t>& buffer) {
+//transform maze into buffer vector
+void serialize_maze(const std::vector<std::vector<Location>>& maze, std::vector<uint8_t>& buffer) {
     for (const auto& row : maze) {
         for (const auto& loc : row) {
             buffer.insert(buffer.end(), loc.walls.begin(), loc.walls.end());
@@ -99,8 +100,8 @@ void serializeMaze(const std::vector<std::vector<Location>>& maze, std::vector<u
     }
 }
 
-//transform  vector into a "Matrix"
-void deserializeMaze(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
+//transform buffer vector into matrix
+void deserialize_maze(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
     size_t index = 0;
     for (auto& row : maze) {
         for (auto& loc : row) {
@@ -119,18 +120,19 @@ void deserializeMaze(uint32_t startAddress, std::vector<std::vector<Location>>& 
 }
 
 
-void writeMazeToFlash(uint32_t startAddress, const std::vector<uint8_t>& maze) {
+void write_maze_to_flash(uint32_t startAddress, const std::vector<uint8_t>& maze) {
     HAL_FLASH_Unlock();
+
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGSERR);
-    FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);
+    FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);       //Erase sector to write afterwards
 
     for (size_t i = 0; i < maze.size(); i++) {
-        HAL_FLASH_Program(TYPEPROGRAM_BYTE, startAddress + i, maze[i]);
+        HAL_FLASH_Program(TYPEPROGRAM_BYTE, startAddress + i, maze[i]);     //write into flash
     }
 
     HAL_FLASH_Lock();
 }
 
-void loadMazeFromFlash(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
-    deserializeMaze(startAddress, maze);
+void load_maze_from_flash(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
+    deserialize_maze(startAddress, maze);
 }

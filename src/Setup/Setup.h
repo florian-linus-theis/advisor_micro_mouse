@@ -335,7 +335,7 @@ extern void soft_reset();
 //Flash Memory
 #define FLASH_SECTOR11_START_ADDR 0x080E0000
 #define FLASH_SECTOR_11_END_ADDR 0x080FFFFF
-extern void serializeMaze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
-extern void deserializeMaze(uint32_t, std::vector<std::vector<Location>>&);   
-extern void writeDataToFlash(uint32_t, const std::vector<uint8_t>&); 
-extern void loadMazeFromFlash(uint32_t, std::vector<std::vector<Location>>&);
+extern void serialize_maze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
+extern void deserialize_maze(uint32_t, std::vector<std::vector<Location>>&);   
+extern void write_data_to_flash(uint32_t, const std::vector<uint8_t>&); 
+extern void load_maze_from_flash(uint32_t, std::vector<std::vector<Location>>&);
