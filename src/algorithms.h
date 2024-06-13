@@ -72,18 +72,14 @@ void bfs_algorithm(){
     // translate the actions into actual movements in maze
     std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
     // print the movements via blutooth
-    ble->print("Movements: ");
-    for (int i = 0; i < movements.size(); i++) {
-        ble->print(std::get<0>(movements[i]));
-        ble->print(std::get<1>(movements[i]));
-        ble->print(" ");
-    }
     // execute the movements
     execute_movements(movements);
+    delay(500);
+    display_print("Ready for execution...");
+    start(5);
     // display completion message
-    display->clearDisplay();
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion
-    display->print("BFS complete");
+    display_print("BFS complete");
     delay(1000);
     return;
 }
@@ -95,15 +91,15 @@ void a_star_algorithm(){
         return;
     }
     if (GOAL_POSITION[0] == -1 && GOAL_POSITION[1] == -1) {
-        display->clearDisplay();
         delay(1000);
-        display->print("Goal not found yet");
+        display_print("Goal not found yet");
         BFSAlgorithm bfs(&maze, &GOAL_POSITION, BALLGREIFER); // Initialize BFS algorithm
         bfs.find_bfs_shortest_path(); 
-        display->clearDisplay();
         delay(1000);
-        display->print("Goal Position found");
+        display_print("Goal Position found");
+        delay(1000);
     }
+    display_print("Calculating A*");
     AStarAlgorithm a_star_algorithm(&maze, GOAL_POSITION, BALLGREIFER); // Initialize A* algorithm
     A_star_node* solution_a_star = a_star_algorithm.prioritize_straight_paths(); // Find the shortest path using A* algorithm
     if (current_option == 0) {
@@ -113,9 +109,11 @@ void a_star_algorithm(){
     std::vector<int> action_vector = a_star_algorithm.return_action_vector_shortest_path_psp(solution_a_star);
     // translate the actions into actual movements in maze
     std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
+    delay(500);
+    display_print("Ready for execution...");
+    start(5);
     // execute the movements
     execute_movements(movements);
-    
     // display completion message
     display->clearDisplay();
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion
