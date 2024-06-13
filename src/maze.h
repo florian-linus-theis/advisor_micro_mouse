@@ -6,7 +6,6 @@
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
-int baseAddress = 0x08080000;
 // Initialize the maze with Location objects
 // maze is a global variable so no need to pass it here
 void initialize_maze(){
@@ -89,44 +88,49 @@ bool isFlashWritable(uint32_t address) {
     return false; // Address outside of Flash memory 
 }
 
-void saveMazeToFlash(const std::vector<std::vector<Location>>& maze, int baseAddress) {
-    HAL_StatusTypeDef status = HAL_FLASH_Unlock();
-    // Store the dimensions first
-    int height = maze.size();
-    int width = maze[0].size();
-    EEPROM.put(baseAddress, height);
-    baseAddress += sizeof(height);
-    EEPROM.put(baseAddress, width);
-    baseAddress += sizeof(width);
-
-    // Store each Location object
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            maze[i][j].serialize(baseAddress);
-             baseAddress += sizeof(Location); // Increment baseAddress
+//transform "Maze-Matrix" into a vector
+void serializeMaze(const std::vector<std::vector<Location>>& maze, std::vector<uint8_t>& buffer) {
+    for (const auto& row : maze) {
+        for (const auto& loc : row) {
+            buffer.insert(buffer.end(), loc.walls.begin(), loc.walls.end());
+            buffer.push_back(loc.visited);
+            buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(loc.position.data()), reinterpret_cast<const uint8_t*>(loc.position.data()) + loc.position.size() * sizeof(int));
         }
     }
-    EEPROM.commit();
+}
+
+//transform  vector into a "Matrix"
+void deserializeMaze(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
+    size_t index = 0;
+    for (auto& row : maze) {
+        for (auto& loc : row) {
+            for (size_t i = 0; i < loc.walls.size(); i++) {
+                loc.walls[i] = *reinterpret_cast<uint8_t*>(startAddress + index);
+                index++;
+            }
+            loc.visited = *reinterpret_cast<uint8_t*>(startAddress + index);
+            index++;
+            for (size_t i = 0; i < loc.position.size(); i++) {
+                loc.position[i] = *reinterpret_cast<int*>(startAddress + index);
+                index += sizeof(int);
+            }
+        }
+    }
+}
+
+
+void writeMazeToFlash(uint32_t startAddress, const std::vector<uint8_t>& maze) {
+    HAL_FLASH_Unlock();
+    __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGSERR);
+    FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);
+
+    for (size_t i = 0; i < maze.size(); i++) {
+        HAL_FLASH_Program(TYPEPROGRAM_BYTE, startAddress + i, maze[i]);
+    }
+
     HAL_FLASH_Lock();
 }
 
-void loadMazeFromFlash(std::vector<std::vector<Location>>& maze, int baseAddress) {
-    int height;
-    int width;
-
-    // Read the dimensions first
-    EEPROM.get(baseAddress, height);
-    baseAddress += sizeof(height);
-    EEPROM.get(baseAddress, width);
-    baseAddress += sizeof(width);
-
-    maze.resize(height, std::vector<Location>(width));
-
-    // Read each Location object
-    for (int i = 0; i < height; ++i) {
-        for (int j = 0; j < width; ++j) {
-            maze[i][j].deserialize(baseAddress);
-        }
-    }
+void loadMazeFromFlash(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
+    deserializeMaze(startAddress, maze);
 }
-

@@ -332,9 +332,10 @@ extern void move_forward_mapping(int);
 // softreset
 extern void soft_reset();
 
-//Flash Memory 
-extern int baseAddress; // Address for storing Maze on Flash 
-extern void saveMazeToFlash(const std::vector<std::vector<Location>>&, int); 
-extern void loadMazeFromFlash(std::vector<std::vector<Location>>&, int);
-extern bool MAPPING_COMPLETE; 
-   
+//Flash Memory
+#define FLASH_SECTOR11_START_ADDR 0x080E0000
+#define FLASH_SECTOR_11_END_ADDR 0x080FFFFF
+extern void serializeMaze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
+extern void deserializeMaze(uint32_t, std::vector<std::vector<Location>>&);   
+extern void writeDataToFlash(uint32_t, const std::vector<uint8_t>&); 
+extern void loadMazeFromFlash(uint32_t, std::vector<std::vector<Location>>&);

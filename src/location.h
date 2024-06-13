@@ -2,7 +2,6 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include <FlashStorage_STM32.hpp>
 
 
 class Location {
@@ -19,35 +18,7 @@ class Location {
             position[0] = pos[0];
             position[1] = pos[1];
         }
-    }
-    // Serialization method
-    void serialize(int& address) const {
-        for (bool wall : walls) {
-            EEPROM.put(address, wall);
-            address += sizeof(wall);
         }
-        for (int pos : position) {
-            EEPROM.put(address, pos);
-            address += sizeof(pos);
-        }
-        EEPROM.put(address, visited);
-        address += sizeof(visited);
-    }
-
-    // Deserialization method
-    void deserialize(int& address) {
-        for (bool& wall : walls) {
-            EEPROM.get(address, wall);
-            address += sizeof(wall);
-        }
-        for (int& pos : position) {
-            EEPROM.get(address, pos);
-            address += sizeof(pos);
-        }
-        EEPROM.get(address, visited);
-        address += sizeof(visited);
-    }
-
 
     // takes position as order pair list [x, y]
     void set_position(std::vector<int> pos) {
