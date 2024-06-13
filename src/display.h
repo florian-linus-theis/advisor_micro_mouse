@@ -276,7 +276,7 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
 
     buzzer_counter = (beeps * 2) - 2;
     timer7->setCount(0);
-    timer7->setOverflow(length*10);
+    timer7->setOverflow(length*10, TICK_FORMAT);
     timer7->refresh();
     timer7->resume();
 

@@ -424,11 +424,13 @@ void Timer13_Interrupt() {
         if(!SETUP_COMPLETE) return;
 
         SETUP_COMPLETE = false;
-        TIM13->ARR = 10*(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]);
+        timer13->setOverflow(10*(full_90s_pause[beat_cnt][note_cnt] + full_90s_length[beat_cnt][note_cnt]), TICK_FORMAT);
         SETUP_COMPLETE = true;
 
         Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
         
+        ble->println("b_cnt: " + String(beat_cnt) + "n_cnt: " + String(note_cnt) + "note: " + String(full_90s_notes[beat_cnt][note_cnt]) + " length: " + String(full_90s_length[beat_cnt][note_cnt]) + "  pause: " + String(full_90s_pause[beat_cnt][note_cnt]));
+
         note_cnt++;
 
         if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
