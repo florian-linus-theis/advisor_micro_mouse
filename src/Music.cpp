@@ -435,5 +435,5 @@ void Timer13_Interrupt() {
                 note_cnt = 0;
                 beat_cnt++;
         }
-        if (beat_cnt > 37) SONG_COMPLETE = true;  
+        if (beat_cnt > 36) SONG_COMPLETE = true;  
 } 
