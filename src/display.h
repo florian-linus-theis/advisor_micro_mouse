@@ -20,7 +20,7 @@ enum Mode {
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 
-volatile int buzzer_counter;
+volatile int buzzer_counter = 0;
 
 
 // Functions
@@ -265,12 +265,15 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
         duty = overflow / 2;      // 50% Duty Cycle - square wave
     }
 
+    timer1->pause();
+    timer1->setCount(0);
     timer1->setOverflow(overflow);
     timer1->setCaptureCompare(4, duty, TICK_COMPARE_FORMAT);
     timer1->refresh();
     timer1->resume();
 
     buzzer_counter = (beeps * 2) - 2;
+    timer7->setCount(0);
     timer7->setOverflow(length*10);
     timer7->refresh();
     timer7->resume();
