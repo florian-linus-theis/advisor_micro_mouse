@@ -5,6 +5,7 @@
 //#include "battery.h"
 #include "PID.h"
 #include "Music.h"
+#include <maze.h>
 
 // Define an enum for all modes
 enum Mode {
@@ -216,24 +217,31 @@ void handleModeSelection(Mode mode) {
         //     break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-            loadMazeFromFlash(maze, baseAddress);
-                // Print the loaded maze
-            for (const auto& row : maze) {
-                for (const auto& loc : row) {
-                    ble->print("(");
-                    ble->print(loc.position[0]);
-                    ble->print(", ");
-                    ble->print(loc.position[1]);
-                    ble->print(") Walls: ");
-                    for (bool wall : loc.walls) {
-                        ble->print(wall);
-                        ble->print(" ");
-                    }
-                    ble->println("Visited: ");
-                    ble->print(loc.visited);
-                }
-                ble->println();
+            uint32_t address_to_check = 0x08080000; // Example address to check
+
+            if (isFlashWritable(address_to_check)) {
+                ble->println("Flash mem free");
+            } else {
+                ble->println("Flash mem not free");
             }
+            // loadMazeFromFlash(maze, baseAddress);
+            //     // Print the loaded maze
+            // for (const auto& row : maze) {
+            //     for (const auto& loc : row) {
+            //         ble->print("(");
+            //         ble->print(loc.position[0]);
+            //         ble->print(", ");
+            //         ble->print(loc.position[1]);
+            //         ble->print(") Walls: ");
+            //         for (bool wall : loc.walls) {
+            //             ble->print(wall);
+            //             ble->print(" ");
+            //         }
+            //         ble->println("Visited: ");
+            //         ble->print(loc.visited);
+            //     }
+            //     ble->println();
+            // }
         }
 
     }

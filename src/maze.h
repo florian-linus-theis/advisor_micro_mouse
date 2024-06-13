@@ -6,7 +6,7 @@
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
-int baseAddress = 0;
+int baseAddress = 0x08080000;
 // Initialize the maze with Location objects
 // maze is a global variable so no need to pass it here
 void initialize_maze(){
@@ -64,7 +64,33 @@ void maze_setup(){
     }
 }
 
+//Flash memory---------------------------------------------------------------------
+
+//check if adress in flash is available
+bool isFlashWritable(uint32_t address) {
+    const uint32_t FLASH_START_ADDRESS = 0x08000000;  // Flash memory start address
+    const uint32_t FLASH_SECTOR_SIZE  = 131072;      // Flash memory sector size in bytes (128 KB)
+    const uint32_t FLASH_SIZE = 1048576;            // Total Flash memory size in bytes (1 MB)
+
+    // Check if address is within the Flash memory size
+    if (address >= FLASH_START_ADDRESS && address < (FLASH_START_ADDRESS + FLASH_SIZE)) {
+
+        // Calculate the sector number
+        uint32_t sector_number = (address - FLASH_START_ADDRESS) / FLASH_SECTOR_SIZE;
+        
+        // Check if flash sector is fully erased
+        for (uint32_t i = 0; i < FLASH_SECTOR_SIZE; i += 4) {           // STM32F4 reads and erases 32 bits words (4 bytes) 
+            if (*reinterpret_cast<const volatile uint32_t*>(FLASH_START_ADDRESS + (sector_number * FLASH_SECTOR_SIZE) + i) != 0xFFFFFFFF) {
+                return false;
+            }
+        }
+        return true; // Flash sector  fully erased and writable
+    }
+    return false; // Address outside of Flash memory 
+}
+
 void saveMazeToFlash(const std::vector<std::vector<Location>>& maze, int baseAddress) {
+    HAL_StatusTypeDef status = HAL_FLASH_Unlock();
     // Store the dimensions first
     int height = maze.size();
     int width = maze[0].size();
@@ -77,9 +103,11 @@ void saveMazeToFlash(const std::vector<std::vector<Location>>& maze, int baseAdd
     for (int i = 0; i < height; ++i) {
         for (int j = 0; j < width; ++j) {
             maze[i][j].serialize(baseAddress);
+             baseAddress += sizeof(Location); // Increment baseAddress
         }
     }
     EEPROM.commit();
+    HAL_FLASH_Lock();
 }
 
 void loadMazeFromFlash(std::vector<std::vector<Location>>& maze, int baseAddress) {
