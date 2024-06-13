@@ -26,16 +26,23 @@ void writeServo(int angle) {
 
 // Function to move the ball grabber forward (in front of robot)
 void move_ballgrabber_forward() {
-    delay(220);
+    for (int degree = DEGREE_BACK; degree >= DEGREE_FRONT; degree-= 10) {
+        writeServo(degree);
+        delay(40);
+    }
     writeServo(DEGREE_FRONT);
-    delay(1000);
 }
 
 // Function to move the ball grabber backward (above robot)
 void move_ballgrabber_backward() {
-    delay(220);
+    // delay(220);
+    // writeServo(DEGREE_BACK);
+    // delay(1000);
+    for (int degree = DEGREE_FRONT; degree <= DEGREE_BACK; degree+=10) {
+        writeServo(degree);
+        delay(40);
+    }
     writeServo(DEGREE_BACK);
-    delay(1000);
 }
 
 
@@ -65,18 +72,26 @@ void grab_ball(){
     delay(200);
     stop();
     delay(1000);
+    timer14->pause();
     timer10->resume();
+    ble->println("Ballgrabber enabled");
     digitalWrite(SERVO_ENABLE, HIGH);
+    ble->println("Servo enabled");
     // move ballgrabber forward
     move_ballgrabber_forward();
     // drive to ball 
     reset_PID_values(); 
-    delay(30);
+    timer10->pause();
+    timer14->resume();
     drive_forward(200, 0, 0.24); 
+    timer14->pause();
+    timer10->resume();
+    delay(500);
     // move ballgrabber backwards
     move_ballgrabber_backward();
     digitalWrite(SERVO_ENABLE, LOW);
     timer10->pause();
+    timer14->resume();
     // rotate right 
     rotate_right();
     reset_PID_values();

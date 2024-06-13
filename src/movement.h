@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <cmath> // abs()
 #include <vector>
-#include <robin.h>
+#include <motors.h>
 #include "Setup/Setup.h"
 
 int precompute_duty_intervals();
@@ -303,16 +303,17 @@ void drive_forward(int desired_max_speed, int end_speed, float squares){
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
     reset_PID_values();
+    accelerate(desired_max_speed);
     while(avg_distance_traveled < desired_distance){ 
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled;
         int distance_remaining = desired_distance - avg_distance_traveled;
         int braking_distance = calculate_braking_distance(end_speed);
-        if (!disappearing_wall_detected &&  avg_distance_traveled > ticks_until_walls_disappearing && side_walls_disappearing()){
-            desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
-            disappearing_wall_detected = true; // such that we only set the distance once
-            ble->println("Side walls disappearing, setting distance remaining to 32400");
-        }
+        // if (!disappearing_wall_detected &&  avg_distance_traveled > ticks_until_walls_disappearing && side_walls_disappearing()){
+        //     desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
+        //     disappearing_wall_detected = true; // such that we only set the distance once
+        //     ble->println("Side walls disappearing, setting distance remaining to 32400");
+        // }
         if (distance_remaining > braking_distance){
                 accelerate(desired_max_speed);
         } else {
@@ -460,10 +461,10 @@ void right_turn_around(){
     current_duty_cycle = DUTY_SLOW_ROTATION;
     int full_rotation_ticks = tick_rotate * 1.9;
     reset_distance_traveled();
-    BackwardRight(DUTY_SLOW_ROTATION + 50); // start moving wheels in opposite directions (turning right)
-    ForwardLeft(DUTY_SLOW_ROTATION + 50);
+    BackwardRight(150); // start moving wheels in opposite directions (turning right)
+    ForwardLeft(150);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
-    while(abs(distance_traveled_R) < full_rotation_ticks && abs(distance_traveled_L) < full_rotation_ticks){
+    while(abs(distance_traveled_R) < full_rotation_ticks || abs(distance_traveled_L) < full_rotation_ticks){
     }
     stop();
     delay(200);

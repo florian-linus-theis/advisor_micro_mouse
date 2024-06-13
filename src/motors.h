@@ -1,6 +1,6 @@
 #pragma once
 #include "Setup/Setup.h"
-#include <display.h>
+#include <user_interface.h>
 
 std::vector<int> determine_correction_needed(){
     std::vector<int> chosen_correction = {0,0};
@@ -29,19 +29,19 @@ void BackwardLeft(int dutyCycle) {
 }
 
 void ForwardLeft(int dutyCycle) {
-    timer3->setCount(0);
-    timer3->resume();
+    // timer3->setCount(0);
+    // timer3->resume();
     timer3->setCaptureCompare(1, 0, TICK_COMPARE_FORMAT);
     timer3->setCaptureCompare(2, dutyCycle, TICK_COMPARE_FORMAT);
-    timer3->refresh();
+    // timer3->refresh();
 }
 
 void ForwardRight(int dutyCycle) {
-    timer4->setCount(0);
-    timer4->resume();
+    // timer4->setCount(0);
+    // timer4->resume();
     timer4->setCaptureCompare(1, dutyCycle, TICK_COMPARE_FORMAT);
     timer4->setCaptureCompare(2, 0, TICK_COMPARE_FORMAT);
-    timer4->refresh();
+    // timer4->refresh();
 }
 
 void BackwardRight(int dutyCycle) {

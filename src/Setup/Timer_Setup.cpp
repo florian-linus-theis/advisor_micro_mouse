@@ -198,7 +198,7 @@ void Timer10_Setup() {      //Servo1 PWM TImer
     // Timer 10 konfigurieren
     TIM10->PSC = 168 - 1;           // Setze den Prescaler auf 168 (PSC Wert ist Prescaler - 1) -> 1 Tick / uS
     TIM10->ARR = 20000;             // Setze den Auto-Reload-Wert auf 2000
-    TIM10->CCR1 = 0;              // Setze den Capture/Compare-Wert für Kanal 1 auf 0 (initial 0% Duty Cycle)
+    TIM10->CCR1 = constrain(map(130, 0, 180, 500, 2500), 500, 2500);  // Setze den Capture/Compare-Wert für Kanal 1 auf 130 Grad initial
 
     // PWM Mode 1 für Kanal 1 konfigurieren
     TIM10->CCMR1 &= ~TIM_CCMR1_OC1M;          // Lösche die OC1M Bits

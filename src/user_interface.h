@@ -1,6 +1,6 @@
 #pragma once
 #include "Setup/Setup.h"
-#include <robin.h>
+#include <motors.h>
 #include <ballgrabber.h>
 //#include "battery.h"
 #include "PID.h"
@@ -191,6 +191,12 @@ void handleModeSelection(Mode mode) {
             delay(100);
             grab_ball();
             stop();
+            // while(!encoderTurned){
+            //     std::vector<bool> walls = find_walls_forward_looking();
+            //     ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
+            //     ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
+            //     delay(2500);
+            // }
             delay(100);
             digitalWrite(MOTOR_ENABLE, HIGH);
             // timer14->resume(); // starting systick timer
