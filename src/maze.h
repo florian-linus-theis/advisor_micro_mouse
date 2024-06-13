@@ -133,56 +133,50 @@ void write_maze_to_flash(uint32_t startAddress, const std::vector<uint8_t>& maze
     HAL_FLASH_Lock();
 }
 
-<<<<<<< HEAD
-void loadMazeFromFlash(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
-    deserializeMaze(startAddress, maze);
-}
-
 //Define the Maze type
 using Test_Maze = std::vector<std::vector<Location>>;
-Test_Maze initializeTestMaze() {
-    Test_Maze Testmaze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
+Test_Maze initialize_test_maze() {
+    Test_Maze test_maze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
 
     // Initialize the testmaze with dummy data
-    for (int i = 0; i < MAZE_HEIGHT; ++i) {
-        for (int j = 0; j < MAZE_WIDTH; ++j) {
-            Location loc;
-            loc.set_position({i, j});
-            loc.set_visited(i % 2 == 0 && j % 2 == 0);  // Set visited based on a pattern
-            std::array<bool, 4> walls = {i == 0, j == MAZE_WIDTH - 1, i == MAZE_HEIGHT - 1, j == 0};
-            loc.set_walls(walls);
+    // for (int i = 0; i < MAZE_HEIGHT; ++i) {
+    //     for (int j = 0; j < MAZE_WIDTH; ++j) {
+    //         Location loc;
+    //         loc.set_position({i, j});
+    //         loc.set_visited(i % 2 == 0 && j % 2 == 0);  // Set visited based on a pattern
+    //         std::array<bool, 4> walls = {i == 0, j == MAZE_WIDTH - 1, i == MAZE_HEIGHT - 1, j == 0};
+    //         loc.set_walls(walls);
 
-            Testmaze[i][j] = loc;
-        }
-    }
+    //         test_maze[i][j] = loc;
+    //     }
+    // }
 
     // Example maze structure with walls and visited status
     // Each location has walls on the north, east, south, west sides respectively
     // Example: The top-left corner location (0, 0)
-    Testmaze[0][0].set_position({0, 0});
-    Testmaze[0][0].set_walls({true, false, true, false});
-    Testmaze[0][0].set_visited(true);
+    test_maze[0][0].set_position({0, 0});
+    test_maze[0][0].set_walls({true, false, true, false});
+    test_maze[0][0].set_visited(true);
 
     // Example: The top-right corner location (0, 3)
-    Testmaze[0][3].set_position({0, 3});
-    Testmaze[0][3].set_walls({true, true, false, false});
-    Testmaze[0][3].set_visited(false);
+    test_maze[0][3].set_position({0, 3});
+    test_maze[0][3].set_walls({true, true, false, false});
+    test_maze[0][3].set_visited(false);
 
     // Example: The bottom-left corner location (3, 0)
-    Testmaze[3][0].set_position({3, 0});
-    Testmaze[3][0].set_walls({false, false, true, true});
-    Testmaze[3][0].set_visited(false);
+    test_maze[3][0].set_position({3, 0});
+    test_maze[3][0].set_walls({false, false, true, true});
+    test_maze[3][0].set_visited(false);
 
     // Example: The bottom-right corner location (3, 3)
-    Testmaze[3][3].set_position({3, 3});
-    Testmaze[3][3].set_walls({false, true, false, true});
-    Testmaze[3][3].set_visited(false);
+    test_maze[3][3].set_position({3, 3});
+    test_maze[3][3].set_walls({false, true, false, true});
+    test_maze[3][3].set_visited(false);
 
 
-    return Testmaze;
+    return test_maze;
 }
-=======
+
 void load_maze_from_flash(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
     deserialize_maze(startAddress, maze);
 }
->>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee

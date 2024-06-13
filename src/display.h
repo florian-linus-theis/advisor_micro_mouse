@@ -25,11 +25,10 @@ const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 
 volatile int buzzer_counter;
 //--------------------------------------------------------------------------------------
-<<<<<<< HEAD
-// vector to serialize maze 
->>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee
+// vector to serialize maze
 std::vector<u_int8_t> buffer;
-Test_Maze Testmaze = initializeTestMaze();
+Test_Maze test_maze = initialize_test_maze();
+;
 //--------------------------------------------------------------------------------------
 
 
@@ -192,13 +191,7 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
-<<<<<<< HEAD
-            serializeMaze(Testmaze, buffer);
-=======
-
             serialize_maze(test_maze, buffer);
-
->>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee
             // Write serialized data to flash
             write_maze_to_flash(0x080E0000, buffer);
             ble->println("Data written to Flash");
@@ -227,11 +220,7 @@ void handleModeSelection(Mode mode) {
             display_print("Store Flash Mode selected.");
             uint32_t address_to_check = 0x080E0000; // Example address: sector 11
             // Load the maze from flash
-<<<<<<< HEAD
-             loadMazeFromFlash(0x080E0000, Testmaze);
-=======
              load_maze_from_flash(0x080E0000, test_maze);
->>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee
 
             for (const auto& row : maze) {
                 for (const auto& loc : row) {
