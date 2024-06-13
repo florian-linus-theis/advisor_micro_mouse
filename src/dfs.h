@@ -4,8 +4,8 @@
 
 #include "maze.h"
 #include "location.h"
-#include "API.h"
-#include "mms_interaction.h"
+
+#include "algo_movement_api.h"
 
 extern int current_option; // current state selected by the user
 
@@ -100,6 +100,10 @@ void dfs_map_maze() {
         }
         // If loc_stack is empty, backtrack to the initial position then return
         if (loc_stack.empty()) {
+            if (cur_position == std::vector<int>{0, 0}) {
+                backup_to_wall(); // If we are at the origin, we are done
+                return; // if we are at the origin, we are done
+            }
             // if we are not at the origin yet, we move back and try again
             if (!(cur_position == std::vector<int>{0, 0})) {
                 set_dir_fast_mapping((dir_stack.top() + 2) % 4); // Turn around and follow direction stack in reverse order

@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include "mms_interaction.h"
+#include "algo_movement_api.h"
 #include "location.h"
 #include "state.h"
-#include "API.h"
-#include "display.h"
+
+#include "user_interface.h"
 
 extern int current_option; // current option selected by the user
 

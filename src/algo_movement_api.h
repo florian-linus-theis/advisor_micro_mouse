@@ -1,11 +1,10 @@
 #pragma once
 #include <iostream>
 #include <vector>
-#include "API.h" // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
 #include "location.h"
-#include <ballgrabber.h>
-#include "display.h"
-#include <movement.h>
+#include "ballgrabber.h"
+#include "user_interface.h"
+#include "movement.h"
 #include "Setup/Setup.h"
 
 
@@ -85,10 +84,8 @@ void move_forward_mapping_fast(int squares = 1){
         if (cur_direction == 0){
             drive_forward(365, 365, 0.7778); // drive forward until edge of the cell 
             update_position();
-        } else {
-            backup_to_wall();   
+            return;
         }
-        return;
     }
     drive_forward(365, 365, squares);
     update_position();
@@ -124,18 +121,6 @@ void turn_around(){
 }
 
 
-// void turn_around_fast_mapping(){
-//     // brake 
-//     stop();
-//     delay(300);
-//     // position to wall using y-error
-//     // evtl zur wand fahren und von da aus wieder los
-//     recalibrate_front_wall();
-//     // turning around
-//     turn_around_right();
-//     // drive back to edge of next square 
-//     move_forward_mapping_fast();
-// }
 
 void turn_around_and_back_up(){
     backup_to_wall();
@@ -177,9 +162,10 @@ void set_dir_fast_mapping(int _dir) {
         } else {
             drive_forward(365, 0, 0.5);
             right_turn_around();
+            drive_forward(365, 365, 0.5);
             update_direction(+2);
             update_position();
-            drive_forward(365, 365, 0.5);
+            return;
         }
     }
     fast_turn_left();  // If need to turn left once
@@ -224,6 +210,84 @@ void turn_toward_fast_mapping(Location loc){
     }
     set_dir_fast_mapping(_dir); // turning towards desired location
 }
+
+
+
+// ------------------------------------------------------------------------
+// Algorithm Fast Run Execution
+constexpr int FORWARD = 0;
+constexpr int RIGHT = 1;        // turns right, then forward - confusing
+constexpr int LEFT = 3;         // turns left, then forward - confusing
+
+
+// function to translate the actions of the algorithm into movement
+std::vector<std::tuple<int, float>> translate_actions_into_movement(std::vector<int> actions, bool ballgreifer) {
+    std::vector<std::tuple<int, float>> movement;
+    int i = 1; // always skipping first square (we know it is 0 action and need specific distance to drive to the edge of the cell)
+    if (ballgreifer) i = 3; // skip the first three actions
+
+    for (i; i < actions.size(); i++) {
+        
+        // CASE FORWARD
+        if (actions[i] == FORWARD) {
+            int j = 1;
+            // check how many forward actions are following
+            while (i + j < actions.size() && actions[i + j] == FORWARD) {
+                j++;
+            }
+            // if there is more than one forward action, we drive multiple squares forward
+            if (j > 1) {
+                movement.push_back(std::make_tuple(FORWARD, j));
+                i += j-1;
+                continue;
+            }
+            // if there is only one forward action, we drive one square forward
+            movement.push_back(std::make_tuple(FORWARD, 1));
+        // CASE RIGHT CURVE
+        } else if (actions[i] == RIGHT) {
+            movement.push_back(std::make_tuple(RIGHT, 0));
+        // CASE LEFT CURVE
+        } else if (actions[i] == LEFT) {
+            movement.push_back(std::make_tuple(LEFT, 0));
+        }
+    }
+    return movement;
+}
+
+
+// function to execute the translated actions of the algorithm into actual movement
+// calls middle_layer_functions that work together with the hardware
+void execute_movements(const std::vector<std::tuple<int, float>>& movement) {
+    // print the movements
+    for (int i = 0; i < movement.size(); ++i) {
+        if (std::get<0>(movement[i]) == FORWARD) {
+            ble->print("F ");
+            ble->println(std::get<1>(movement[i]));
+        } else if (std::get<0>(movement[i]) == RIGHT) {
+            ble->println("R");
+        } else if (std::get<0>(movement[i]) == LEFT) {
+            ble->println("L");
+        }
+    }
+    drive_forward(SPEED_MAPPING, SPEED_MAPPING, 0.7778); // start square
+    for (int i = 0; i < movement.size(); ++i) {
+        switch (std::get<0>(movement[i])) {
+            case FORWARD:
+                drive_forward(SPEED_MAPPING, SPEED_MAPPING, std::get<1>(movement[i]));
+                break;
+            case RIGHT:
+                curve_right();
+                break;
+            case LEFT:
+                curve_left();
+                break;
+            default:
+                break;
+        }
+    }
+    drive_forward(SPEED_MAPPING, 0, 0.5); // stop inside final square
+}
+
 
 
 

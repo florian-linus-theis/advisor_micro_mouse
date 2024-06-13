@@ -1,6 +1,6 @@
 #pragma once
-#include "API.h" // for interacting with the MMS
-#include "mms_interaction.h"
+ // for interacting with the MMS
+#include "algo_movement_api.h"
 #include "location.h" // importing location class
 #include "maze.h" // importing maze functions
 #include "state.h" // importing state class
@@ -8,15 +8,14 @@
 #include "bfs.h" // importing breadth-first-search algorithm
 #include "a_star_nodes.h" // importing a_star_node class
 #include "a_star_algorithm.h" // importing AStarAlgorithm class
-#include "display.h"
+#include "user_interface.h"
 #include "Setup/Setup.h"
-#include "algorithms_to_movement.h"
 
 
 bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
-std::vector<int> POSSIBLE_GOAL_POS_ONE = {0,2}; 
-std::vector<int> POSSIBLE_GOAL_POS_TWO = {8, 8}; 
+std::vector<int> POSSIBLE_GOAL_POS_ONE = {3,3}; 
+std::vector<int> POSSIBLE_GOAL_POS_TWO = {8,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_THREE = {8,7};
 std::vector<int> POSSIBLE_GOAL_POS_FOUR = {7,7}; 
 std::vector<int> GOAL_POSITION = {-1,-1}; // Global variable to store the goal position
@@ -31,8 +30,8 @@ void dfs_mapping(){
     cur_direction = 0; // Set the current direction to north
     ble->println("Mapping maze using DFS");	
     dfs_map_maze(); // Mapping the maze using depth-first search 
-    set_dir(0); // Reset heading to north
     display_print("Mapping complete");
+    MAPPING_COMPLETE = true; // Set mapping complete to true
     return;
 }
 
@@ -64,8 +63,21 @@ void bfs_algorithm(){
     }
     // calculate the shortest path
     std::vector<int> action_vector = bfs.return_action_vector_bfs_path(solution_position);
+    // print the action vector via blutooth
+    ble->print("Action Vector: ");
+    for (int i = 0; i < action_vector.size(); i++) {
+        ble->print(action_vector[i]);
+        ble->print(" ");
+    }
     // translate the actions into actual movements in maze
     std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
+    // print the movements via blutooth
+    ble->print("Movements: ");
+    for (int i = 0; i < movements.size(); i++) {
+        ble->print(std::get<0>(movements[i]));
+        ble->print(std::get<1>(movements[i]));
+        ble->print(" ");
+    }
     // execute the movements
     execute_movements(movements);
     // display completion message

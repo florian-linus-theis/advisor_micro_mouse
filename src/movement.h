@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <cmath> // abs()
 #include <vector>
-#include <robin.h>
+#include <motors.h>
 #include "Setup/Setup.h"
 
 int precompute_duty_intervals();
@@ -303,6 +303,7 @@ void drive_forward(int desired_max_speed, int end_speed, float squares){
     // int braking_distance = calc_fixed_braking_distance(end_duty_cycle);
     reset_distance_traveled(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
     reset_PID_values();
+    accelerate(desired_max_speed);
     while(avg_distance_traveled < desired_distance){ 
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled;
@@ -460,10 +461,10 @@ void right_turn_around(){
     current_duty_cycle = DUTY_SLOW_ROTATION;
     int full_rotation_ticks = tick_rotate * 1.9;
     reset_distance_traveled();
-    BackwardRight(DUTY_SLOW_ROTATION + 50); // start moving wheels in opposite directions (turning right)
-    ForwardLeft(DUTY_SLOW_ROTATION + 50);
+    BackwardRight(150); // start moving wheels in opposite directions (turning right)
+    ForwardLeft(150);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
-    while(abs(distance_traveled_R) < full_rotation_ticks && abs(distance_traveled_L) < full_rotation_ticks){
+    while(abs(distance_traveled_R) < full_rotation_ticks || abs(distance_traveled_L) < full_rotation_ticks){
     }
     stop();
     delay(200);
@@ -527,7 +528,6 @@ void curve_right(){
     // speed calculation
     int speed_L = static_cast<int>((start_speed / 3) * 4);
     int speed_R = static_cast<int>((start_speed / 3) * 1.9);
-    ble->println("Curve right");
     disable_PID();
     reset_distance_traveled();
     int last_distance_traveled = avg_distance_traveled;
