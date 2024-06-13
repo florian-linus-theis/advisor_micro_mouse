@@ -25,9 +25,9 @@ const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 
 volatile int buzzer_counter;
 //--------------------------------------------------------------------------------------
-// Create your maze with dummy data or actual initialization
-// std::vector<std::vector<Location>> test_maze(16, std::vector<Location>(16));
-// // Serialize the maze 
+<<<<<<< HEAD
+// vector to serialize maze 
+>>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee
 std::vector<u_int8_t> buffer;
 Test_Maze Testmaze = initializeTestMaze();
 //--------------------------------------------------------------------------------------
@@ -192,10 +192,17 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
+<<<<<<< HEAD
             serializeMaze(Testmaze, buffer);
+=======
+
+            serialize_maze(test_maze, buffer);
+
+>>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee
             // Write serialized data to flash
-            writeMazeToFlash(0x080E0000, buffer);
+            write_maze_to_flash(0x080E0000, buffer);
             ble->println("Data written to Flash");
+
             // Clear the maze to demonstrate loading from flash
             maze.clear();
             maze.resize(16, std::vector<Location>(16));
@@ -218,38 +225,39 @@ void handleModeSelection(Mode mode) {
         //     break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-            uint32_t address_to_check = 0x080E0000; // Example address to check
+            uint32_t address_to_check = 0x080E0000; // Example address: sector 11
             // Load the maze from flash
+<<<<<<< HEAD
              loadMazeFromFlash(0x080E0000, Testmaze);
+=======
+             load_maze_from_flash(0x080E0000, test_maze);
+>>>>>>> 323ba918a5ba0349db9ba507ff6ac13c46d3a4ee
 
             for (const auto& row : maze) {
                 for (const auto& loc : row) {
+                    ble->print("Position: ");
                     ble->print("(");
                     ble->print(loc.position[0]);
                     ble->print(", ");
                     ble->print(loc.position[1]);
-                    ble->print(") Walls: ");
+                    ble->println(")");
+                    
+                    ble->println("Walls: ");
                     for (bool wall : loc.walls) {
-                        ble->print(wall);
-                        ble->print(" ");
+                        ble->println(wall);
                     }
-                    ble->println("Visited: ");
+                    ble->print("Visited: ");
                     ble->print(loc.visited);
                 }
                 ble->println();
             }
         
-            if (isFlashWritable(address_to_check)) {
+            if (is_flash_writable(address_to_check)) {
                 ble->println("Flash mem free");
             } else {
                 ble->println("Flash mem not free");
             }
     }
-
-
-            // loadMazeFromFlash(maze, baseAddress);
-            //     // Print the loaded maze
-
 }
 
 void Buzzer_beep(int freq, int beeps) {  //Frequency and Number of beeps
