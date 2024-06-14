@@ -4,7 +4,7 @@
 float battery_volts;  
 int battery_percentage; 
 int adc_value; 
-const float v_min = 2.0;
+const float v_min = 2.3;
 const float v_max = 2.7;          
 
 //Spannung an Batterie in Volt und Umrechnung in Prozent

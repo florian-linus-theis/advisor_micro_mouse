@@ -186,19 +186,19 @@ void handleModeSelection(Mode mode) {
             digitalWrite(MOTOR_ENABLE, LOW); // disable motor
             timer14->resume();
             start(5); // wait for finger
-            reset_encoders();
-            reset_PID_values();
+            // reset_encoders();
+            // reset_PID_values();
+            // delay(100);
+            // grab_ball();
+            // stop();
+            while(!encoderTurned){
+                std::vector<bool> walls = find_walls_forward_looking();
+                ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
+                ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
+                delay(2500);
+            }
             delay(100);
-            grab_ball();
-            stop();
-            // while(!encoderTurned){
-            //     std::vector<bool> walls = find_walls_forward_looking();
-            //     ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
-            //     ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
-            //     delay(2500);
-            // }
-            delay(100);
-            digitalWrite(MOTOR_ENABLE, HIGH);
+            // digitalWrite(MOTOR_ENABLE, HIGH);
             // timer14->resume(); // starting systick timer
             // delay(100);
             // // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
@@ -214,7 +214,7 @@ void handleModeSelection(Mode mode) {
             // // display_print("A* Mode completed");
             // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             // // always keep this last
-            // break;
+            break;
             timer14->pause();
             displayOptions(MODE_ASTAR, false);
         default:
