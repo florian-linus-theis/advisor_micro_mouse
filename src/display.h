@@ -18,18 +18,12 @@ enum Mode {
     MODE_STORE_FLASH,
     MODE_MAX, // This can be used to determine the number of modes
 };
-
+Test_Maze test_maze = initialize_test_maze();
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 
 volatile int buzzer_counter;
-//--------------------------------------------------------------------------------------
-// vector to serialize maze
-std::vector<int8_t> buffer;
-Test_Maze test_maze = initialize_test_maze();
-int indexprint;
-//--------------------------------------------------------------------------------------
 
 
 // Functions
@@ -193,7 +187,6 @@ void handleModeSelection(Mode mode) {
             ble->println("A* Mode selected");
             
             // Write serialized data to flash
-            buffer.clear();
             serialize_maze(test_maze, buffer);
             // Debug print to serial monitor or log
             ble->println("Serialized Buffer:");
@@ -225,7 +218,7 @@ void handleModeSelection(Mode mode) {
             }
 
             ble->println();
-            
+
             writeDataToFlash(FLASH_SECTOR_11_START_ADDR, buffer);
             //write_maze_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
             ble->println("Data written to Flash");
@@ -249,7 +242,6 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-            buffer.clear();
             test_maze.clear();
             test_maze.resize(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
             

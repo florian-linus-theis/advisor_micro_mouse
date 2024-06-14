@@ -64,6 +64,12 @@ void maze_setup(){
 }
 
 //Flash memory---------------------------------------------------------------------
+// vector to serialize maze
+using Test_Maze = std::vector<std::vector<Location>>;
+std::vector<int8_t> buffer(28, 0);
+int indexprint;
+int buffer_size = 28; //7 * #Squares
+//--------------------------------------------------------------------------------------
 
 
 //check if adress in flash is available
@@ -92,6 +98,7 @@ bool is_flash_writable(uint32_t address) {
 //transform maze into buffer vector
 
 void serialize_maze(const std::vector<std::vector<Location>>& maze, std::vector<int8_t>& buffer) {
+    buffer.clear();
     for (const auto& row : maze) {
         for (const auto& loc : row) {
             // Serialize Walls
@@ -121,28 +128,29 @@ void writeDataToFlash(uint32_t startAddress, const std::vector<int8_t>& data) {
 
 void read_maze_from_flash(uint32_t startAddress, std::vector<int8_t>& buffer) {
     for (size_t i = 0; i < buffer.size(); ++i) {
-        buffer[i] = *reinterpret_cast<int8_t*>(startAddress + i);
+        buffer[i] = *reinterpret_cast<volatile int8_t*>(startAddress + i);
     }
 }
 //transform buffer vector into matrix
 void deserialize_maze(const std::vector<int8_t>& buffer, std::vector<std::vector<Location>>& maze) {
-    size_t index = 0;
-    for (auto& row : maze) {
-        for (auto& loc : row) {
-            for (size_t i = 0; i < loc.walls.size(); i++) {
-                loc.walls[i] = static_cast<bool>(buffer[index]);
+    if(buffer.size() < buffer_size){  //check Buffer size  
+        size_t index = 0;
+        for (auto& row : maze) {
+            for (auto& loc : row) {
+                for (size_t i = 0; i < loc.walls.size(); i++) {
+                    loc.walls[i] = static_cast<bool>(buffer[index]);
+                    index++;
+                }
+                loc.visited = static_cast<bool>(buffer[index]);
                 index++;
+                loc.position[0] = static_cast<int>(buffer[index]);
+                loc.position[1] = static_cast<int>(buffer[index + 1]);
+                index += 2;
             }
-            loc.visited = static_cast<bool>(buffer[index]);
-            index++;
-            loc.position[0] = static_cast<int>(buffer[index]);
-            loc.position[1] = static_cast<int>(buffer[index + 1]);
-            index += 2;
         }
-    }
+    }   
 }
 //Define the Maze type
-using Test_Maze = std::vector<std::vector<Location>>;
 Test_Maze initialize_test_maze() {
     Test_Maze test_maze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
 
