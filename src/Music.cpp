@@ -404,6 +404,45 @@ int* full_90s_pause[] = {
         pause14, };
 
 
+int full_90s_count[] = {
+        6, 
+        8, 
+        6, 
+        8,   
+        12,
+        12,
+        12,
+        3,
+        12,
+        12,
+        12,
+        8,
+        14,
+        12,
+        14,
+        10,
+        14,
+        12,
+        14,
+        8,
+        9,
+        6,
+        1,
+        8,
+        1,
+        2,
+        6,
+        7,
+        2,
+        6,
+        8,
+        2,
+        6,
+        1,
+        5,
+        1,
+        5, 
+};
 
 void Running_in_the_90s(){
     note_cnt = 0;
@@ -429,11 +468,11 @@ void Timer13_Interrupt() {
 
         Buzzer_beep_noBlock(full_90s_notes[beat_cnt][note_cnt], 1, full_90s_length[beat_cnt][note_cnt]);
         
-        ble->println("b_cnt: " + String(beat_cnt) + "n_cnt: " + String(note_cnt) + "note: " + String(full_90s_notes[beat_cnt][note_cnt]) + " length: " + String(full_90s_length[beat_cnt][note_cnt]) + "  pause: " + String(full_90s_pause[beat_cnt][note_cnt]));
+        ble->println("b_cnt: " + String(beat_cnt) + " n_cnt: " + String(note_cnt) + " note: " + String(full_90s_notes[beat_cnt][note_cnt]) + " length: " + String(full_90s_length[beat_cnt][note_cnt]) + "  pause: " + String(full_90s_pause[beat_cnt][note_cnt]));
 
         note_cnt++;
 
-        if (note_cnt >= sizeof(full_90s_notes[beat_cnt]) / sizeof(full_90s_notes[beat_cnt][0]) ) {
+        if (note_cnt >= full_90s_count[beat_cnt]) {
                 note_cnt = 0;
                 beat_cnt++;
         }
