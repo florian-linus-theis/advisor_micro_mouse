@@ -11,7 +11,7 @@
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
 #include "./location.h"
-#include <stm32f4xx_hal.h> //probably not neccessary
+#include <stm32f4xx_hal.h> //necessary for Flash Memory Usage
 
 
 //Pin Naming
@@ -164,8 +164,8 @@ enum PID_CASES{
 // ---------------------------------------
 // Algorithm constants
 // Initializing maze size with constexpr to set them up as compile-time-constants rather than runtime constants
-#define MAZE_WIDTH 16
-#define MAZE_HEIGHT 16
+#define MAZE_WIDTH 2
+#define MAZE_HEIGHT 2
 extern std::vector<std::vector<Location>> maze; // Global variable to store the maze
 extern bool BALLGREIFER; // Control Variable to check if the ballgreifer is present
 extern std::vector<int> POSSIBLE_GOAL_POS_ONE; 
@@ -333,9 +333,11 @@ extern void move_forward_mapping(int);
 extern void soft_reset();
 
 //Flash Memory
-#define FLASH_SECTOR11_START_ADDR 0x080E0000
+#define FLASH_SECTOR_11_START_ADDR 0x080E0000
 #define FLASH_SECTOR_11_END_ADDR 0x080FFFFF
+#define FLASH_SECTOR_11_SIZE 0x20000 // 128 KB for Sector 11
+
+
 extern void serialize_maze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
 extern void deserialize_maze(uint32_t, std::vector<std::vector<Location>>&);   
 extern void write_data_to_flash(uint32_t, const std::vector<uint8_t>&); 
-extern void load_maze_from_flash(uint32_t, std::vector<std::vector<Location>>&);

@@ -26,9 +26,9 @@ const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
 volatile int buzzer_counter;
 //--------------------------------------------------------------------------------------
 // vector to serialize maze
-std::vector<u_int8_t> buffer;
+std::vector<int8_t> buffer;
 Test_Maze test_maze = initialize_test_maze();
-;
+int indexprint;
 //--------------------------------------------------------------------------------------
 
 
@@ -191,14 +191,44 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
-            serialize_maze(test_maze, buffer);
+            
             // Write serialized data to flash
-            write_maze_to_flash(0x080E0000, buffer);
-            ble->println("Data written to Flash");
+            serialize_maze(test_maze, buffer);
+            
+            // Debug print to serial monitor or log
+            ble->println("Serialized Buffer:");
+            indexprint = 0;
+            while (indexprint < buffer.size()) {
+            // Print Walls
+            ble->println("Walls:");
+                for (int i = 0; i < 4; ++i) {
+                    bool wall = buffer[indexprint++] != 0;
+                    ble->print(wall);
+                    ble->print(" ");
+                }
+            ble->println();
 
+            // Print Visited
+            bool visited = buffer[indexprint++] != 0;
+            ble->print("Visited: ");
+            ble->println(visited);
+
+            // Print Position
+            ble->print("Position: [");
+            int x = (buffer[indexprint]);
+            int y = (buffer[indexprint + 1]); 
+            ble->print(x);
+            ble->print(", ");
+            ble->print(y);
+            ble->println("]");
+            indexprint += 2; 
+            }
+
+            ble->println();
+            writeDataToFlash(FLASH_SECTOR_11_START_ADDR, buffer);
+            //write_maze_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
+            ble->println("Data written to Flash");
             // Clear the maze to demonstrate loading from flash
-            maze.clear();
-            maze.resize(16, std::vector<Location>(16));
             ble->println("Maze cleared");
 
             // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
@@ -215,32 +245,40 @@ void handleModeSelection(Mode mode) {
             displayOptions(MODE_ASTAR, false);
         // default:
         //     display_print("Invalid mode");
-        //     break;
+            break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-            uint32_t address_to_check = 0x080E0000; // Example address: sector 11
+            buffer.clear();
+            test_maze.clear();
+            test_maze.resize(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
+            
             // Load the maze from flash
-             load_maze_from_flash(0x080E0000, test_maze);
+            read_maze_from_flash(FLASH_SECTOR_11_START_ADDR, buffer);
+            deserialize_maze(buffer, test_maze);
+            // Verify loaded data
+            ble->println("Maze data loaded from flash:");
 
-            for (const auto& row : maze) {
-                for (const auto& loc : row) {
-                    ble->print("Position: ");
-                    ble->print("(");
-                    ble->print(loc.position[0]);
+            for (int i = 0; i < MAZE_HEIGHT; ++i) {
+                for (int j = 0; j < MAZE_WIDTH; ++j) {
+                    ble->print("Position: [");
+                    ble->print(test_maze[i][j].position[0]);
                     ble->print(", ");
-                    ble->print(loc.position[1]);
-                    ble->println(")");
-                    
-                    ble->println("Walls: ");
-                    for (bool wall : loc.walls) {
-                        ble->println(wall);
+                    ble->print(test_maze[i][j].position[1]);
+                    ble->println("]");
+
+                    ble->print("Walls: ");
+                    for (bool wall : test_maze[i][j].walls) {
+                        ble->print(wall);
+                        ble->print(" ");
                     }
+                    ble->println();
+
                     ble->print("Visited: ");
-                    ble->print(loc.visited);
+                    ble->println(test_maze[i][j].visited);
+                    ble->println();
                 }
-                ble->println();
             }
-        
+            uint32_t address_to_check = FLASH_SECTOR_11_START_ADDR; // Example address: sector 11
             if (is_flash_writable(address_to_check)) {
                 ble->println("Flash mem free");
             } else {

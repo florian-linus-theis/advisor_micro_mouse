@@ -34,6 +34,9 @@ void dfs_mapping(){
     set_dir(0); // Reset heading to north
     display_print("Mapping complete");
     delay(2000);
+    //Store Maze to Flash
+    //serialize_maze(maze, buffer);
+    //write_maze_to_flash(FLASH_SECTOR_6_START_ADDR, buffer);
     return;
 }
 

@@ -90,93 +90,83 @@ bool is_flash_writable(uint32_t address) {
 }
 
 //transform maze into buffer vector
-void serialize_maze(const std::vector<std::vector<Location>>& maze, std::vector<uint8_t>& buffer) {
+
+void serialize_maze(const std::vector<std::vector<Location>>& maze, std::vector<int8_t>& buffer) {
     for (const auto& row : maze) {
         for (const auto& loc : row) {
-            buffer.insert(buffer.end(), loc.walls.begin(), loc.walls.end());
-            buffer.push_back(loc.visited);
-            buffer.insert(buffer.end(), reinterpret_cast<const uint8_t*>(loc.position.data()), reinterpret_cast<const uint8_t*>(loc.position.data()) + loc.position.size() * sizeof(int));
+            // Serialize Walls
+            for(bool wall : loc.walls){
+                buffer.push_back(static_cast<int8_t>(wall));
+            }
+            // Serialize visited
+            buffer.push_back(static_cast<int8_t>(loc.visited));
+            // Serialize position (assuming fixed byte order)
+            buffer.push_back(static_cast<int8_t>(loc.position[0])); // Low byte
+            buffer.push_back(static_cast<int8_t>(loc.position[1])); // Low byte
         }
     }
 }
 
-//transform buffer vector into matrix
-void deserialize_maze(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
-    size_t index = 0;
-    for (auto& row : maze) {
-        for (auto& loc : row) {
-            for (size_t i = 0; i < loc.walls.size(); i++) {
-                loc.walls[i] = *reinterpret_cast<uint8_t*>(startAddress + index);
-                index++;
-            }
-            loc.visited = *reinterpret_cast<uint8_t*>(startAddress + index);
-            index++;
-            for (size_t i = 0; i < loc.position.size(); i++) {
-                loc.position[i] = *reinterpret_cast<int*>(startAddress + index);
-                index += sizeof(int);
-            }
-        }
-    }
-}
-
-
-void write_maze_to_flash(uint32_t startAddress, const std::vector<uint8_t>& maze) {
+void writeDataToFlash(uint32_t startAddress, const std::vector<int8_t>& data) {
     HAL_FLASH_Unlock();
-
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGSERR);
-    FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);       //Erase sector to write afterwards
+    FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);
 
-    for (size_t i = 0; i < maze.size(); i++) {
-        HAL_FLASH_Program(TYPEPROGRAM_BYTE, startAddress + i, maze[i]);     //write into flash
+    for (size_t i = 0; i < data.size(); i++) {
+        HAL_FLASH_Program(TYPEPROGRAM_BYTE, startAddress + i, data[i]);
     }
 
     HAL_FLASH_Lock();
 }
 
+void read_maze_from_flash(uint32_t startAddress, std::vector<int8_t>& buffer) {
+    for (size_t i = 0; i < buffer.size(); ++i) {
+        buffer[i] = *reinterpret_cast<int8_t*>(startAddress + i);
+    }
+}
+//transform buffer vector into matrix
+void deserialize_maze(const std::vector<int8_t>& buffer, std::vector<std::vector<Location>>& maze) {
+    size_t index = 0;
+    for (auto& row : maze) {
+        for (auto& loc : row) {
+            for (size_t i = 0; i < loc.walls.size(); i++) {
+                loc.walls[i] = static_cast<bool>(buffer[index]);
+                index++;
+            }
+            loc.visited = static_cast<bool>(buffer[index]);
+            index++;
+            loc.position[0] = static_cast<int>(buffer[index]);
+            loc.position[1] = static_cast<int>(buffer[index + 1]);
+            index += 2;
+        }
+    }
+}
 //Define the Maze type
 using Test_Maze = std::vector<std::vector<Location>>;
 Test_Maze initialize_test_maze() {
     Test_Maze test_maze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
 
-    // Initialize the testmaze with dummy data
-    // for (int i = 0; i < MAZE_HEIGHT; ++i) {
-    //     for (int j = 0; j < MAZE_WIDTH; ++j) {
-    //         Location loc;
-    //         loc.set_position({i, j});
-    //         loc.set_visited(i % 2 == 0 && j % 2 == 0);  // Set visited based on a pattern
-    //         std::array<bool, 4> walls = {i == 0, j == MAZE_WIDTH - 1, i == MAZE_HEIGHT - 1, j == 0};
-    //         loc.set_walls(walls);
-
-    //         test_maze[i][j] = loc;
-    //     }
-    // }
-
     // Example maze structure with walls and visited status
     // Each location has walls on the north, east, south, west sides respectively
     // Example: The top-left corner location (0, 0)
     test_maze[0][0].set_position({0, 0});
-    test_maze[0][0].set_walls({true, false, true, false});
+    test_maze[0][0].set_walls({false, false, true, true});
     test_maze[0][0].set_visited(true);
 
-    // Example: The top-right corner location (0, 3)
-    test_maze[0][3].set_position({0, 3});
-    test_maze[0][3].set_walls({true, true, false, false});
-    test_maze[0][3].set_visited(false);
+    // Example: The top-right corner location (0, 1)
+    test_maze[0][1].set_position({0, 1});
+    test_maze[0][1].set_walls({true, false, false, true});
+    test_maze[0][1].set_visited(false);
 
-    // Example: The bottom-left corner location (3, 0)
-    test_maze[3][0].set_position({3, 0});
-    test_maze[3][0].set_walls({false, false, true, true});
-    test_maze[3][0].set_visited(false);
+    // Example: The bottom-left corner location (1, 0)
+    test_maze[1][0].set_position({1, 0});
+    test_maze[1][0].set_walls({true, true, false, false});
+    test_maze[1][0].set_visited(false);
 
-    // Example: The bottom-right corner location (3, 3)
-    test_maze[3][3].set_position({3, 3});
-    test_maze[3][3].set_walls({false, true, false, true});
-    test_maze[3][3].set_visited(false);
-
+    // Example: The bottom-right corner location (1, 1)
+    test_maze[1][1].set_position({1, 1});
+    test_maze[1][1].set_walls({false, true, true, false});
+    test_maze[1][1].set_visited(true);
 
     return test_maze;
-}
-
-void load_maze_from_flash(uint32_t startAddress, std::vector<std::vector<Location>>& maze) {
-    deserialize_maze(startAddress, maze);
 }
