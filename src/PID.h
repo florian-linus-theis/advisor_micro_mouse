@@ -248,14 +248,32 @@ std::vector<bool> find_walls_forward_looking(){
     //     avg_distance_sensors[i] = avg_distance_sensors[i] / counter;
     // }
     // Left Wall Sensors:
-    if(Distance_Sensor[0] > MinSensorValues[0] * 0.8 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
+    if(Distance_Sensor[0] > MinSensorValues[0] * 0.75 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
         wallsVec[3] = true;
     }
+    // Right Wall: both left and right sensor must be above threshold
+    if(Distance_Sensor[5] > MinSensorValues[5] * 0.75 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
+        wallsVec[1] = true;
+    }
     // Front Wall: only front sensor must be above threshold
-    // slight left rotation
-    if(Distance_Sensor[2] > MinSensorValues[2] * 1.4){
+    // Check if right and left are walls ->be less sensitive in all cases, avoiding reflexcions of walls
+    if (wallsVec[1] == true && wallsVec[3] == true)
+    {
+        if(Distance_Sensor[2] > MinSensorValues[2] * 1.7){
         // only use front and front right sensor
-        if(Distance_Sensor[3] > MinSensorValues[3] * 0.75 && Distance_Sensor[6] > MinSensorValues[6] * 0.75) wallsVec[0] = true;
+        if(Distance_Sensor[3] > MinSensorValues[3] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.2) wallsVec[0] = true;
+        } // slight right rotation
+        else if(Distance_Sensor[3] > MinSensorValues[3] * 1.7){ 
+            // only use front and front left sensor
+            if(Distance_Sensor[2] > MinSensorValues[2] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.3) wallsVec[0] = true;
+        } // normal case 
+        else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 1.0){
+            wallsVec[0] = true;
+    }
+    }
+    else if(Distance_Sensor[2] > MinSensorValues[2] * 1.4){
+        // only use front and front right sensor
+        if(Distance_Sensor[3] > MinSensorValues[3] * 0.8 && Distance_Sensor[6] > MinSensorValues[6] * 0.75) wallsVec[0] = true;
     } // slight right rotation
     else if(Distance_Sensor[3] > MinSensorValues[3] * 1.4){ 
         // only use front and front left sensor
@@ -264,10 +282,7 @@ std::vector<bool> find_walls_forward_looking(){
     else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 0.78){
         wallsVec[0] = true;
     }
-    // Right Wall: both left and right sensor must be above threshold
-    if(Distance_Sensor[5] > MinSensorValues[5] * 0.8 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
-        wallsVec[1] = true;
-    }
+    
     return wallsVec;
 }
 
