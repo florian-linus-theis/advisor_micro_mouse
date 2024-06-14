@@ -71,12 +71,10 @@ void bfs_algorithm(){
     }
     // translate the actions into actual movements in maze
     std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
-    // print the movements via blutooth
-    // execute the movements
-    execute_movements(movements);
-    delay(500);
     display_print("Ready for execution...");
     start(5);
+    // execute the movements
+    execute_movements(movements);
     // display completion message
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion
     display_print("BFS complete");

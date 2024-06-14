@@ -235,7 +235,7 @@ std::vector<bool> find_walls_forward_looking(){
     // int counter = 1; 
     // int last_distance_traveled = avg_distance_traveled;
     // std::vector<int> avg_distance_sensors = {0,0,0,0,0,0,0};
-    // // avergae 4 sensor values to get the most reliable results (period of 12ms ~ 3mm)
+    // // average 4 sensor values to get the most reliable results (period of 12ms ~ 3mm distance at mapping speed)
     // while (counter < 5){
     //     if (last_distance_traveled  == avg_distance_traveled) continue; 
     //     counter++;
