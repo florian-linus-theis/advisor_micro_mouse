@@ -24,7 +24,7 @@ enum state{slow, fast};
 int encoder_L = 0;
 int encoder_R = 0;
 
-// tick variables: [distance / (2,2cm * pi)] * 5 * 2048 Ticks
+// tick variables: [distance / (2,2cm * pi)] * 20 * 2048 Ticks
 // int tick_forward = 26668 * 4 ;
 // int tick_start = 6889 * 4;
 // int tick_rotate = 7460 * 4;
@@ -43,12 +43,6 @@ void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R);
 void right_turn_around();
 
 
-// placeholder for sensor values
-int sensor_LA, sensor_LI, sensor_LV, sensor_RV, sensor_RA, sensor_RI;
-int threshhold; // for wall detection missing
-
-std::array<bool, 4> current_walls = {false, false, false, false}; // [N, E, S, W]
-
 int precompute_duty_intervals(){
     return (DUTY_FAST - DUTY_SLOW) / 4;
 }
@@ -66,7 +60,6 @@ void reset_distance_traveled(){
     current_angle = 0;
 }
 
-
 // convert speed to duty cycle
 double duty_to_speed(int duty_cycle){
     return duty_cycle / DUTY_TO_SPEED_FACTOR;
@@ -80,19 +73,6 @@ int speed_to_duty(double speed){
 int speedToDutyCycle(int speed) {
     // Map speed (0 to 800 mm/s) to duty cycle (0 to 200) duty cycle that we reach 200 with
     return static_cast<int>(speed * DUTY_TO_SPEED_FACTOR);
-}
-
-// running wall-array overwrites values of each cell every few ticks
-void scan_walls(){
-    if (sensor_LA > threshhold && sensor_LI > threshhold){
-        // left wall = true
-    }
-    if (sensor_LV > threshhold && sensor_RV > threshhold){
-        // front wall = true
-    }
-    if (sensor_RA > threshhold && sensor_RI > threshhold){
-        // right wall = true
-    }
 }
 
 // Low Level Function 
@@ -341,7 +321,6 @@ int calc_duty_correction(int desired_speed){
 }
 
 
-
 // speed in mm/s
 // aceeleration in mm/s^2
 // basically P-controller for speed
@@ -378,16 +357,6 @@ int calculate_braking_distance(int end_speed){
 
     return static_cast<int>(std::round(braking_distance));
 }
-
-
-
-
-
-
-
-
-
-// mapping movement
 
 void go_to_start(int duty_cycle){
     while(avg_distance_traveled < tick_start){
@@ -438,22 +407,6 @@ void rotate_right(){
     reset_distance_traveled();
 }
 
-// void turn_around(){
-//     ForwardRight (DUTY_SLOW_ROTATION); 
-//     BackwardLeft(DUTY_SLOW_ROTATION);
-//     int last_distance_traveled = 0;
-//     while(avg_distance_traveled < (tick_rotate * 2)){
-//         // basically turning left left two times 
-//         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
-//         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-//         ForwardRight(DUTY_SLOW_ROTATION); 
-//         BackwardLeft(DUTY_SLOW_ROTATION); 
-//     }
-//     stop();
-//     current_duty_cycle = 0;
-//     reset_distance_traveled();
-// }
-
 void right_turn_around(){
     disable_PID();
     volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
@@ -471,13 +424,11 @@ void right_turn_around(){
     reset_distance_traveled();
 }
 
-
 void turn_around_right(){
     rotate_right();
     // delay(500);
     rotate_right();
 }
-
 
 void turn_around_left(){
     rotate_left();

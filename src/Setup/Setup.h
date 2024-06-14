@@ -1,5 +1,5 @@
 //Include Librarys
-#pragma once //<-- Macht das hier faxen?
+#pragma once
 #include <Arduino.h>
 #include "cmath"
 #include "vector"
@@ -11,7 +11,7 @@
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
 #include "./location.h"
-#include <stm32f4xx_hal.h> //probably not neccessary
+#include <stm32f4xx_hal.h> // flash library
 
 //Pin Naming
 //System
@@ -166,11 +166,11 @@ enum PID_CASES{
 #define MAZE_WIDTH 16
 #define MAZE_HEIGHT 16
 extern std::vector<std::vector<Location>> maze; // Global variable to store the maze
-extern bool BALLGREIFER; // Control Variable to check if the ballgreifer is present
 extern std::vector<int> POSSIBLE_GOAL_POS_ONE; 
 extern std::vector<int> POSSIBLE_GOAL_POS_TWO;
 extern std::vector<int> POSSIBLE_GOAL_POS_THREE;
 extern std::vector<int> POSSIBLE_GOAL_POS_FOUR;
+extern bool BALLGREIFER; // Control Variable to check if the ballgreifer is present
 
 
 //Object, Function and Variable Declaration - - - - - - - - - - - - - - - - - - - - -
@@ -206,6 +206,8 @@ extern void set_Interrupt_Priority(void);
 //Systick
 extern void Systick_Interrupt(void);
 extern int Systick_Counter;
+
+
 // Global variables updated during systick 
 extern int encoder_right_total; 
 extern int encoder_left_total;
@@ -258,8 +260,6 @@ extern void grab_ball();
 
 
 
-
-
 //Move to new Header File - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 //Sensors
 extern void Timer6_Interrupt(void);
@@ -300,8 +300,7 @@ extern volatile bool encoderTurned;
 extern bool confirmationPending;
 
 // Buzzer
-extern void Buzzer_beep(int, int);
-extern void Buzzer_beep(int, int, int);
+extern void Buzzer_beep(int, int, int); // Frequency, length, amount
 extern void Buzzer_beep_noBlock(int, int, int);
 extern void Timer7_Interrupt();
 

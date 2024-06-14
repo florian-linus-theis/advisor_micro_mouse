@@ -10,27 +10,27 @@ Clock Overview:
 
 //unused Timers 8,9,11,12,13
 
-HardwareTimer *timer14 = new HardwareTimer(TIM14);
+HardwareTimer *timer1 = new HardwareTimer(TIM1);
+HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer3 = new HardwareTimer(TIM3);
 HardwareTimer *timer4 = new HardwareTimer(TIM4);
-HardwareTimer *timer2 = new HardwareTimer(TIM2);
 HardwareTimer *timer5 = new HardwareTimer(TIM5);
 HardwareTimer *timer6 = new HardwareTimer(TIM6);
-HardwareTimer *timer10 = new HardwareTimer(TIM10);
-HardwareTimer *timer1 = new HardwareTimer(TIM1);
 HardwareTimer *timer7 = new HardwareTimer(TIM7);
+HardwareTimer *timer10 = new HardwareTimer(TIM10);
+HardwareTimer *timer14 = new HardwareTimer(TIM14);
 
 
 void internal_clock_setup();
 void Systick_Setup();
+void Timer1_Setup(); 
+void Timer2_Setup();
 void Timer3_Setup();
 void Timer4_Setup();
-void Timer2_Setup();
 void Timer5_Setup();
 void Timer6_Setup();
+void Timer7_Setup();
 void Timer10_Setup();
-void Timer1_Setup(); 
-void Timer7_Setup(); 
 
 
 void Timer_Setup() {    //Main Timer Setup - - - - - - - - - - - - - - - - - - - - - - -
@@ -91,7 +91,6 @@ void Timer3_Setup() {   // Motor PWM Left
     timer3->refresh();
     timer3->resume();
 }
-
 
 
 // Timer 4 setup for motor PWM Right
@@ -236,7 +235,6 @@ void Timer7_Setup(void) {   //Buzzer Delay Timer
 
 
 
-
 // ----------------------------------------------------------------
 // Interrupt Priorities 
 void setInterruptPriority(IRQn_Type irq, uint32_t preemptPriority, uint32_t subPriority) {
@@ -253,4 +251,12 @@ void set_Interrupt_Priority() {
     timer5->setInterruptPriority(1,2);              //Motor Encoder rechts
     timer6->setInterruptPriority(5,1);              //Main Infrared Sensor
     timer14->setInterruptPriority(7,1);             //Systick
+}
+
+// removed from ADC_Setup.cpp
+void ADC_Setup() {
+    analogReadResolution(12);
+
+    //more to come
+    //Oversampling, ... etc
 }
