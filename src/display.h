@@ -193,8 +193,8 @@ void handleModeSelection(Mode mode) {
             ble->println("A* Mode selected");
             
             // Write serialized data to flash
+            buffer.clear();
             serialize_maze(test_maze, buffer);
-            
             // Debug print to serial monitor or log
             ble->println("Serialized Buffer:");
             indexprint = 0;
@@ -225,6 +225,7 @@ void handleModeSelection(Mode mode) {
             }
 
             ble->println();
+            
             writeDataToFlash(FLASH_SECTOR_11_START_ADDR, buffer);
             //write_maze_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
             ble->println("Data written to Flash");

@@ -335,8 +335,6 @@ extern void soft_reset();
 //Flash Memory
 #define FLASH_SECTOR_11_START_ADDR 0x080E0000
 #define FLASH_SECTOR_11_END_ADDR 0x080FFFFF
-#define FLASH_SECTOR_11_SIZE 0x20000 // 128 KB for Sector 11
-
 
 extern void serialize_maze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
 extern void deserialize_maze(uint32_t, std::vector<std::vector<Location>>&);   

@@ -111,7 +111,7 @@ void writeDataToFlash(uint32_t startAddress, const std::vector<int8_t>& data) {
     HAL_FLASH_Unlock();
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGSERR);
     FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);
-
+    
     for (size_t i = 0; i < data.size(); i++) {
         HAL_FLASH_Program(TYPEPROGRAM_BYTE, startAddress + i, data[i]);
     }
