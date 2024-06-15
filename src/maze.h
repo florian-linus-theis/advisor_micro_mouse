@@ -114,7 +114,7 @@ void serialize_maze(const std::vector<std::vector<Location>>& maze, std::vector<
     }
 }
 
-void writeDataToFlash(uint32_t startAddress, const std::vector<int8_t>& data) {
+void write_data_to_flash(uint32_t startAddress, const std::vector<int8_t>& data) {
     HAL_FLASH_Unlock();
     __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGSERR);
     FLASH_Erase_Sector(FLASH_SECTOR_11, VOLTAGE_RANGE_3);

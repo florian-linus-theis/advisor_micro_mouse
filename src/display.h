@@ -219,7 +219,7 @@ void handleModeSelection(Mode mode) {
 
             ble->println();
 
-            writeDataToFlash(FLASH_SECTOR_11_START_ADDR, buffer);
+            write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
             //write_maze_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
             ble->println("Data written to Flash");
             // Clear the maze to demonstrate loading from flash
