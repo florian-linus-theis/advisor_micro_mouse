@@ -5,7 +5,7 @@
 //#include "battery.h"
 #include "PID.h"
 #include "Music.h"
-#include <maze.h>
+#include "maze.h"
 
 // Define an enum for all modes
 enum Mode {
@@ -18,6 +18,8 @@ enum Mode {
     MODE_STORE_FLASH,
     MODE_MAX, // This can be used to determine the number of modes
 };
+
+
 Test_Maze test_maze = initialize_test_maze();
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
@@ -247,7 +249,10 @@ void handleModeSelection(Mode mode) {
             
             // Load the maze from flash
             read_maze_from_flash(FLASH_SECTOR_11_START_ADDR, buffer);
-            deserialize_maze(buffer, test_maze);
+            for(int i = 0; i < buffer.size(); ++i){
+                ble->println(buffer[i]); 
+            }
+             deserialize_maze(buffer, test_maze);
             // Verify loaded data
             ble->println("Maze data loaded from flash:");
 
@@ -271,12 +276,14 @@ void handleModeSelection(Mode mode) {
                     ble->println();
                 }
             }
-            uint32_t address_to_check = FLASH_SECTOR_11_START_ADDR; // Example address: sector 11
-            if (is_flash_writable(address_to_check)) {
-                ble->println("Flash mem free");
-            } else {
-                ble->println("Flash mem not free");
-            }
+            // uint32_t address_to_check = FLASH_SECTOR_11_START_ADDR; // Example address: sector 11
+            // if (is_flash_writable(address_to_check)) {
+            //     ble->println("Flash mem free");
+            // } else {
+            //     ble->println("Flash mem not free");
+            // }
+            displayOptions(MODE_STORE_FLASH, false);
+            break;
     }
 }
 

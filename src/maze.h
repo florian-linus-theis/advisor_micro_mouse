@@ -3,6 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "location.h" // importing location class;
+#include "display.h"
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
@@ -63,14 +64,13 @@ void maze_setup(){
     }
 }
 
-//Flash memory---------------------------------------------------------------------
+//Flash memory-------------------------------------------------------------------------
 // vector to serialize maze
 using Test_Maze = std::vector<std::vector<Location>>;
-std::vector<int8_t> buffer(28, 0);
+int buffer_size = 16 *(4 + 1 + 2); //7 * #Squares
+std::vector<int8_t> buffer(buffer_size, 0);
 int indexprint;
-int buffer_size = 28; //7 * #Squares
 //--------------------------------------------------------------------------------------
-
 
 //check if adress in flash is available
 bool is_flash_writable(uint32_t address) {
@@ -133,7 +133,12 @@ void read_maze_from_flash(uint32_t startAddress, std::vector<int8_t>& buffer) {
 }
 //transform buffer vector into matrix
 void deserialize_maze(const std::vector<int8_t>& buffer, std::vector<std::vector<Location>>& maze) {
-    if(buffer.size() < buffer_size){  //check Buffer size  
+    size_t expected_size = MAZE_HEIGHT * MAZE_WIDTH * (4 + 1 + 2 ); // walls + visited + position
+    if (buffer.size() < expected_size) {
+        // Buffer size mismatch
+        return;
+    }   
+      
         size_t index = 0;
         for (auto& row : maze) {
             for (auto& loc : row) {
@@ -143,38 +148,86 @@ void deserialize_maze(const std::vector<int8_t>& buffer, std::vector<std::vector
                 }
                 loc.visited = static_cast<bool>(buffer[index]);
                 index++;
-                loc.position[0] = static_cast<int>(buffer[index]);
-                loc.position[1] = static_cast<int>(buffer[index + 1]);
-                index += 2;
+
+                loc.position[0] = *reinterpret_cast<const int*>(&buffer[index]);
+                loc.position[1] = *reinterpret_cast<const int*>(&buffer[index + sizeof(int)]);
+                index += 2 * sizeof(int);
+
             }
         }
-    }   
+       
 }
-//Define the Maze type
+// Define the Maze type
 Test_Maze initialize_test_maze() {
     Test_Maze test_maze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
 
-    // Example maze structure with walls and visited status
-    // Each location has walls on the north, east, south, west sides respectively
-    // Example: The top-left corner location (0, 0)
+    // Row 0
     test_maze[0][0].set_position({0, 0});
-    test_maze[0][0].set_walls({false, false, true, true});
-    test_maze[0][0].set_visited(true);
+    test_maze[0][0].set_walls({true, false, true, true});
+    test_maze[0][0].set_visited(false);
 
-    // Example: The top-right corner location (0, 1)
     test_maze[0][1].set_position({0, 1});
-    test_maze[0][1].set_walls({true, false, false, true});
+    test_maze[0][1].set_walls({true, false, false, false});
     test_maze[0][1].set_visited(false);
 
-    // Example: The bottom-left corner location (1, 0)
+    test_maze[0][2].set_position({0, 2});
+    test_maze[0][2].set_walls({true, false, false, false});
+    test_maze[0][2].set_visited(false);
+
+    test_maze[0][3].set_position({0, 3});
+    test_maze[0][3].set_walls({true, true, false, false});
+    test_maze[0][3].set_visited(false);
+
+    // Row 1
     test_maze[1][0].set_position({1, 0});
-    test_maze[1][0].set_walls({true, true, false, false});
+    test_maze[1][0].set_walls({false, true, false, true});
     test_maze[1][0].set_visited(false);
 
-    // Example: The bottom-right corner location (1, 1)
     test_maze[1][1].set_position({1, 1});
-    test_maze[1][1].set_walls({false, true, true, false});
-    test_maze[1][1].set_visited(true);
+    test_maze[1][1].set_walls({false, false, true, true});
+    test_maze[1][1].set_visited(false);
+
+    test_maze[1][2].set_position({1, 2});
+    test_maze[1][2].set_walls({false, true, false, false});
+    test_maze[1][2].set_visited(false);
+
+    test_maze[1][3].set_position({1, 3});
+    test_maze[1][3].set_walls({false, true, true, false});
+    test_maze[1][3].set_visited(false);
+
+    // Row 2
+    test_maze[2][0].set_position({2, 0});
+    test_maze[2][0].set_walls({false, true, false, true});
+    test_maze[2][0].set_visited(false);
+
+    test_maze[2][1].set_position({2, 1});
+    test_maze[2][1].set_walls({true, false, false, true});
+    test_maze[2][1].set_visited(false);
+
+    test_maze[2][2].set_position({2, 2});
+    test_maze[2][2].set_walls({false, false, true, false});
+    test_maze[2][2].set_visited(false);
+
+    test_maze[2][3].set_position({2, 3});
+    test_maze[2][3].set_walls({true, true, false, false});
+    test_maze[2][3].set_visited(false);
+
+    // Row 3
+    test_maze[3][0].set_position({3, 0});
+    test_maze[3][0].set_walls({false, true, true, true});
+    test_maze[3][0].set_visited(false);
+
+    test_maze[3][1].set_position({3, 1});
+    test_maze[3][1].set_walls({false, true, true, true});
+    test_maze[3][1].set_visited(false);
+
+    test_maze[3][2].set_position({3, 2});
+    test_maze[3][2].set_walls({true, false, true, true});
+    test_maze[3][2].set_visited(false);
+
+    test_maze[3][3].set_position({3, 3});
+    test_maze[3][3].set_walls({false, true, true, false});
+    test_maze[3][3].set_visited(false);
 
     return test_maze;
 }
