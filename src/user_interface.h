@@ -184,20 +184,30 @@ void handleModeSelection(Mode mode) {
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
             digitalWrite(MOTOR_ENABLE, LOW); // disable motor
-            timer14->resume();
             start(5); // wait for finger
-            // reset_encoders();
-            // reset_PID_values();
+            timer14->resume();
+            delay(50);
+            reset_encoders();
+            reset_PID_values();
             // delay(100);
             // grab_ball();
             // stop();
-            while(!encoderTurned){
-                std::vector<bool> walls = find_walls_forward_looking();
-                ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
-                ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
-                delay(2500);
-            }
-            delay(100);
+            // while(!encoderTurned){
+            //     std::vector<bool> walls = find_walls_forward_looking();
+            //     ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
+            //     ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
+            //     delay(2500);
+            // }
+            delay(50);
+            drive_forward(365, 365, 2);
+            curve_left();
+            drive_forward(365, 365, 2);
+            curve_left();
+            drive_forward(365, 365, 2);
+            curve_left();
+            drive_forward(365, 0, 2);
+            stop();
+            delay(200);
             // digitalWrite(MOTOR_ENABLE, HIGH);
             // timer14->resume(); // starting systick timer
             // delay(100);
@@ -212,11 +222,11 @@ void handleModeSelection(Mode mode) {
             // stop();
             // timer14->pause();
             // // display_print("A* Mode completed");
-            // digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             // // always keep this last
-            break;
             timer14->pause();
             displayOptions(MODE_ASTAR, false);
+            break;
         default:
             display_print("Invalid mode");
             break;
