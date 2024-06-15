@@ -232,8 +232,8 @@ std::vector<bool> find_walls(){
 }
 
 // Function to determine if a wall is detected in front or either side of the robot
-std::vector<bool> find_walls_forward_looking(){
-    std::vector<bool> wallsVec = {false, false, false, false};
+std::array<bool, 4> find_walls_forward_looking(){
+    std::array<bool, 4> wallsVec = {false, false, false, false};
     // int counter = 1; 
     // int last_distance_traveled = avg_distance_traveled;
     // std::vector<int> avg_distance_sensors = {0,0,0,0,0,0,0};

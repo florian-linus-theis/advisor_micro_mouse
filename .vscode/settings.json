@@ -105,6 +105,7 @@
     "cinttypes": "cpp",
     "typeinfo": "cpp",
     "ctime": "cpp",
-    "iomanip": "cpp"
+    "iomanip": "cpp",
+    "optional": "cpp"
   }
 }

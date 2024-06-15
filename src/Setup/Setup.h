@@ -114,6 +114,7 @@ extern bool SETUP_COMPLETE;
 extern void dfs_mapping();
 extern void bfs_algorithm();
 extern void a_star_algorithm();
+extern bool MAPPING_COMPLETE; 
 
 // ---------------------------------------
 // PID 
@@ -125,12 +126,12 @@ extern std::vector<int> calc_correction(int);
 extern std::vector<int> determine_correction_needed();
 extern void reset_PID_values();
 extern int determine_PID_case();
-extern std::vector<bool> find_walls();
+extern std::array<bool, 4> find_walls_forward_looking();
 extern void pid_move_function(int);
 extern void calc_average_PID_values();
 extern void recalibrate_front_wall();
 extern bool front_wall_detected();
-extern bool side_wall_disappearing();
+extern bool side_walls_disappearing();
 extern double differential;
 extern double integral;
 extern double proportional; 
@@ -151,6 +152,7 @@ extern void disable_PID();
 extern std::vector<int> correction_offset;
 extern double give_percent(double, int, int);
 extern std::vector<double> previous_speed;
+extern int calc_correction_speed(int, int, double, double, double);
 
 enum PID_CASES{
     X_ERROR = 0,
@@ -313,6 +315,19 @@ extern bool optionSelected;
 extern volatile bool encoderTurned;
 extern bool confirmationPending;
 
+// Define an enum for all modes
+enum Mode {
+    MODE_STANDBY,
+    MODE_SOFT_RESET,
+    MODE_SHOW_DATA,
+    MODE_MAP_MAZE,
+    MODE_BFS,
+    MODE_ASTAR,
+    MODE_LOAD_FLASH,
+    MODE_MAX, // This can be used to determine the number of modes
+};
+
+
 // Buzzer
 extern void Buzzer_beep(int, int);
 extern void Buzzer_beep(int, int, int);
@@ -349,6 +364,8 @@ extern void soft_reset();
 #define FLASH_SECTOR_11_START_ADDR 0x080E0000
 #define FLASH_SECTOR_11_END_ADDR 0x080FFFFF
 
+extern std::vector<int8_t> buffer;
 extern void serialize_maze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
-extern void deserialize_maze(uint32_t, std::vector<std::vector<Location>>&);   
+extern void deserialize_maze(const std::vector<int8_t>&, std::vector<std::vector<Location>>&);   
 extern void write_data_to_flash(uint32_t, const std::vector<uint8_t>&); 
+extern void read_maze_from_flash(uint32_t, std::vector<int8_t>&);

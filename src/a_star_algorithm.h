@@ -6,7 +6,6 @@
 #include <iostream>
  // for the API functions (currently still MMS API but will be changed to the new functions of mouse)
 #include "algo_movement_api.h"
-#include "user_interface.h"
 
 extern int current_option; // current state selected by the user
 
@@ -57,7 +56,7 @@ public:
             
             // If it is goal, return the position of it in global state vector
             if (current_state->is_goal()) {
-                display_print("Goal state found");
+                display_print("Goal state found", 1);
                 return current_state;
             }
 
@@ -106,7 +105,7 @@ public:
     // Function to execute the shortest path found by the A* algorithm
     std::vector<int> return_action_vector_shortest_path_psp(A_star_node* solution) {
         if (solution == nullptr) {  // If no solution was found
-            display_print("No solution found");
+            display_print("No solution found", 1);
             return {-1}; // Return -1 to indicate no solution found
         }
         

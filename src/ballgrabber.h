@@ -8,8 +8,9 @@
 // Servo pulse widths (in microseconds)
 const uint16_t PULSE_WIDTH_0 = 500; // 0.5 ms
 const uint16_t PULSE_WIDTH_180 = 2500; // 0.5 ms
-const uint16_t DEGREE_FRONT = 8;
-const uint16_t DEGREE_BACK = 130;
+const uint16_t DEGREE_FRONT = 110;
+const uint16_t DEGREE_BACK = 0;
+const uint16_t DEGREE_GROUND = 140;
 
 // Sensor Calibrations 
 std::vector<int> ballgrabber_calibration(7, 0);
@@ -26,10 +27,10 @@ void writeServo(int angle) {
 
 // Function to move the ball grabber forward (in front of robot)
 void move_ballgrabber_forward() {
-    for (int degree = DEGREE_BACK; degree >= DEGREE_FRONT; degree--) {
-        writeServo(degree);
-        delay(100);
-    }
+    // for (int degree = DEGREE_BACK; degree >= DEGREE_FRONT; degree--) {
+    //     writeServo(degree);
+    //     delay(100);
+    // }
     writeServo(DEGREE_FRONT);
 }
 
@@ -38,10 +39,10 @@ void move_ballgrabber_backward() {
     // delay(220);
     // writeServo(DEGREE_BACK);
     // delay(1000);
-    for (int degree = DEGREE_FRONT; degree <= DEGREE_BACK; degree++) {
-        writeServo(degree);
-        delay(40);
-    }
+    // for (int degree = DEGREE_FRONT; degree <= DEGREE_BACK; degree++) {
+    //     writeServo(degree);
+    //     delay(40);
+    // }
     writeServo(DEGREE_BACK);
 }
 
@@ -57,45 +58,39 @@ void handle_ballgrabber(){
 
 // Full Function to grab the ball
 void grab_ball(){
-    // drive toward enorth dge of square (0,1)
-    // timer10->pause();
-    // drive_forward(365, 365, 1.778);
-    // // drive right curve 
-    // curve_right();
-    // // drive one forward
-    // drive_forward(365, 0, 0.9);
-    // rotate_right();
-    // // backup to wall 
-    // BackwardBoth(90);
-    // delay(30);
-    // while(current_avg_speed < 0){};
-    // delay(200);
-    // stop();
-    // delay(1000);
+    // drive toward north edge of square (0,1)
+    drive_forward(365, 365, 1.778);
+    // drive right curve 
+    curve_right();
+    // drive one forward
+    drive_forward(365, 0, 1.05);
+    rotate_right();
+    // backup to wall 
+    BackwardBoth(90);
+    delay(20); // wait for motors to react
+    while(current_avg_speed < 0){};
+    delay(200); // wait to make sure we are positioned nicely along the wall
+    stop();
+    reset_distance_traveled_after_straight();
+    delay(50);
     // timer14->pause();
     timer10->resume();
-    ble->println("Ballgrabber enabled");
     digitalWrite(SERVO_ENABLE, HIGH);
-    ble->println("Servo enabled");
     // move ballgrabber forward
     move_ballgrabber_forward();
     // drive to ball 
     reset_PID_values(); 
-    timer10->pause();
-    timer14->resume();
-    // drive_forward(200, 0, 0.24); 
-    timer14->pause();
-    timer10->resume();
-    delay(500);
+    drive_forward(300, 0, 0.24); 
+    delay(400);
     // move ballgrabber backwards
     move_ballgrabber_backward();
+    delay(400);
     digitalWrite(SERVO_ENABLE, LOW);
-    // timer10->pause();
-    // timer14->resume();
-    // // rotate right 
-    // rotate_right();
+    timer10->pause();
+    // rotate right 
+    rotate_right();
     reset_PID_values();
     // move back to exit 
-    drive_forward(365, 365, 1);
+    drive_forward(365, 365, 0.95);
     curve_right(); // now at northern edge of cell (0, 2)
 } 

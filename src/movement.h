@@ -550,7 +550,7 @@ void curve_right(){
     int distance_right_wheel = distance_traveled_R;
     accelerate_each_wheel_in_curve(speed_L, speed_R);
     // less than 90 degrees because we do not want to oversteer
-    while(current_angle > (-86 - start_angle) && distance_right_wheel < TICKS_INNER_WHEEL){
+    while(current_angle > (-86 - start_angle) || distance_right_wheel < TICKS_INNER_WHEEL){
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
         distance_right_wheel = distance_traveled_R - distance_right_wheel;
@@ -581,7 +581,7 @@ void curve_left(){
     int distance_left_wheel = distance_traveled_L;
     accelerate_each_wheel_in_curve(speed_L, speed_R);
     // less than 90 degrees because we do not want to oversteer
-    while(current_angle < (86 - start_angle) && distance_left_wheel < TICKS_INNER_WHEEL){
+    while(current_angle < (86 - start_angle) || distance_left_wheel < TICKS_INNER_WHEEL){
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
         distance_left_wheel = distance_traveled_L - distance_left_wheel;
