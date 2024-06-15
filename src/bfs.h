@@ -5,8 +5,6 @@
 #include "location.h"
 #include "state.h"
 
-#include "user_interface.h"
-
 extern int current_option; // current option selected by the user
 
 class BFSAlgorithm {
@@ -42,7 +40,7 @@ public:
         // while we have not every state in the state_vector
         while (counter < state_vector.size()) {
             if (counter >= maze_height*maze_width) { // If we have explored every possible state and no solution was found
-                display_print("No solution found");
+                display_print("No solution found", 1);
                 break;
             }
             State* current_state = &state_vector[counter]; // Get the first node (state) we have not yet explored from the global array (FIFO)
@@ -51,7 +49,7 @@ public:
             // If it is goal, return the position of it in global state vector
             if (current_state->is_goal()) {
                 // TODO: Buzzer success sound
-                display_print("Goal state found");
+                display_print("Goal state found", 1);
                 *GOAL_POSITION = current_state->location->position;
                 return counter;
             }
@@ -86,16 +84,16 @@ public:
 
             counter++;
         }
-        display_print("No solution found");
+        display_print("No solution found", 1);
         return -1; // If no solution is found
     }
 
 
     std::vector<int> return_action_vector_bfs_path(int solution_position) {
         if (solution_position == -1) {  // If no solution was found
-            display_print("could not execute");
+            display_print("could not execute", 1);
             delay(1000);
-            display_print("No solution found");
+            display_print("No solution found", 1);
             return {-1}; // Return -1 to indicate no solution was found
         }
         State state = state_vector[solution_position]; // Get the goal state

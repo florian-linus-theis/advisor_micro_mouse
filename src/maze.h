@@ -3,7 +3,7 @@
 #include <vector>
 #include <iostream>
 #include "location.h" // importing location class;
-#include "display.h"
+// #include "user_interface.h"
 
 // For tracking all maze data, create a 2D vector of Locations
 std::vector<std::vector<Location>> maze (MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));

@@ -3,7 +3,6 @@
 #include <vector>
 #include "location.h"
 #include "ballgrabber.h"
-#include "user_interface.h"
 #include "movement.h"
 #include "Setup/Setup.h"
 
@@ -258,18 +257,11 @@ std::vector<std::tuple<int, float>> translate_actions_into_movement(std::vector<
 // function to execute the translated actions of the algorithm into actual movement
 // calls middle_layer_functions that work together with the hardware
 void execute_movements(const std::vector<std::tuple<int, float>>& movement) {
-    // print the movements
-    for (int i = 0; i < movement.size(); ++i) {
-        if (std::get<0>(movement[i]) == FORWARD) {
-            ble->print("F ");
-            ble->println(std::get<1>(movement[i]));
-        } else if (std::get<0>(movement[i]) == RIGHT) {
-            ble->println("R");
-        } else if (std::get<0>(movement[i]) == LEFT) {
-            ble->println("L");
-        }
+    if (BALLGREIFER){
+        grab_ball();
+    } else {
+        drive_forward(SPEED_MAPPING, SPEED_MAPPING, 0.7778); // start square
     }
-    drive_forward(SPEED_MAPPING, SPEED_MAPPING, 0.7778); // start square
     for (int i = 0; i < movement.size(); ++i) {
         switch (std::get<0>(movement[i])) {
             case FORWARD:

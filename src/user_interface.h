@@ -6,17 +6,6 @@
 #include "PID.h"
 #include "Music.h"
 
-// Define an enum for all modes
-enum Mode {
-    MODE_STANDBY,
-    MODE_SOFT_RESET,
-    MODE_SHOW_DATA,
-    MODE_MAP_MAZE,
-    MODE_BFS,
-    MODE_ASTAR,
-    MODE_MAX // This can be used to determine the number of modes
-};
-
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
@@ -62,7 +51,7 @@ void updateEncoderState() {
 
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
-    const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*"};
+    const char* options[] = {"CAL", "SR", "BAT", "DFS", "BFS", "A*", "LF"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
@@ -130,45 +119,61 @@ void handleModeSelection(Mode mode) {
             display_print("Soft Reset Mode selected");
             // execute soft reset
             soft_reset();
-            delay(1000); // Delay to allow the user to read the message
+            delay(700); // Delay to allow the user to read the message
             display_print("Soft Reset completed");
-            delay(1000); // Delay to allow the user to read the message
+            delay(700); // Delay to allow the user to read the message
             // always keep this last
             displayOptions(MODE_SOFT_RESET, false);
             break;
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
+            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
+            // getBattery();
+            // drawBatteryStatus();
+            // delay(2000);
+            start(5);
+            timer14->resume(); // starting systick timer
+            delay(100);
+            reset_encoders();
+            reset_PID_values();	
+            digitalWrite(MOTOR_ENABLE, LOW); //enbale motor
+            grab_ball();
+            delay(200);
+            stop();
+            delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-            getBattery();
-            drawBatteryStatus();
-            delay(3000);
             // always keep this last
             displayOptions(MODE_SHOW_DATA, false);
             break;
         case MODE_MAP_MAZE:
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor at first
             display_print("DFS Mode selected");
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            start(5);
             timer14->resume(); // starting systick timer
+            stop();
+            delay(10);
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            delay(100);
             reset_encoders();
             reset_PID_values();
             delay(100);
-            start(5);
             dfs_mapping(); // start mapping maze
             delay(1000);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
-            delay(200);
-            // ble->println(avg_distance_traveled);
-            // Handle Map Maze Mode
+            delay(10);
             // always keep this last
             displayOptions(MODE_MAP_MAZE, false);
             break;
         case MODE_BFS:
-             // starting systick timer
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor at first
             display_print("BFS Mode selected");
-            timer14->resume();
             start(5);
+            timer14->resume(); //starting systick timer
+            stop();
+            delay(10);
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            delay(50);
             reset_encoders();
             reset_PID_values();
             delay(50);
@@ -181,51 +186,57 @@ void handleModeSelection(Mode mode) {
             displayOptions(MODE_BFS, false);
             break;
         case MODE_ASTAR:
-            display_print("A* Mode selected wait for Finger");
-            ble->println("A* Mode selected");
-            digitalWrite(MOTOR_ENABLE, LOW); // disable motor
-            start(5); // wait for finger
-            timer14->resume();
-            delay(50);
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor at first
+            display_print("A* Mode selected");
+            start(5);
+            timer14->resume(); // starting systick timer
+            stop();
+            delay(10);
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
             reset_encoders();
             reset_PID_values();
-            // delay(100);
-            // grab_ball();
-            // stop();
-            // while(!encoderTurned){
-            //     std::vector<bool> walls = find_walls_forward_looking();
-            //     ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
-            //     ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
-            //     delay(2500);
-            // }
             delay(50);
-            drive_forward(365, 365, 2);
-            curve_left();
-            drive_forward(365, 365, 2);
-            curve_left();
-            drive_forward(365, 365, 2);
-            curve_left();
-            drive_forward(365, 0, 2);
-            stop();
+            bfs_algorithm();
             delay(200);
-            // digitalWrite(MOTOR_ENABLE, HIGH);
-            // timer14->resume(); // starting systick timer
-            // delay(100);
-            // // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
-            // reset_encoders();
-            // reset_PID_values();
-            // delay(50);
-            // while(!encoderTurned){
-            //     drive_forward(350, 350, 2);
-            //     curve_left();
-            // }
-            // stop();
-            // timer14->pause();
-            // // display_print("A* Mode completed");
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            // // always keep this last
-            timer14->pause();
+            timer14->pause(); // stopping systick timer
+            // always keep this last
             displayOptions(MODE_ASTAR, false);
+            break;
+        case MODE_LOAD_FLASH:
+            display_print("Store Flash Mode selected.");
+            maze.clear();
+            maze.resize(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
+            
+            // Load the maze from flash
+            read_maze_from_flash(FLASH_SECTOR_11_START_ADDR, buffer);
+            deserialize_maze(buffer, maze);
+            // Verify loaded data
+            ble->println("Maze data loaded from flash:");
+
+            for (int i = 0; i < 4; ++i) {
+                for (int j = 0; j < 4; ++j) {
+                    ble->print("Position: [");
+                    ble->print(maze[i][j].position[0]);
+                    ble->print(", ");
+                    ble->print(maze[i][j].position[1]);
+                    ble->println("]");
+
+                    ble->print("Walls: ");
+                    for (bool wall : maze[i][j].walls) {
+                        ble->print(wall);
+                        ble->print(" ");
+                    }
+                    ble->println();
+
+                    ble->print("Visited: ");
+                    ble->println(maze[i][j].visited);
+                    ble->println();
+                }
+            }
+            MAPPING_COMPLETE = true;
+            delay(1000); // give user time to read the message
+            displayOptions(MODE_LOAD_FLASH, false);
             break;
         default:
             display_print("Invalid mode");
