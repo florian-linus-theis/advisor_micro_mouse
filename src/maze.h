@@ -133,30 +133,32 @@ void read_maze_from_flash(uint32_t startAddress, std::vector<int8_t>& buffer) {
 }
 //transform buffer vector into matrix
 void deserialize_maze(const std::vector<int8_t>& buffer, std::vector<std::vector<Location>>& maze) {
-    size_t expected_size = MAZE_HEIGHT * MAZE_WIDTH * (4 + 1 + 2 ); // walls + visited + position
+    // Calculate the expected buffer size
+    size_t expected_size = MAZE_HEIGHT * MAZE_WIDTH * (4 + 1 + 2); // 4 walls + visited + 2 positions
     if (buffer.size() < expected_size) {
         // Buffer size mismatch
         return;
-    }   
-      
-        size_t index = 0;
-        for (auto& row : maze) {
-            for (auto& loc : row) {
-                for (size_t i = 0; i < loc.walls.size(); i++) {
-                    loc.walls[i] = static_cast<bool>(buffer[index]);
-                    index++;
-                }
-                loc.visited = static_cast<bool>(buffer[index]);
+    }
+
+    size_t index = 0;
+    for (auto& row : maze) {
+        for (auto& loc : row) {
+            // Deserialize walls
+            for (size_t i = 0; i < loc.walls.size(); i++) {
+                loc.walls[i] = static_cast<bool>(buffer[index]);
                 index++;
-
-                loc.position[0] = *reinterpret_cast<const int*>(&buffer[index]);
-                loc.position[1] = *reinterpret_cast<const int*>(&buffer[index + sizeof(int)]);
-                index += 2 * sizeof(int);
-
             }
+            // Deserialize visited status
+            loc.visited = static_cast<bool>(buffer[index]);
+            index++;
+            // Deserialize position
+            loc.position[0] = static_cast<int>(buffer[index]);
+            loc.position[1] = static_cast<int>(buffer[index + 1]);
+            index += 2;
         }
-       
+    }
 }
+
 // Define the Maze type
 Test_Maze initialize_test_maze() {
     Test_Maze test_maze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
