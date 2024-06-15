@@ -164,8 +164,8 @@ enum PID_CASES{
 // ---------------------------------------
 // Algorithm constants
 // Initializing maze size with constexpr to set them up as compile-time-constants rather than runtime constants
-#define MAZE_WIDTH 4
-#define MAZE_HEIGHT 4
+#define MAZE_WIDTH 16
+#define MAZE_HEIGHT 16
 extern std::vector<std::vector<Location>> maze; // Global variable to store the maze
 extern bool BALLGREIFER; // Control Variable to check if the ballgreifer is present
 extern std::vector<int> POSSIBLE_GOAL_POS_ONE; 

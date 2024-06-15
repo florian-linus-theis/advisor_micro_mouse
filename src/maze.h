@@ -67,7 +67,7 @@ void maze_setup(){
 //Flash memory-------------------------------------------------------------------------
 // vector to serialize maze
 using Test_Maze = std::vector<std::vector<Location>>;
-int buffer_size = 16 *(4 + 1 + 2); //7 * #Squares
+int buffer_size = 256 * 7; //(4+1+2) * #Squares
 std::vector<int8_t> buffer(buffer_size, 0);
 int indexprint;
 //--------------------------------------------------------------------------------------
@@ -157,79 +157,4 @@ void deserialize_maze(const std::vector<int8_t>& buffer, std::vector<std::vector
             index += 2;
         }
     }
-}
-
-// Define the Maze type
-Test_Maze initialize_test_maze() {
-    Test_Maze test_maze(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
-
-    // Row 0
-    test_maze[0][0].set_position({0, 0});
-    test_maze[0][0].set_walls({true, false, true, true});
-    test_maze[0][0].set_visited(false);
-
-    test_maze[0][1].set_position({0, 1});
-    test_maze[0][1].set_walls({true, false, false, false});
-    test_maze[0][1].set_visited(false);
-
-    test_maze[0][2].set_position({0, 2});
-    test_maze[0][2].set_walls({true, false, false, false});
-    test_maze[0][2].set_visited(false);
-
-    test_maze[0][3].set_position({0, 3});
-    test_maze[0][3].set_walls({true, true, false, false});
-    test_maze[0][3].set_visited(false);
-
-    // Row 1
-    test_maze[1][0].set_position({1, 0});
-    test_maze[1][0].set_walls({false, true, false, true});
-    test_maze[1][0].set_visited(false);
-
-    test_maze[1][1].set_position({1, 1});
-    test_maze[1][1].set_walls({false, false, true, true});
-    test_maze[1][1].set_visited(false);
-
-    test_maze[1][2].set_position({1, 2});
-    test_maze[1][2].set_walls({false, true, false, false});
-    test_maze[1][2].set_visited(false);
-
-    test_maze[1][3].set_position({1, 3});
-    test_maze[1][3].set_walls({false, true, true, false});
-    test_maze[1][3].set_visited(false);
-
-    // Row 2
-    test_maze[2][0].set_position({2, 0});
-    test_maze[2][0].set_walls({false, true, false, true});
-    test_maze[2][0].set_visited(false);
-
-    test_maze[2][1].set_position({2, 1});
-    test_maze[2][1].set_walls({true, false, false, true});
-    test_maze[2][1].set_visited(false);
-
-    test_maze[2][2].set_position({2, 2});
-    test_maze[2][2].set_walls({false, false, true, false});
-    test_maze[2][2].set_visited(false);
-
-    test_maze[2][3].set_position({2, 3});
-    test_maze[2][3].set_walls({true, true, false, false});
-    test_maze[2][3].set_visited(false);
-
-    // Row 3
-    test_maze[3][0].set_position({3, 0});
-    test_maze[3][0].set_walls({false, true, true, true});
-    test_maze[3][0].set_visited(false);
-
-    test_maze[3][1].set_position({3, 1});
-    test_maze[3][1].set_walls({false, true, true, true});
-    test_maze[3][1].set_visited(false);
-
-    test_maze[3][2].set_position({3, 2});
-    test_maze[3][2].set_walls({true, false, true, true});
-    test_maze[3][2].set_visited(false);
-
-    test_maze[3][3].set_position({3, 3});
-    test_maze[3][3].set_walls({false, true, true, false});
-    test_maze[3][3].set_visited(false);
-
-    return test_maze;
 }

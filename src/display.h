@@ -20,7 +20,7 @@ enum Mode {
 };
 
 
-Test_Maze test_maze = initialize_test_maze();
+// Test_Maze test_maze = initialize_test_maze();
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
@@ -189,7 +189,7 @@ void handleModeSelection(Mode mode) {
             ble->println("A* Mode selected");
             
             // Write serialized data to flash
-            serialize_maze(test_maze, buffer);
+            serialize_maze(maze, buffer);
             // Debug print to serial monitor or log
             ble->println("Serialized Buffer:");
             indexprint = 0;
@@ -244,35 +244,32 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_STORE_FLASH:
             display_print("Store Flash Mode selected.");
-            test_maze.clear();
-            test_maze.resize(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
+            maze.clear();
+            maze.resize(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
             
             // Load the maze from flash
             read_maze_from_flash(FLASH_SECTOR_11_START_ADDR, buffer);
-            for(int i = 0; i < buffer.size(); ++i){
-                ble->println(buffer[i]); 
-            }
-             deserialize_maze(buffer, test_maze);
+             deserialize_maze(buffer, maze);
             // Verify loaded data
             ble->println("Maze data loaded from flash:");
 
             for (int i = 0; i < MAZE_HEIGHT; ++i) {
                 for (int j = 0; j < MAZE_WIDTH; ++j) {
                     ble->print("Position: [");
-                    ble->print(test_maze[i][j].position[0]);
+                    ble->print(maze[i][j].position[0]);
                     ble->print(", ");
-                    ble->print(test_maze[i][j].position[1]);
+                    ble->print(maze[i][j].position[1]);
                     ble->println("]");
 
                     ble->print("Walls: ");
-                    for (bool wall : test_maze[i][j].walls) {
+                    for (bool wall : maze[i][j].walls) {
                         ble->print(wall);
                         ble->print(" ");
                     }
                     ble->println();
 
                     ble->print("Visited: ");
-                    ble->println(test_maze[i][j].visited);
+                    ble->println(maze[i][j].visited);
                     ble->println();
                 }
             }

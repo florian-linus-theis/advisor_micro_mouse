@@ -34,10 +34,10 @@ void dfs_mapping(){
     set_dir(0); // Reset heading to north
     display_print("Mapping complete");
     delay(2000);
-    // serialize_maze(test_maze, buffer); //Put maze into buffer vector 
-    // write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
-    // display_print("Data written to flash");
-    // delay(1000);
+    serialize_maze(test_maze, buffer); //Put maze into buffer vector 
+    write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
+    display_print("Data written to flash");
+    delay(1000);
     return;
 }
 
