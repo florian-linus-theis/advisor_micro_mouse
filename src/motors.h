@@ -7,14 +7,14 @@ std::vector<int> determine_correction_needed(){
     if(PID_ENABLED == false){
         chosen_correction = {0,0};
     }
-    else if(abs(remapped_error[CURRENT_CASE_PID]) > 1){
+    else if(abs(remapped_error[CURRENT_CASE_PID]) > 2){
         chosen_correction = PID_values;
         //ble->println("IR");
     }
     else{
-        chosen_correction = PID_values_encoder;
         distance_traveled_L_PID = 0;
         distance_traveled_R_PID = 0;
+        chosen_correction = PID_values_encoder;
         //ble->println("ENC");
     }
     return chosen_correction;

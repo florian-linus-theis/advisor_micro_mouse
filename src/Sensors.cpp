@@ -190,8 +190,8 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         max_values[0] += Distance_Sensor[0];
         max_values[1] += Distance_Sensor[1];
         // updating pid values
-        for(int i=0; i < ENUM_END;i++){
-          max_values_left[i] = max_values_left[i] + max_occuring_Errors_Vec[i];
+        for(int j=0; j < ENUM_END;j++){
+          max_values_left[j] = max_values_left[j] + max_occuring_Errors_Vec[j];
         }
     }
 
@@ -209,8 +209,8 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         min_values[1] += Distance_Sensor[1];
         max_values[4] += Distance_Sensor[4];
         max_values[5] += Distance_Sensor[5];
-        for(int i=0; i < ENUM_END;i++){
-          max_values_right[i] += max_occuring_Errors_Vec[i];
+        for(int j=0; j < ENUM_END;j++){
+          max_values_right[j] += max_occuring_Errors_Vec[j];
         }
     }
     for(int i=0; i < ENUM_END; i++){
@@ -244,8 +244,8 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
         min_values[3] += Distance_Sensor[3];
         min_values[6] += Distance_Sensor[6];
 
-        for(int i=0; i < ENUM_END;i++){
-          correction_offset[i] += give_percent(calcError(i),max_values_lower_boundary[i],max_values_upper_boundary[i]);
+        for(int j=0; j < ENUM_END;j++){
+          correction_offset[j] += give_percent(calcError(j),max_values_lower_boundary[j],max_values_upper_boundary[j]);
         }
     }
 
