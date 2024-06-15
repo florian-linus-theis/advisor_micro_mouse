@@ -124,18 +124,7 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SOFT_RESET:
             display_print("Soft Reset Mode selected");
-            timer14->resume(); // starting systick timer
-            delay(1000);
-            // ForwardBoth(10);
-            move_actual(100);
-            delay(2000);
-            ForwardRight(0);
-            ForwardLeft(0);
-            //stop();
-            delay(1000);
-            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
-            timer14->pause(); // stopping systick timer
-            // always keep this last
+            handle_ballgrabber();
             displayOptions(MODE_SOFT_RESET, false);
             break;
         case MODE_SHOW_DATA:

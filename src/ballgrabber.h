@@ -4,8 +4,9 @@
 // Servo pulse widths (in microseconds)
 const uint16_t PULSE_WIDTH_0 = 500; // 0.5 ms
 const uint16_t PULSE_WIDTH_180 = 2500; // 0.5 ms
-const uint16_t DEGREE_FRONT = 0;
-const uint16_t DEGREE_BACK = 131;
+const uint16_t DEGREE_FRONT = 110;
+const uint16_t DEGREE_BACK = 0;
+const uint16_t DEGREE_GROUND = 140;
 
 
 
@@ -32,11 +33,10 @@ void move_ballgrabber_backward() {
 
 //handling ballgrabber action including reset of motor timer and servo timer
 void handle_ballgrabber(){
-    digitalWrite(SERVO_ENABLE, HIGH);
-    delay(10); // TODO: improve here, maybe cancel this out completely
-    writeServo(DEGREE_FRONT);
-    delay(1000);
     writeServo(DEGREE_BACK);
-    delay(500); // TODO: improve here, maybe cancel this out completely
+    digitalWrite(SERVO_ENABLE, HIGH);
+    delay(1000);
+    writeServo(DEGREE_FRONT);
+    delay(500);
     digitalWrite(SERVO_ENABLE, LOW);
 }
