@@ -23,13 +23,15 @@ int system_clock_micros();
 
 void Systick_Interrupt() {
   if (!SETUP_COMPLETE) {return;}
+  // setting old speed values 
 
   // first read encoder values 
   static int counter = 0; 
   update_encoders();
   
-  // setting old values for comparison (every 5th iteration)
-  if (counter % 5 == 0) {
+  // setting old values for comparison (every 10th iteration)
+  // every 30ms
+  if (counter % 10 == 0) {
     for(int i=0; i < 7; i++){
       Last_Distance_Sensor[i] = Distance_Sensor[i];
     }
@@ -47,6 +49,10 @@ void Systick_Interrupt() {
   PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
   PID_values = determine_correction_needed();
   calc_average_PID_values();
+
+  if (counter % 20 == 0){
+    //ble->println("R: " + String(current_delta_speed_R) + " L: " + String(current_delta_speed_L));
+  }
   counter++;
 }
 
@@ -59,6 +65,8 @@ void update_encoders() {
   avg_distance_traveled = (distance_traveled_L + distance_traveled_R) / 2;
   calc_speed(); // calculate the speed of the robot before updating the last encoder values
   calc_angle(); // calcualte the angle of the robot
+  distance_traveled_L_PID += encoder_left - encoder_left_last_time;
+  distance_traveled_R_PID += encoder_right - encoder_right_last_time;
   encoder_left_last_time = encoder_left;
   encoder_right_last_time = encoder_right;
 }
@@ -71,6 +79,8 @@ void reset_encoders() {
   // Reset all distance and average distance tracking variables
   distance_traveled_L = 0;
   distance_traveled_R = 0;
+  distance_traveled_L_PID = 0;
+  distance_traveled_R_PID = 0;
   avg_distance_traveled = 0;
 
   // Initialize last encoder readings to zero

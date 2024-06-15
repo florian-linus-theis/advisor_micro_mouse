@@ -1,6 +1,6 @@
 #pragma once
-#include "API.h" // for interacting with the MMS
-#include "mms_interaction.h"
+ // for interacting with the MMS
+#include "algo_movement_api.h"
 #include "location.h" // importing location class
 #include "maze.h" // importing maze functions
 #include "state.h" // importing state class
@@ -8,15 +8,14 @@
 #include "bfs.h" // importing breadth-first-search algorithm
 #include "a_star_nodes.h" // importing a_star_node class
 #include "a_star_algorithm.h" // importing AStarAlgorithm class
-#include "display.h"
+#include "user_interface.h"
 #include "Setup/Setup.h"
-#include "algorithms_to_movement.h"
 
 
 bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
-std::vector<int> POSSIBLE_GOAL_POS_ONE = {0,2}; 
-std::vector<int> POSSIBLE_GOAL_POS_TWO = {8, 8}; 
+std::vector<int> POSSIBLE_GOAL_POS_ONE = {3,3}; 
+std::vector<int> POSSIBLE_GOAL_POS_TWO = {8,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_THREE = {8,7};
 std::vector<int> POSSIBLE_GOAL_POS_FOUR = {7,7}; 
 std::vector<int> GOAL_POSITION = {-1,-1}; // Global variable to store the goal position
@@ -31,13 +30,13 @@ void dfs_mapping(){
     cur_direction = 0; // Set the current direction to north
     ble->println("Mapping maze using DFS");	
     dfs_map_maze(); // Mapping the maze using depth-first search 
-    set_dir(0); // Reset heading to north
     display_print("Mapping complete");
     delay(2000);
     serialize_maze(test_maze, buffer); //Put maze into buffer vector 
     write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
     display_print("Data written to flash");
     delay(1000);
+    MAPPING_COMPLETE = true; // Set mapping complete to true
     return;
 }
 
@@ -69,14 +68,21 @@ void bfs_algorithm(){
     }
     // calculate the shortest path
     std::vector<int> action_vector = bfs.return_action_vector_bfs_path(solution_position);
+    // print the action vector via blutooth
+    ble->print("Action Vector: ");
+    for (int i = 0; i < action_vector.size(); i++) {
+        ble->print(action_vector[i]);
+        ble->print(" ");
+    }
     // translate the actions into actual movements in maze
     std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
+    display_print("Ready for execution...");
+    start(5);
     // execute the movements
     execute_movements(movements);
     // display completion message
-    display->clearDisplay();
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion
-    display->print("BFS complete");
+    display_print("BFS complete");
     delay(1000);
     return;
 }
@@ -88,15 +94,15 @@ void a_star_algorithm(){
         return;
     }
     if (GOAL_POSITION[0] == -1 && GOAL_POSITION[1] == -1) {
-        display->clearDisplay();
         delay(1000);
-        display->print("Goal not found yet");
+        display_print("Goal not found yet");
         BFSAlgorithm bfs(&maze, &GOAL_POSITION, BALLGREIFER); // Initialize BFS algorithm
         bfs.find_bfs_shortest_path(); 
-        display->clearDisplay();
         delay(1000);
-        display->print("Goal Position found");
+        display_print("Goal Position found");
+        delay(1000);
     }
+    display_print("Calculating A*");
     AStarAlgorithm a_star_algorithm(&maze, GOAL_POSITION, BALLGREIFER); // Initialize A* algorithm
     A_star_node* solution_a_star = a_star_algorithm.prioritize_straight_paths(); // Find the shortest path using A* algorithm
     if (current_option == 0) {
@@ -106,9 +112,11 @@ void a_star_algorithm(){
     std::vector<int> action_vector = a_star_algorithm.return_action_vector_shortest_path_psp(solution_a_star);
     // translate the actions into actual movements in maze
     std::vector<std::tuple<int, float>> movements = translate_actions_into_movement(action_vector, BALLGREIFER);
+    delay(500);
+    display_print("Ready for execution...");
+    start(5);
     // execute the movements
     execute_movements(movements);
-    
     // display completion message
     display->clearDisplay();
     Buzzer_beep(2000, 3); // Beep 4 times to indicate completion

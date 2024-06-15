@@ -6,7 +6,7 @@
 double last_time=0;
 double dt, kp_default=2, ki_default=0, kd_default=0.001;
 double proportional, integral, differential;
-signed int previous=0;
+std::vector<int> previous(ENUM_END,0);
 int default_base_speed = 100;
 int default_max_correction_speed_x = 150;
 int max_correction_speed = 150;
@@ -48,7 +48,7 @@ void disable_PID(){
 
  // Function to calculate the time difference between two calls -> delta t
 double calc_dt(){
-    double now = millis();
+    double now = system_clock_micros() / 1000;
     dt = now-last_time;
     last_time = now;
     return dt;
@@ -105,7 +105,7 @@ int calcError(int PID_case){
 }
 
 //Apply PID to given error
-int applyPID(signed int error, double kp = 0.5 , double ki = 0, double kd = 0){
+int applyPID(signed int error, int pid_case, double kp = 0.5 , double ki = 0, double kd = 0){
 
     proportional = error;
     // cap the integral value
@@ -113,9 +113,9 @@ int applyPID(signed int error, double kp = 0.5 , double ki = 0, double kd = 0){
         integral += error * dt;
     }
     // calculate the PID values
-    differential = (error-previous)/dt;
+    differential = (error-previous[pid_case])/dt;
     double output = kp * proportional + ki*integral + kd*differential;
-    previous = error;
+    previous[pid_case] = error;
     int output_G_int = static_cast<int>(round(output));
     return output_G_int;
 }
@@ -145,7 +145,8 @@ std::vector<int> calc_correction(int PID_case){
     case X_ERROR:
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) - correction_offset[X_ERROR];
-        output_G = applyPID(remapped_error[X_ERROR], 0.4, 0.0001, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        //ble->println("B: " + String(remapped_error[X_ERROR]));
+        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 0.4, 0.0001, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -154,8 +155,7 @@ std::vector<int> calc_correction(int PID_case){
     case Y_ERROR:
         max_correction_speed = default_max_correction_speed_y;
         remapped_error[Y_ERROR] = give_percent(calcError(Y_ERROR),max_values_lower_boundary[Y_ERROR],max_values_upper_boundary[Y_ERROR]);
-        output_G = applyPID(remapped_error[Y_ERROR], 2, 0, 0); // 0.8,0.0005,0.01
-        // ble->println(integral);
+        output_G = applyPID(remapped_error[Y_ERROR], Y_ERROR, 2, 0, 0); // 0.8,0.0005,0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = -output_G;
@@ -164,7 +164,8 @@ std::vector<int> calc_correction(int PID_case){
     case X_ERROR_LEFT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) - correction_offset[X_ERROR_LEFT_WALL_ONLY];
-        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], 0.4, 0.0001, 0.001); // 12, 0.0001, 0.01
+        //ble->println("L: " + String(remapped_error[X_ERROR_LEFT_WALL_ONLY]));
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 0.4, 0.0001, 0.001); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -173,7 +174,8 @@ std::vector<int> calc_correction(int PID_case){
     case X_ERROR_RIGHT_WALL_ONLY:
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) - correction_offset[X_ERROR_RIGHT_WALL_ONLY];
-        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], 0.4, 0.0001, 0.001);
+        //ble->println("R: " + String(remapped_error[X_ERROR_RIGHT_WALL_ONLY]));
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 0.4, 0.0001, 0.001);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -192,9 +194,9 @@ std::vector<int> calc_correction(int PID_case){
         break;
 
      case X_ERROR_ENCODER_BASED:
-        max_correction_speed = default_max_correction_speed_x;
+        max_correction_speed = 400;
         remapped_error[X_ERROR_ENCODER_BASED] = give_percent(calcError(X_ERROR_ENCODER_BASED),-40960,40960);
-        output_G = applyPID(remapped_error[X_ERROR_ENCODER_BASED], 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = applyPID(remapped_error[X_ERROR_ENCODER_BASED], X_ERROR_ENCODER_BASED, 0.5, 0, 0); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = -output_G;
         correction_right = output_G;
@@ -229,21 +231,60 @@ std::vector<bool> find_walls(){
     return wallsVec;
 }
 
-std::array<bool,4> find_walls_forward_looking(){
-    std::array<bool,4> wallsVec = {false, false, false, false};
-    ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
+// Function to determine if a wall is detected in front or either side of the robot
+std::vector<bool> find_walls_forward_looking(){
+    std::vector<bool> wallsVec = {false, false, false, false};
+    // int counter = 1; 
+    // int last_distance_traveled = avg_distance_traveled;
+    // std::vector<int> avg_distance_sensors = {0,0,0,0,0,0,0};
+    // // average 4 sensor values to get the most reliable results (period of 12ms ~ 3mm distance at mapping speed)
+    // while (counter < 5){
+    //     if (last_distance_traveled  == avg_distance_traveled) continue; 
+    //     counter++;
+    //     for (int i = 0; i < 7; i++){
+    //         avg_distance_sensors[i] += Distance_Sensor[i];
+    //     }
+    // }
+    // now averaging the sensor values
+    // for (int i = 0; i < 7; i++){
+    //     avg_distance_sensors[i] = avg_distance_sensors[i] / counter;
+    // }
     // Left Wall Sensors:
-    if((Distance_Sensor[0] > MinSensorValues[0] * 0.9 && Distance_Sensor[1] > MinSensorValues[1] * 0.7) || (Distance_Sensor[0] > MinSensorValues[0] * 0.7 && Distance_Sensor[1] > MinSensorValues[1] * 0.9)){ 
+    if(Distance_Sensor[0] > MinSensorValues[0] * 0.75 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
         wallsVec[3] = true;
     }
-    // Front Wall: either front and front-right or front and front-left 
-    if(Distance_Sensor[6] > MinSensorValues[6] * 0.8 && ( Distance_Sensor[2] > MinSensorValues[2] *0.8 || Distance_Sensor[3] > MinSensorValues[3] * 0.8)){ 
-        wallsVec[0] = true;
-    }
     // Right Wall: both left and right sensor must be above threshold
-    if((Distance_Sensor[5] > MinSensorValues[5] * 0.9 && Distance_Sensor[4] > MinSensorValues[4] * 0.7)|| (Distance_Sensor[5] > MinSensorValues[5] * 0.7 && Distance_Sensor[4] > MinSensorValues[4] * 0.9)) { 
+    if(Distance_Sensor[5] > MinSensorValues[5] * 0.75 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
         wallsVec[1] = true;
     }
+    // Front Wall: only front sensor must be above threshold
+    // Check if right and left are walls ->be less sensitive in all cases, avoiding reflexcions of walls
+    if (wallsVec[1] == true && wallsVec[3] == true)
+    {
+        if(Distance_Sensor[2] > MinSensorValues[2] * 1.7){
+        // only use front and front right sensor
+        if(Distance_Sensor[3] > MinSensorValues[3] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.2) wallsVec[0] = true;
+        } // slight right rotation
+        else if(Distance_Sensor[3] > MinSensorValues[3] * 1.7){ 
+            // only use front and front left sensor
+            if(Distance_Sensor[2] > MinSensorValues[2] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.3) wallsVec[0] = true;
+        } // normal case 
+        else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 1.0){
+            wallsVec[0] = true;
+    }
+    }
+    else if(Distance_Sensor[2] > MinSensorValues[2] * 1.4){
+        // only use front and front right sensor
+        if(Distance_Sensor[3] > MinSensorValues[3] * 0.8 && Distance_Sensor[6] > MinSensorValues[6] * 0.75) wallsVec[0] = true;
+    } // slight right rotation
+    else if(Distance_Sensor[3] > MinSensorValues[3] * 1.4){ 
+        // only use front and front left sensor
+        if(Distance_Sensor[2] > MinSensorValues[2] * 0.75 && Distance_Sensor[6] > MinSensorValues[6] * 0.75) wallsVec[0] = true;
+    } // normal case 
+    else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 0.78){
+        wallsVec[0] = true;
+    }
+    
     return wallsVec;
 }
 
@@ -255,15 +296,13 @@ bool side_walls_disappearing(){
     // delta_sensors > typical sensor values - min sensor values when there is still a wall
     int comp_left = Last_Distance_Sensor[0] - Distance_Sensor[0];
     int comp_right = Last_Distance_Sensor[5] - Distance_Sensor[5];
-    // ble->println("L :" + comp_left);
-    ble->println(comp_right);
-    return Last_Distance_Sensor[0] - Distance_Sensor[0] > 50 || Last_Distance_Sensor[5] - Distance_Sensor[5] > 50;
+    return Last_Distance_Sensor[0] - Distance_Sensor[0] > 65 || Last_Distance_Sensor[5] - Distance_Sensor[5] > 65;
 }
 
 int determine_PID_case(){
     std::vector<bool> walls_compare_threshold(7, false);
     for (int i = 0; i < 6; i++){
-        walls_compare_threshold[i] = Distance_Sensor[i] > (NeutralSensorValues[i] * 0.3); // threshold of 50% of the neutral value
+        walls_compare_threshold[i] = Distance_Sensor[i] > (MinSensorValues[i] * 0.6); // threshold of 50% of the neutral value
     }
     if (walls_compare_threshold[0] && walls_compare_threshold[5] && walls_compare_threshold[1] && walls_compare_threshold[4] ){
         return X_ERROR;
@@ -272,9 +311,9 @@ int determine_PID_case(){
     } else if (walls_compare_threshold[4] && walls_compare_threshold[5] && (!walls_compare_threshold[0] || !walls_compare_threshold[1])){
         return X_ERROR_RIGHT_WALL_ONLY;
     } else if (!walls_compare_threshold[0] && !walls_compare_threshold[1] && !walls_compare_threshold[4] && !walls_compare_threshold[5]){
-        return X_ERROR_ENCODER_BASED;
+        return TRANSITION;
     } else {
-        return X_ERROR_ENCODER_BASED;
+        return BLIND;
     }
     return 10; // just default but will not be reached
 }
@@ -347,7 +386,7 @@ void recalibrate_front_wall(){
 }
 
 void encoder_based_move_function(int base_speed){
-    reset_distance_traveled();
+    reset_distance_traveled_after_straight();
 
     while(1){
         delay(8);
@@ -391,3 +430,43 @@ void encoder_based_move_function(int base_speed){
     }
     return;
 }
+
+//------------------------------------------ PID controller for speed -------------------------------------
+
+std::vector<double> previous_speed(3,0);
+
+int calc_correction_speed(int speed_case, int desired_speed, double kp, double ki, double kd){
+    double current_speed = 0;
+
+    switch (speed_case)
+    {
+    case LEFT_SPEED:
+        current_speed = current_delta_speed_L;
+        break;
+    case RIGHT_SPEED:
+        current_speed = current_delta_speed_R;
+    case BOTH_SPEEDS:
+        current_speed = current_avg_speed;
+    default:
+        current_speed = current_avg_speed;
+        break;
+    }
+
+    double proportional, integral, differential;
+    double error = static_cast<double>(desired_speed) - current_speed;
+    dt = calc_dt();
+
+    //ApplyPID
+    proportional = error;
+    integral += error*dt;
+    differential = (error-previous_speed[speed_case])/dt;
+
+    previous_speed[speed_case] = error;
+
+    return cap_output(speedToDutyCycle(kp * proportional + ki * integral + kd * differential), 300);
+}
+
+
+
+
+

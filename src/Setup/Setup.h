@@ -94,6 +94,8 @@
 #define DUTY_SLOW_ROTATION 100 // --> Tested - works with 24000 ticks for rotation
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 100
+#define SPEED_MAPPING 365
+#define SPEED_FAST 500
 #define MINIMUM_DUTY 50
 #define TICKS_INNER_WHEEL 31000 // thorugh testing
 #define TICKS_OUTER_WHEEL 62000 // through testing
@@ -148,6 +150,7 @@ extern void enable_PID();
 extern void disable_PID();
 extern std::vector<int> correction_offset;
 extern double give_percent(double, int, int);
+extern std::vector<double> previous_speed;
 
 enum PID_CASES{
     X_ERROR = 0,
@@ -157,9 +160,16 @@ enum PID_CASES{
     Y_ERROR = 4,
     TRANSITION = 5,
     BLIND = 6,
-    ENUM_END = 7
+    ENUM_END = 7,
+    V_ERROR_BASE_SPEED = 8,
+    V_ERROR_EQUAL_SPEED = 9
 };
 
+enum SPEED_CASES{
+    LEFT_SPEED = 0,
+    RIGHT_SPEED = 1,
+    BOTH_SPEEDS = 2
+};
 
 // ---------------------------------------
 // Algorithm constants
@@ -222,8 +232,10 @@ extern volatile double current_delta_speed_L;
 extern volatile double current_delta_speed_R;
 extern volatile double current_avg_speed;
 extern volatile double current_angle; 
-extern void reset_distance_traveled(void);
+extern void reset_distance_traveled_after_straight(void);
+extern void reset_distance_traveled_after_curve(void);
 extern void reset_encoders(void);
+extern int system_clock_micros();
 
 
 
@@ -252,6 +264,7 @@ extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
 extern void drive_forward(int, int, float);
 extern void backup_to_wall();
+extern int speedToDutyCycle(double);
 
 
 // Middle Layer Drving Functions

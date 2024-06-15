@@ -1,11 +1,10 @@
 #pragma once
 #include "Setup/Setup.h"
-#include <robin.h>
+#include <motors.h>
 #include <ballgrabber.h>
 //#include "battery.h"
 #include "PID.h"
 #include "Music.h"
-#include "maze.h"
 
 // Define an enum for all modes
 enum Mode {
@@ -15,12 +14,9 @@ enum Mode {
     MODE_MAP_MAZE,
     MODE_BFS,
     MODE_ASTAR,
-    MODE_STORE_FLASH,
-    MODE_MAX, // This can be used to determine the number of modes
+    MODE_MAX // This can be used to determine the number of modes
 };
 
-
-// Test_Maze test_maze = initialize_test_maze();
 // Rotary encoder debouncing variables
 volatile unsigned long lastTurnTime = 0;
 const unsigned long debounceDelay = 100; // Debounce delay in milliseconds
@@ -66,7 +62,7 @@ void updateEncoderState() {
 
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
-    const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*", "STF"};
+    const char* options[] = {"S-B", "S-Res", "Data", "DFS", "BFS", "A*"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
@@ -176,7 +172,7 @@ void handleModeSelection(Mode mode) {
             reset_encoders();
             reset_PID_values();
             delay(50);
-            drive_forward(350, 0, 2);
+            bfs_algorithm();
             delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
@@ -187,99 +183,52 @@ void handleModeSelection(Mode mode) {
         case MODE_ASTAR:
             display_print("A* Mode selected wait for Finger");
             ble->println("A* Mode selected");
-            
-            // Write serialized data to flash
-            serialize_maze(maze, buffer);
-            // Debug print to serial monitor or log
-            ble->println("Serialized Buffer:");
-            indexprint = 0;
-            while (indexprint < buffer.size()) {
-            // Print Walls
-            ble->println("Walls:");
-                for (int i = 0; i < 4; ++i) {
-                    bool wall = buffer[indexprint++] != 0;
-                    ble->print(wall);
-                    ble->print(" ");
-                }
-            ble->println();
-
-            // Print Visited
-            bool visited = buffer[indexprint++] != 0;
-            ble->print("Visited: ");
-            ble->println(visited);
-
-            // Print Position
-            ble->print("Position: [");
-            int x = (buffer[indexprint]);
-            int y = (buffer[indexprint + 1]); 
-            ble->print(x);
-            ble->print(", ");
-            ble->print(y);
-            ble->println("]");
-            indexprint += 2; 
-            }
-
-            ble->println();
-
-            write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
-            //write_maze_to_flash(FLASH_SECTOR_11_START_ADDR, buffer);
-            ble->println("Data written to Flash");
-            // Clear the maze to demonstrate loading from flash
-            ble->println("Maze cleared");
-
-            // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            // timer14->resume();
-            // start(5); // wait for finger
-            // reset_encoders();
-            // reset_PID_values();
+            digitalWrite(MOTOR_ENABLE, LOW); // disable motor
+            start(5); // wait for finger
+            timer14->resume();
+            delay(50);
+            reset_encoders();
+            reset_PID_values();
             // delay(100);
             // grab_ball();
             // stop();
-            // delay(100);
-            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-            // timer14->pause();
-            displayOptions(MODE_ASTAR, false);
-        // default:
-        //     display_print("Invalid mode");
-            break;
-        case MODE_STORE_FLASH:
-            display_print("Store Flash Mode selected.");
-            maze.clear();
-            maze.resize(MAZE_HEIGHT, std::vector<Location>(MAZE_WIDTH));
-            
-            // Load the maze from flash
-            read_maze_from_flash(FLASH_SECTOR_11_START_ADDR, buffer);
-             deserialize_maze(buffer, maze);
-            // Verify loaded data
-            ble->println("Maze data loaded from flash:");
-
-            for (int i = 0; i < MAZE_HEIGHT; ++i) {
-                for (int j = 0; j < MAZE_WIDTH; ++j) {
-                    ble->print("Position: [");
-                    ble->print(maze[i][j].position[0]);
-                    ble->print(", ");
-                    ble->print(maze[i][j].position[1]);
-                    ble->println("]");
-
-                    ble->print("Walls: ");
-                    for (bool wall : maze[i][j].walls) {
-                        ble->print(wall);
-                        ble->print(" ");
-                    }
-                    ble->println();
-
-                    ble->print("Visited: ");
-                    ble->println(maze[i][j].visited);
-                    ble->println();
-                }
-            }
-            // uint32_t address_to_check = FLASH_SECTOR_11_START_ADDR; // Example address: sector 11
-            // if (is_flash_writable(address_to_check)) {
-            //     ble->println("Flash mem free");
-            // } else {
-            //     ble->println("Flash mem not free");
+            // while(!encoderTurned){
+            //     std::vector<bool> walls = find_walls_forward_looking();
+            //     ble->println("0: " + String(Distance_Sensor[0]) + " 1: " + String(Distance_Sensor[1]) + " 2: " + String(Distance_Sensor[2]) + " 3: " + String(Distance_Sensor[3]) + " 4: " + String(Distance_Sensor[4]) + " 5: " + String(Distance_Sensor[5]) + " 6: " + String(Distance_Sensor[6]));
+            //     ble->println("Walls: " + String(walls[0]) + " " + String(walls[1]) + " " + String(walls[2]) + " " + String(walls[3]));
+            //     delay(2500);
             // }
-            displayOptions(MODE_STORE_FLASH, false);
+            delay(50);
+            drive_forward(365, 365, 2);
+            curve_left();
+            drive_forward(365, 365, 2);
+            curve_left();
+            drive_forward(365, 365, 2);
+            curve_left();
+            drive_forward(365, 0, 2);
+            stop();
+            delay(200);
+            // digitalWrite(MOTOR_ENABLE, HIGH);
+            // timer14->resume(); // starting systick timer
+            // delay(100);
+            // // resetting all values to zero to ensure no previous values are used and no beginning encoder values read
+            // reset_encoders();
+            // reset_PID_values();
+            // delay(50);
+            // while(!encoderTurned){
+            //     drive_forward(350, 350, 2);
+            //     curve_left();
+            // }
+            // stop();
+            // timer14->pause();
+            // // display_print("A* Mode completed");
+            digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
+            // // always keep this last
+            timer14->pause();
+            displayOptions(MODE_ASTAR, false);
+            break;
+        default:
+            display_print("Invalid mode");
             break;
     }
 }

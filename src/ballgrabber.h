@@ -26,16 +26,23 @@ void writeServo(int angle) {
 
 // Function to move the ball grabber forward (in front of robot)
 void move_ballgrabber_forward() {
-    delay(220);
+    for (int degree = DEGREE_BACK; degree >= DEGREE_FRONT; degree--) {
+        writeServo(degree);
+        delay(100);
+    }
     writeServo(DEGREE_FRONT);
-    delay(1000);
 }
 
 // Function to move the ball grabber backward (above robot)
 void move_ballgrabber_backward() {
-    delay(220);
+    // delay(220);
+    // writeServo(DEGREE_BACK);
+    // delay(1000);
+    for (int degree = DEGREE_FRONT; degree <= DEGREE_BACK; degree++) {
+        writeServo(degree);
+        delay(40);
+    }
     writeServo(DEGREE_BACK);
-    delay(1000);
 }
 
 
@@ -51,34 +58,42 @@ void handle_ballgrabber(){
 // Full Function to grab the ball
 void grab_ball(){
     // drive toward enorth dge of square (0,1)
-    timer10->pause();
-    drive_forward(365, 365, 1.778);
-    // drive right curve 
-    curve_right();
-    // drive one forward
-    drive_forward(365, 0, 0.9);
-    rotate_right();
-    // backup to wall 
-    BackwardBoth(90);
-    delay(30);
-    while(current_avg_speed < 0){};
-    delay(200);
-    stop();
-    delay(1000);
+    // timer10->pause();
+    // drive_forward(365, 365, 1.778);
+    // // drive right curve 
+    // curve_right();
+    // // drive one forward
+    // drive_forward(365, 0, 0.9);
+    // rotate_right();
+    // // backup to wall 
+    // BackwardBoth(90);
+    // delay(30);
+    // while(current_avg_speed < 0){};
+    // delay(200);
+    // stop();
+    // delay(1000);
+    // timer14->pause();
     timer10->resume();
+    ble->println("Ballgrabber enabled");
     digitalWrite(SERVO_ENABLE, HIGH);
+    ble->println("Servo enabled");
     // move ballgrabber forward
     move_ballgrabber_forward();
     // drive to ball 
     reset_PID_values(); 
-    delay(30);
-    drive_forward(200, 0, 0.24); 
+    timer10->pause();
+    timer14->resume();
+    // drive_forward(200, 0, 0.24); 
+    timer14->pause();
+    timer10->resume();
+    delay(500);
     // move ballgrabber backwards
     move_ballgrabber_backward();
     digitalWrite(SERVO_ENABLE, LOW);
-    timer10->pause();
-    // rotate right 
-    rotate_right();
+    // timer10->pause();
+    // timer14->resume();
+    // // rotate right 
+    // rotate_right();
     reset_PID_values();
     // move back to exit 
     drive_forward(365, 365, 1);
