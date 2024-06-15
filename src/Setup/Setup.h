@@ -11,7 +11,8 @@
 #include "Adafruit_SSD1306.h"
 #include "Adafruit_GFX.h"
 #include "./location.h"
-#include <stm32f4xx_hal.h> //probably not neccessary
+#include <stm32f4xx_hal.h> //necessary for Flash Memory Usage
+
 
 //Pin Naming
 //System
@@ -343,3 +344,11 @@ extern void move_forward_mapping(int);
 
 // softreset
 extern void soft_reset();
+
+//Flash Memory
+#define FLASH_SECTOR_11_START_ADDR 0x080E0000
+#define FLASH_SECTOR_11_END_ADDR 0x080FFFFF
+
+extern void serialize_maze(const std::vector<std::vector<Location>>&, std::vector<uint8_t>&);
+extern void deserialize_maze(uint32_t, std::vector<std::vector<Location>>&);   
+extern void write_data_to_flash(uint32_t, const std::vector<uint8_t>&); 

@@ -39,9 +39,9 @@ void update_direction(int turn_direction) {
 
 // Function to get the list of walls around the current cell in the maze, e.g. [True, False, True, False] -> No walls to the front and the back of the mouse but left and right
 // returns values relative to direction we come from
-std::vector<bool> get_walls() {
-    std::vector<bool> walls_absolute(4, false); // initializing list containing 4 walls each to be false by default
-    std::vector<bool> walls_relative_cur_dir = find_walls_forward_looking(); // initializing list containing 4 walls each to be false by default
+std::array<bool, 4> get_walls() {
+    std::array<bool, 4> walls_absolute{false, false, false, false}; // initializing list containing 4 walls each to be false by default
+    std::array<bool, 4> walls_relative_cur_dir = find_walls_forward_looking(); // initializing list containing 4 walls each to be false by default
     // Check for walls in each direction independent of the current direction 
     walls_absolute[cur_direction] = walls_relative_cur_dir[0]; // Is there a wall in front
     walls_absolute[(cur_direction + 1) % 4] = walls_relative_cur_dir[1]; // Is there a wall to the right

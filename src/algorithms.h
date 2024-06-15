@@ -31,6 +31,11 @@ void dfs_mapping(){
     ble->println("Mapping maze using DFS");	
     dfs_map_maze(); // Mapping the maze using depth-first search 
     display_print("Mapping complete");
+    delay(1000);
+    serialize_maze(test_maze, buffer); //Put maze into buffer vector 
+    write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
+    display_print("Data written to flash");
+    delay(1000);
     MAPPING_COMPLETE = true; // Set mapping complete to true
     return;
 }

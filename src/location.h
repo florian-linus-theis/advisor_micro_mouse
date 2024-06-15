@@ -6,7 +6,7 @@
 
 class Location {
     public:
-    std::vector<bool> walls; // list of 4 booleans (north, east, south, west)
+    std::array<bool, 4> walls; // list of 4 booleans (north, east, south, west)
     std::vector<int> position; // order pair list [x, y]
     bool visited; // boolean if the location has been visited
     bool ballgreifer;
@@ -18,7 +18,7 @@ class Location {
             position[0] = pos[0];
             position[1] = pos[1];
         }
-    }
+        }
 
     // takes position as order pair list [x, y]
     void set_position(std::vector<int> pos) {
@@ -27,7 +27,7 @@ class Location {
     }
 
     // takes walls as list of 4 booleans, e.g. [true, false, true, false] and updates walls property
-    void set_walls(std::vector<bool> walls) {
+    void set_walls(std::array<bool, 4> walls) {
         this->walls = walls; // this-> is used to differentiate between the class attribute and the parameter that was passed
     }
 
