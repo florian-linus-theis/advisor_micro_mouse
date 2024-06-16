@@ -196,7 +196,7 @@ void handleModeSelection(Mode mode) {
             reset_encoders();
             reset_PID_values();
             delay(50);
-            bfs_algorithm();
+            a_star_algorithm();
             delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
