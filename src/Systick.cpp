@@ -6,7 +6,11 @@ int encoder_right_last_time = 0;
 int encoder_left_last_time = 0;
 volatile double current_delta_speed_L = 0;
 volatile double current_delta_speed_R = 0;
+volatile double last_delta_speed_L = 0;
+volatile double last_delta_speed_R = 0;
 volatile double current_avg_speed = 0;
+volatile double current_acc_L = 0;
+volatile double current_acc_R = 0;
 int current_micros = 0;
 int last_micros = 0;
 volatile double current_angle = 0;
@@ -117,6 +121,8 @@ void print_pid(){
 // 1.000.000 microsecs / sec
 // Our systick interval is roughly at 11.65ms (is not a big issue if it is not exactly 11.65ms)
 void calc_speed() {
+  last_delta_speed_L = current_delta_speed_L;
+  last_delta_speed_R = current_delta_speed_R;
   current_micros = system_clock_micros();
   int delta_time = current_micros - last_micros;
   // left wheel
@@ -126,6 +132,10 @@ void calc_speed() {
   delta_s = encoder_right - encoder_right_last_time;
   current_delta_speed_R = (static_cast<double>(delta_s) / delta_time) * 1687.379; // [mm / s]
   current_avg_speed = (current_delta_speed_L + current_delta_speed_R) / 2; // [mm / s]
+  //acceleration
+  current_acc_L = ((current_delta_speed_L - last_delta_speed_L) / delta_time) * 1000000; // delta speed in [mm/s] / microsec * 1000000
+  current_acc_R = ((current_delta_speed_R - last_delta_speed_R) / delta_time) * 1000000; 
+
   last_micros = current_micros;
 }
 
