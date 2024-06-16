@@ -136,8 +136,17 @@ void handleModeSelection(Mode mode) {
             delay(100);
             reset_encoders();
             reset_PID_values();	
+            delay(4);
             digitalWrite(MOTOR_ENABLE, LOW); //enbale motor
-            grab_ball();
+            // grab_ball();
+            drive_forward(300, 0, 1);
+            rotate_right();
+            drive_forward(300, 0, 1);
+            rotate_right();
+            drive_forward(300, 0, 1);
+            right_turn_around();
+            enable_PID();
+            timer14->pause(); // stopping systick timer
             delay(200);
             stop();
             delay(200);

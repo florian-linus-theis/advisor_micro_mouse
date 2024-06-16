@@ -4,17 +4,17 @@
 std::vector<int> determine_correction_needed(){
     std::vector<int> chosen_correction = {0,0};
     if(PID_ENABLED == false){
-        chosen_correction = {0,0};
+        return {0,0};
     }
-    else if(abs(remapped_error[CURRENT_CASE_PID]) > 3){
-        chosen_correction = PID_values;
-        //ble->println("IR");
-    }
-    else{
-        distance_traveled_L_PID = 0;
-        distance_traveled_R_PID = 0;
-        chosen_correction = PID_values_encoder;
-        //ble->println("ENC");
+    // ble->println("ERROR: " + String(remapped_error[CURRENT_CASE_PID]));
+    if(CURRENT_CASE_PID != X_ERROR_ENCODER_BASED && (abs(remapped_error[CURRENT_CASE_PID])) > 3){
+        chosen_correction = calc_correction(CURRENT_CASE_PID);
+        // ble->println("IR");
+        // every time we choose IR based correciton we reset the encoder based PID values	
+        reset_encoder_PID_values();
+    } else {
+        chosen_correction = calc_correction(X_ERROR_ENCODER_BASED);
+        // ble->println("Enc");
     }
     return chosen_correction;
 }

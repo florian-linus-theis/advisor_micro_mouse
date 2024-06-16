@@ -125,6 +125,7 @@ extern std::vector<int> PID_values_encoder;
 extern std::vector<int> calc_correction(int);
 extern std::vector<int> determine_correction_needed();
 extern void reset_PID_values();
+extern void reset_encoder_PID_values();
 extern int determine_PID_case();
 extern std::array<bool, 4> find_walls_forward_looking();
 extern void pid_move_function(int);
@@ -135,6 +136,7 @@ extern bool side_walls_disappearing();
 extern double differential;
 extern double integral;
 extern double proportional; 
+extern std::vector<int> previous;
 extern int CURRENT_CASE_PID; 
 extern bool SET_PID_MANUALLY;
 extern std::vector<int> remapped_error;
@@ -162,9 +164,9 @@ enum PID_CASES{
     Y_ERROR = 4,
     TRANSITION = 5,
     BLIND = 6,
-    ENUM_END = 7,
-    V_ERROR_BASE_SPEED = 8,
-    V_ERROR_EQUAL_SPEED = 9
+    V_ERROR_BASE_SPEED = 7,
+    V_ERROR_EQUAL_SPEED = 8,
+    ENUM_END = 9
 };
 
 enum SPEED_CASES{
