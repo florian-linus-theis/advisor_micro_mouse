@@ -146,7 +146,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) - correction_offset[X_ERROR];
         //ble->println("B: " + String(remapped_error[X_ERROR]));
-        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 0.4, 0.0001, 0.001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 0.5, 0.0001, 0.0003); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -165,7 +165,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) - correction_offset[X_ERROR_LEFT_WALL_ONLY];
         //ble->println("L: " + String(remapped_error[X_ERROR_LEFT_WALL_ONLY]));
-        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 0.4, 0.0001, 0.001); // 12, 0.0001, 0.01
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 0.5, 0.0001, 0.0003); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -175,7 +175,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) - correction_offset[X_ERROR_RIGHT_WALL_ONLY];
         //ble->println("R: " + String(remapped_error[X_ERROR_RIGHT_WALL_ONLY]));
-        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 0.4, 0.0001, 0.001);
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 0.5, 0.0001, 0.0003);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;

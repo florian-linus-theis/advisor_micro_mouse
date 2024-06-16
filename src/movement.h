@@ -348,11 +348,11 @@ int calc_duty_correction(int desired_speed, int speed_case){
     // return PID correction duty
     switch (speed_case){
     case LEFT_SPEED:
-        correction = calc_correction_speed(speed_case, desired_speed, 2, 0, 0.01);
+        correction = calc_correction_speed(speed_case, desired_speed, 10, 0, 0.1);
     case RIGHT_SPEED:
-        correction = calc_correction_speed(speed_case, desired_speed, 2, 0, 0.01);
+        correction = calc_correction_speed(speed_case, desired_speed, 10, 0, 0.1);
     case BOTH_SPEEDS:
-        correction = calc_correction_speed(speed_case, desired_speed, 2, 0, 0.01);
+        correction = calc_correction_speed(speed_case, desired_speed, 10, 0, 0.1);
     default:
         correction = 0;
     }

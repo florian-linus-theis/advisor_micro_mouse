@@ -6,15 +6,15 @@ std::vector<int> determine_correction_needed(){
     if(PID_ENABLED == false){
         return {0,0};
     }
-    ble->println("ERROR: " + String(remapped_error[CURRENT_CASE_PID]));
+    // ble->println("ERROR: " + String(remapped_error[CURRENT_CASE_PID]));
     if(CURRENT_CASE_PID != X_ERROR_ENCODER_BASED && (abs(remapped_error[CURRENT_CASE_PID])) > 3){
         chosen_correction = calc_correction(CURRENT_CASE_PID);
-        ble->println("IR");
+        // ble->println("IR");
         // every time we choose IR based correciton we reset the encoder based PID values	
         reset_encoder_PID_values();
     } else {
         chosen_correction = calc_correction(X_ERROR_ENCODER_BASED);
-        ble->println("Enc");
+        // ble->println("Enc");
     }
     return chosen_correction;
 }
