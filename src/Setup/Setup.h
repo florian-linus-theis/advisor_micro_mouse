@@ -236,6 +236,8 @@ extern volatile double current_delta_speed_L;
 extern volatile double current_delta_speed_R;
 extern volatile double current_avg_speed;
 extern volatile double current_angle; 
+extern volatile double current_acc_R;
+extern volatile double current_acc_L;
 extern void reset_distance_traveled_after_straight(void);
 extern void reset_distance_traveled_after_curve(void);
 extern void reset_encoders(void);
