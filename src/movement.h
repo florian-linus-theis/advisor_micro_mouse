@@ -57,7 +57,13 @@ void compute_avg_distance_traveled(){
     avg_distance_traveled = (abs(distance_traveled_L) + abs(distance_traveled_R)) / 2;
 }
 
-void reset_distance_traveled_after_straight(){
+void reset_distance_before_straight(){
+    distance_traveled_L = 0;
+    distance_traveled_R = 0;
+    avg_distance_traveled = 0;
+}
+
+void reset_distance_traveled_before_curve(){
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
@@ -66,10 +72,12 @@ void reset_distance_traveled_after_straight(){
 void reset_distance_traveled_after_curve(){
     distance_traveled_L_PID = 0;
     distance_traveled_R_PID = 0;
+}
+
+void reset_distance_traveled_after_straight(){
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
-    current_angle = 0;
 }
 
 
@@ -118,7 +126,7 @@ void stop(){
     ForwardLeft(0);
     ForwardRight(0);
     current_duty_cycle = 0;
-    // delay(1); // added small delay here such that the values have time to settle before the robot starts next move
+    while(current_avg_speed != 0){}; // wait for the robot to really stop
 }
 
 void backup_to_wall(){
@@ -130,7 +138,6 @@ void backup_to_wall(){
     while(current_avg_speed < 0){};
     delay(50);
     stop();
-    delay(50);
     reset_distance_traveled_after_straight();
 }
 
@@ -300,6 +307,8 @@ void move_forward_different(int desired_max_duty_cycle, int end_duty_cycle, floa
 
 void drive_forward(int desired_max_speed, int end_speed, float squares){
     // first reset distances
+    reset_encoder_PID_values();
+    reset_distance_before_straight();
     int desired_distance = static_cast<int>(round(squares * tick_forward));
     int ticks_until_walls_disappearing = static_cast<int>(round((squares-0.5) * tick_forward)); // start looking for walls 1 square before end
     int last_distance_traveled = 1;	// setting the distance to one so that we can enter the loop and not skip first iteration
@@ -326,9 +335,6 @@ void drive_forward(int desired_max_speed, int end_speed, float squares){
            break;
         }
     }
-    // ble->println("Reached destination");
-    // reset_distance_traveled_after_straight();
-    reset_distance_traveled_after_straight(); // perhaps can be deleted because we want to account for having driven too far since the last time we reset
 }
 
 // calculate the duty needed for correcting
@@ -435,24 +441,24 @@ void rotate_left(){
         }
     }
     stop();
-    delay(400);
     reset_distance_traveled_after_straight();
 }
 
 void rotate_right(){
-    BackwardRight(DUTY_SLOW_ROTATION); // start moving wheels in opposite directions (turning right)
-    ForwardLeft(DUTY_SLOW_ROTATION);
-    volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
-    current_duty_cycle = DUTY_SLOW_ROTATION;
-    reset_distance_traveled_after_straight();
+    disable_PID();
+    volatile int start_angle = static_cast<int>(current_angle);
+    reset_distance_traveled_before_curve();
+    delay(4); // wait for systick update
+    BackwardRight(150); // start moving wheels in opposite directions (turning right)
+    ForwardLeft(150);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
-    while(abs(distance_traveled_R) < tick_rotate && abs(distance_traveled_L) < tick_rotate){
-        if (distance_travelled_right == distance_traveled_R) continue;
-        distance_travelled_right = distance_traveled_R; // update the last distance traveled (here just using the left wheel because avg distance cancels out)
+    while(abs(distance_traveled_R) < tick_rotate - 5000 || abs(distance_traveled_L) < tick_rotate - 5000 || current_angle < -80 - start_angle){
     }
     stop();
-    delay(400);
-    reset_distance_traveled_after_straight();
+    reset_distance_traveled_after_curve();
+    delay(6);
+    reset_PID_values();
+    enable_PID();
 }
 
 // void turn_around(){
@@ -473,19 +479,20 @@ void rotate_right(){
 
 void right_turn_around(){
     disable_PID();
-    volatile int distance_travelled_right = 1; // setting the distance to one so that we can enter the loop and not skip first iteration
-    current_duty_cycle = DUTY_SLOW_ROTATION;
-    int full_rotation_ticks = tick_rotate * 1.9;
-    reset_distance_traveled_after_straight();
+    volatile int start_angle = static_cast<int>(current_angle);
+    int full_rotation_ticks = tick_rotate * 1.8;
+    reset_distance_traveled_before_curve();
+    delay(4); // wait for systick update
     BackwardRight(150); // start moving wheels in opposite directions (turning right)
     ForwardLeft(150);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
-    while(abs(distance_traveled_R) < full_rotation_ticks || abs(distance_traveled_L) < full_rotation_ticks){
+    while((abs(distance_traveled_R) < full_rotation_ticks || abs(distance_traveled_L) < full_rotation_ticks) && current_angle > -170 - start_angle){
     }
     stop();
-    delay(200);
+    reset_distance_traveled_after_curve();
+    reset_PID_values();
+    delay(4);
     enable_PID();
-    reset_distance_traveled_after_straight();
 }
 
 

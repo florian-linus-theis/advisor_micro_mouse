@@ -311,9 +311,9 @@ int determine_PID_case(){
     } else if (walls_compare_threshold[4] && walls_compare_threshold[5] && (!walls_compare_threshold[0] || !walls_compare_threshold[1])){
         return X_ERROR_RIGHT_WALL_ONLY;
     } else if (!walls_compare_threshold[0] && !walls_compare_threshold[1] && !walls_compare_threshold[4] && !walls_compare_threshold[5]){
-        return TRANSITION;
+        return X_ERROR_ENCODER_BASED;
     } else {
-        return BLIND;
+        return X_ERROR_ENCODER_BASED;
     }
     return 10; // just default but will not be reached
 }
@@ -362,13 +362,27 @@ void calc_average_PID_values() {
   avg_PID_values[1] = static_cast<int>(std::round(static_cast<double>(avg_PID_values[1]) / counter));
 }
 
+// Function to reset the encoder PID values
+void reset_encoder_PID_values(){
+    distance_traveled_L_PID = 0;
+    distance_traveled_R_PID = 0;
+    previous[X_ERROR_ENCODER_BASED] = 0;
+    PID_values_encoder = {0,0};
+}
+
 // Function to reset the PID values
 void reset_PID_values(){
     PID_values = {0,0};
     integral = 0;
     differential = 0;
     proportional = 0;
+    // setting previous values to 0
+    for (int i = 0; i < ENUM_END; i++){
+        previous[i] = 0;
+    }
+    reset_encoder_PID_values();
 }
+
 
 // Function that is called if there is a wall in front of the robot such that we can use the front wall to recalibrate position
 void recalibrate_front_wall(){
