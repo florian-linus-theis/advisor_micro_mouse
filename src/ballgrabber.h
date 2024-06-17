@@ -69,7 +69,9 @@ void grab_ball(){
     move_ballgrabber_forward();
     // drive to ball 
     reset_PID_values(); 
-    drive_forward(200, 0, ACCELERATION_NORMAL, 0.3); // 0.24
+    SET_PID_MANUALLY = true;
+    CURRENT_CASE_PID = BLIND;
+    drive_forward(200, 0, 2000, 0.26); // 0.24
     delay(400);
     // move ballgrabber backwards
     move_ballgrabber_backward();
@@ -80,6 +82,8 @@ void grab_ball(){
     rotate_right();
     reset_PID_values();
     // move back to exit 
+    CURRENT_CASE_PID = BLIND;
     drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 1);
+    SET_PID_MANUALLY = false;
     curve_right(); // now at northern edge of cell (0, 2)
 } 
