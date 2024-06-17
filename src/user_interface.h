@@ -186,15 +186,12 @@ void handleModeSelection(Mode mode) {
             delay(50);
             SET_PID_MANUALLY = true;
             CURRENT_CASE_PID = BLIND;
-            drive_forward(200, 0, 2000, 1); // 0.24
-            rotate_right();
-            drive_forward(300, 0, 2000, 2); // 0.24
-            rotate_right();
-            drive_forward(300, 0, 2000, 2); // 0.24
-            right_turn_around();
-            drive_forward(300, 0, 2000, 2); // 0.24
-            right_turn_around();
-            drive_forward(300, 0, 2000, 2); // 0.24
+            drive_forward(365, 365, 2000, 1);
+            curve_right();
+            curve_left();
+            curve_right();
+            curve_left();
+            drive_forward(365, 0, 2000, 1);
             SET_PID_MANUALLY = false;
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer

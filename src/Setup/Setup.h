@@ -95,6 +95,7 @@
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 100
 #define SPEED_MAPPING 365
+#define SPEED_CURVES 365
 #define SPEED_FAST 500
 #define MINIMUM_DUTY 50
 #define TICKS_INNER_WHEEL 31000 // thorugh testing
@@ -118,6 +119,7 @@ extern void dfs_mapping();
 extern void bfs_algorithm();
 extern void a_star_algorithm();
 extern bool MAPPING_COMPLETE; 
+extern bool break_out_of_dfs;
 
 // ---------------------------------------
 // PID 

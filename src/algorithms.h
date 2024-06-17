@@ -13,6 +13,7 @@
 
 bool BALLGREIFER = true; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
+bool break_out_of_dfs = false; // Control Variable to break out of the DFS algorithm
 std::vector<int> POSSIBLE_GOAL_POS_ONE = {7,8}; // TODO:ändern zu {7,8}
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_THREE = {8,7};
@@ -31,42 +32,18 @@ void dfs_mapping(){
     dfs_map_maze(); // Mapping the maze using depth-first search 
     display_print("Mapping complete", 1);
     delay(1000);
-    serialize_maze(maze, buffer); //Put maze into buffer vector 
-    write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
-    // Debug print to serial monitor or log
-    // ble->println("Serialized Buffer:");
-    // indexprint = 0;
-    // while (indexprint < buffer.size()) {
-    // // Print Walls
-    // ble->println("Walls:");
-    //     for (int i = 0; i < 4; ++i) {
-    //         bool wall = buffer[indexprint++] != 0;
-    //         ble->print(wall);
-    //         ble->print(" ");
-    //     }
-    // ble->println();
-
-    // // Print Visited
-    // bool visited = buffer[indexprint++] != 0;
-    // ble->print("Visited: ");
-    // ble->println(visited);
-
-    // // Print Position
-    // ble->print("Position: [");
-    // int x = (buffer[indexprint]);
-    // int y = (buffer[indexprint + 1]); 
-    // ble->print(x);
-    // ble->print(", ");
-    // ble->print(y);
-    // ble->println("]");
-    // indexprint += 2; 
-    // }
-
-    // ble->println();
-
-    display_print("Data written to flash", 1);
-    delay(1000);
-    MAPPING_COMPLETE = true; // Set mapping complete to true
+    // if we have not triggered reset then save maze to flash
+    if (break_out_of_dfs == false) {  
+        serialize_maze(maze, buffer); //Put maze into buffer vector 
+        write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
+        display_print("Data written to flash", 1);
+        delay(1000);
+        MAPPING_COMPLETE = true; // Set mapping complete to true
+        return;
+    }
+    display_print("Mapping incomplete", 1);
+    MAPPING_COMPLETE = false; // Set mapping complete to false
+    soft_reset(); // Reset the maze
     return;
 }
 
