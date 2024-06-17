@@ -113,6 +113,9 @@ void handleModeSelection(Mode mode) {
             display_print("Stand By Mode selected");
             delay(1000); // Delay to allow the user to read the message
             Running_in_the_90s();
+            //Running_in_the_90s_OLD();
+            //Buzzer_beep_noBlock(2000, 3, 1000);
+            digitalWrite(LED_GREEN, LOW);
             // always keep this last
             displayOptions(MODE_STANDBY, false);
             break;
@@ -241,15 +244,19 @@ void Buzzer_beep(int freq, int beeps, int length) {  //Frequency, Number of beep
     timer1->setCaptureCompare(4, overflow/2, TICK_COMPARE_FORMAT);
     timer1->refresh();
 
-    int i = 1;
-    while(true) {
-        timer1->resume();
-        delay(length);
-        timer1->pause();
-        if(i >= beeps) break;
-        delay(length);
-        i++;
-    }
+    // int i = 1;
+    // while(true) {
+    //     timer1->resume();
+    //     delay(length);
+    //     timer1->pause();
+    //     if(i >= beeps) break;
+    //     delay(length);
+    //     i++;
+    // }
+
+    timer1->resume();
+    delay(length);
+    timer1->pause();
 }
 
 void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, Number of beeps and Tone Length in ms
@@ -275,8 +282,10 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
     timer1->resume();
 
     buzzer_counter = (beeps * 2) - 2;
+
+    timer7->pause();
     timer7->setCount(0);
-    timer7->setOverflow(length*10, TICK_FORMAT);
+    timer7->setOverflow((length*10), TICK_FORMAT);
     timer7->refresh();
     timer7->resume();
 
@@ -286,8 +295,10 @@ void Buzzer_beep_noBlock(int freq, int beeps, int length) {  //Frequency in Hz, 
 
 void Timer7_Interrupt(void) {
     if(!SETUP_COMPLETE) {return;}
-    if ((buzzer_counter)%2 == 0) {
+
+    if ((buzzer_counter%2) == 0) {
         timer1->pause();
+        timer1->setCount(0);
         if(buzzer_counter == 0) timer7->pause();
     }
     else {

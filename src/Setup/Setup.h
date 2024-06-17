@@ -267,3 +267,4 @@ extern void grab_ball();
 
 //Music.cpp
 extern void Running_in_the_90s(void);
+extern void Running_in_the_90s_OLD(void);
