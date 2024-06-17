@@ -262,6 +262,7 @@ extern void ForwardRight(int);
 extern void BackwardLeft(int);
 extern void BackwardRight(int);
 extern void ForwardBoth(int);
+extern void ForwardBoth(int, int);
 extern void BackwardBoth(int);
 extern void rotate_left();
 extern void rotate_right();

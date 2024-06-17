@@ -13,7 +13,7 @@
 
 bool BALLGREIFER = true; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
-std::vector<int> POSSIBLE_GOAL_POS_ONE = {3,3}; // TODO:ändern zu {7,8}
+std::vector<int> POSSIBLE_GOAL_POS_ONE = {7,8}; // TODO:ändern zu {7,8}
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_THREE = {8,7};
 std::vector<int> POSSIBLE_GOAL_POS_FOUR = {7,7}; 

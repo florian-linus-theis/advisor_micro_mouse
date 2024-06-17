@@ -66,6 +66,23 @@ void ForwardBoth(int dutyCycle){
     current_duty_cycle = dutyCycle;
 }
 
+void ForwardBoth(int dutyCycle_L, int dutyCycle_R){
+    if(dutyCycle_L + PID_values[0] > 0){
+        ForwardLeft(dutyCycle_L + PID_values[0]);
+    }
+    else if(dutyCycle_L + PID_values[0] <= 0){
+        ForwardLeft(0);
+    }
+
+    if(dutyCycle_R +  PID_values[1] > 0){
+        ForwardRight(dutyCycle_R + PID_values[1]);
+    }
+    else if(dutyCycle_R+ PID_values[1] <= 0){
+        ForwardRight(0);
+    }
+    current_duty_cycle = (dutyCycle_L + dutyCycle_R) / 2;
+}
+
 void BackwardBoth(int dutyCycle) {
     BackwardLeft(dutyCycle);
     BackwardRight(dutyCycle);

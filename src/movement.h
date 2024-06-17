@@ -37,13 +37,15 @@ int tick_accelerate = 35000;
 
 
 void break_immediately();
-int calculate_braking_distance(int end_speed, double desired_acceleration, bool break_completely);
+int calculate_braking_distance(int end_speed, double desired_acceleration, bool break_completely, bool both_wheels);
 void accelerate_each_wheel_in_curve(int desired_speed_L, int desired_speed_R, double desired_acceleration_L, double desired_acceleration_R);
 void cruise_speed_each_wheel_in_curve(int desired_speed_L, int desired_speed_R);
 void accelerate(int desired_max_speed, double desired_aceeleration);
 void cruise_speed(int desired_max_speed);
 void decelerate(int end_speed, double desired_acceleration);
 void right_turn_around();
+void accelerate_each_wheel_in_rotation(int desired_speed_L, int desired_speed_R, double desired_acceleration_L, double desired_acceleration_R);
+void cruise_speed_each_wheel_in_rotation(int desired_speed_L, int desired_speed_R);
 
 
 // placeholder for sensor values
@@ -165,7 +167,7 @@ void drive_forward(int desired_max_speed, int end_speed, double desired_accelera
             ble->println("Reached end speed");
             reached_end_speed = true;
         }
-        int braking_distance = calculate_braking_distance(end_speed, desired_acceleration, break_completely);
+        int braking_distance = calculate_braking_distance(end_speed, desired_acceleration, break_completely, true);
         if (!disappearing_wall_detected &&  avg_distance_traveled > ticks_until_walls_disappearing && side_walls_disappearing()){
             desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
             disappearing_wall_detected = true; // such that we only set the distance once
@@ -230,7 +232,7 @@ int calc_duty_correction(int desired_speed, double desired_acceleration, int cor
 
 // Function to accelerate from current speed to desired speed
 void accelerate(int desired_max_speed, double desired_acceleration){
-    ForwardBoth(calc_duty_correction(desired_max_speed, desired_acceleration, BOTH_ACC)); // positive acceleration
+    ForwardBoth(calc_duty_correction(desired_max_speed, desired_acceleration, LEFT_ACC), calc_duty_correction(desired_max_speed, desired_acceleration, RIGHT_ACC)); // positive acceleration
 }
 
 // Function to cruise at a desired speed
@@ -240,19 +242,22 @@ void cruise_speed(int desired_max_speed){
 
 // Function to decelerate from current speed to desired speed
 void decelerate(int end_speed, double desired_acceleration){
-    ForwardBoth(calc_duty_correction(end_speed, -desired_acceleration, BOTH_ACC)); // negative acceleration
+    ForwardBoth(calc_duty_correction(end_speed, -desired_acceleration, LEFT_ACC), calc_duty_correction(end_speed, -desired_acceleration, RIGHT_ACC)); // negative acceleration
 }
 
 void break_immediately(){
     ble->println("Breaking immediately");
-    ForwardLeft(0);
-    ForwardRight(0);
+    ForwardBoth(0);
     while(current_avg_speed > 0){};
 }
 
 
-int calculate_braking_distance(int end_speed, double desired_acceleration, bool break_completely){
+int calculate_braking_distance(int end_speed, double desired_acceleration, bool break_completely, bool both_wheels){
     // either break completely or calculate the braking distance to a desired end speed
+    int current_speed = current_avg_speed;
+    if (!both_wheels){
+        current_speed = current_delta_speed_L;
+    }
     if (!break_completely) {
         if (end_speed > current_avg_speed) {
             return -10000; // same as above
@@ -309,18 +314,29 @@ void rotate_left(){
 void rotate_right(){
     disable_PID();
     volatile int start_angle = static_cast<int>(current_angle);
-    reset_distance_traveled_before_curve();
-    delay(4); // wait for systick update
+    stop();
+    reset_distance_traveled_before_curve(); // wait for systick update
     BackwardRight(150); // start moving wheels in opposite directions (turning right)
     ForwardLeft(150);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
-    while(abs(distance_traveled_R) < tick_rotate - 5000 || abs(distance_traveled_L) < tick_rotate - 5000 || current_angle < -80 - start_angle){
+    while(abs(distance_traveled_R) < tick_rotate - 7000 || abs(distance_traveled_L) < tick_rotate - 7000){
     }
     stop();
+    delay(10);
     reset_distance_traveled_after_curve();
-    delay(6);
     reset_PID_values();
     enable_PID();
+    reset_integral_acc();
+}
+
+void accelerate_each_wheel_in_rotation(int desired_speed_L, int desired_speed_R, double desired_acceleration_L, double desired_acceleration_R){
+    ForwardLeft(calc_duty_correction(desired_speed_L, desired_acceleration_L, LEFT_ACC));
+    BackwardRight(calc_duty_correction(desired_speed_R, desired_acceleration_R, RIGHT_ACC));
+}
+
+void cruise_speed_each_wheel_in_rotation(int desired_speed_L, int desired_speed_R){
+    ForwardLeft(calc_duty_correction(desired_speed_L, 0, LEFT_SPEED));
+    BackwardRight(calc_duty_correction(desired_speed_R, 0, RIGHT_SPEED));
 }
 
 
@@ -333,13 +349,14 @@ void right_turn_around(){
     BackwardRight(150); // start moving wheels in opposite directions (turning right)
     ForwardLeft(150);
     // while we have not turned a quarter of a circle (using abs because we are travelling backwards with the right wheel)
-    while((abs(distance_traveled_R) < full_rotation_ticks || abs(distance_traveled_L) < full_rotation_ticks) && current_angle > -170 - start_angle){
+    while((abs(distance_traveled_R) < full_rotation_ticks || abs(distance_traveled_L) < full_rotation_ticks) && current_angle > -160 - start_angle){
     }
     stop();
     reset_distance_traveled_after_curve();
     reset_PID_values();
-    delay(4);
     enable_PID();
+    delay(10);
+    reset_integral_acc();
 }
 
 
@@ -401,6 +418,8 @@ void curve_right(){
         } else {
             // else we are in the curve and we want to keep the wheels at different speeds
             cruise_speed_each_wheel_in_curve(speed_L, speed_R);
+            total_acceleration_L = 0; // setting values to zeri such that ehwn we slow down again that we do not have any residual acceleration
+            total_acceleration_R = 0;
         }
 
     }
@@ -456,6 +475,8 @@ void curve_left(){
         } else {
             // else we are in the curve and we want to keep the wheels at different speeds
             cruise_speed_each_wheel_in_curve(speed_L, speed_R);
+            total_acceleration_L = 0; // setting values to zeri such that ehwn we slow down again that we do not have any residual acceleration
+            total_acceleration_R = 0;
         }
     }
     reset_PID_values();
