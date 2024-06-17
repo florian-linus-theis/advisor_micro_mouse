@@ -81,12 +81,12 @@ void move_forward_mapping(int squares = 1){
 void move_forward_mapping_fast(int squares = 1){
     if (cur_position == std::vector<int>{0, 0}) {
         if (cur_direction == 0){
-            drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.7778); // drive forward until edge of the cell 
+            drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.7778); // starter cell
             update_position();
             return;
         }
     }
-    drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.7778); // drive forward until edge of the cell
+    drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, squares); // drive forward until edge of the cell
     update_position();
 }
 

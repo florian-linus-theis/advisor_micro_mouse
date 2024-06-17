@@ -11,9 +11,9 @@
 #include "Setup/Setup.h"
 
 
-bool BALLGREIFER = false; // Using the Ballgreifer Version or not?
+bool BALLGREIFER = true; // Using the Ballgreifer Version or not?
 bool MAPPING_COMPLETE = false; // Control Variable to check if the maze is already mapped
-std::vector<int> POSSIBLE_GOAL_POS_ONE = {3,3}; 
+std::vector<int> POSSIBLE_GOAL_POS_ONE = {3,3}; // TODO:ändern zu {7,8}
 std::vector<int> POSSIBLE_GOAL_POS_TWO = {8,8}; 
 std::vector<int> POSSIBLE_GOAL_POS_THREE = {8,7};
 std::vector<int> POSSIBLE_GOAL_POS_FOUR = {7,7}; 
@@ -34,35 +34,35 @@ void dfs_mapping(){
     serialize_maze(maze, buffer); //Put maze into buffer vector 
     write_data_to_flash(FLASH_SECTOR_11_START_ADDR, buffer); // Save buffer vector on flash
     // Debug print to serial monitor or log
-    ble->println("Serialized Buffer:");
-    indexprint = 0;
-    while (indexprint < buffer.size()) {
-    // Print Walls
-    ble->println("Walls:");
-        for (int i = 0; i < 4; ++i) {
-            bool wall = buffer[indexprint++] != 0;
-            ble->print(wall);
-            ble->print(" ");
-        }
-    ble->println();
+    // ble->println("Serialized Buffer:");
+    // indexprint = 0;
+    // while (indexprint < buffer.size()) {
+    // // Print Walls
+    // ble->println("Walls:");
+    //     for (int i = 0; i < 4; ++i) {
+    //         bool wall = buffer[indexprint++] != 0;
+    //         ble->print(wall);
+    //         ble->print(" ");
+    //     }
+    // ble->println();
 
-    // Print Visited
-    bool visited = buffer[indexprint++] != 0;
-    ble->print("Visited: ");
-    ble->println(visited);
+    // // Print Visited
+    // bool visited = buffer[indexprint++] != 0;
+    // ble->print("Visited: ");
+    // ble->println(visited);
 
-    // Print Position
-    ble->print("Position: [");
-    int x = (buffer[indexprint]);
-    int y = (buffer[indexprint + 1]); 
-    ble->print(x);
-    ble->print(", ");
-    ble->print(y);
-    ble->println("]");
-    indexprint += 2; 
-    }
+    // // Print Position
+    // ble->print("Position: [");
+    // int x = (buffer[indexprint]);
+    // int y = (buffer[indexprint + 1]); 
+    // ble->print(x);
+    // ble->print(", ");
+    // ble->print(y);
+    // ble->println("]");
+    // indexprint += 2; 
+    // }
 
-    ble->println();
+    // ble->println();
 
     display_print("Data written to flash", 1);
     delay(1000);

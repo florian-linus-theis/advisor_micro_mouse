@@ -61,23 +61,27 @@ void compute_avg_distance_traveled(){
 }
 
 void reset_distance_before_straight(){
+    // total_angle += current_angle;
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
 }
 
 void reset_distance_traveled_before_curve(){
+    // total_angle += current_angle;
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
 }
 
 void reset_distance_traveled_after_curve(){
+    // total_angle += current_angle;
     distance_traveled_L_PID = 0;
     distance_traveled_R_PID = 0;
 }
 
 void reset_distance_traveled_after_straight(){
+    // total_angle += current_angle;
     distance_traveled_L = 0;
     distance_traveled_R = 0;
     avg_distance_traveled = 0;
@@ -131,6 +135,7 @@ void printer_debugger(int average_distance_travelled, int distance_remaining, in
 
 void drive_forward(int desired_max_speed, int end_speed, double desired_acceleration, float squares){
     // first reset distances
+    ble->println("Driving forward");
     reset_encoder_PID_values();
     reset_distance_before_straight();
     bool reached_end_speed = false;
@@ -357,6 +362,7 @@ double avg_acceleration_L = 0;
 double avg_acceleration_R = 0;
 
 void curve_right(){
+    ble->println("Curve right");
     disable_PID();
     int start_speed = current_avg_speed;
     if (start_speed < 365){
@@ -370,9 +376,8 @@ void curve_right(){
     double total_acceleration_L = 0; 
     double total_acceleration_R = 0;
     int start_angle = current_angle;
-    total_angle += current_angle;
-    total_angle += 90;
-    current_angle = 0;
+    // total_angle += current_angle + 90;
+    // current_angle = 0;
     reset_distance_traveled_before_curve();
     int last_distance_traveled = avg_distance_traveled;
     accelerate_each_wheel_in_curve(speed_L, speed_R, ACCELERATION_CURVES, -ACCELERATION_CURVES);
@@ -399,6 +404,7 @@ void curve_right(){
         }
 
     }
+   
     // wait for the inner wheel to drive the full distance that we do not start the drive forward function too early
     reset_PID_values();
     enable_PID();
@@ -406,13 +412,14 @@ void curve_right(){
     while(distance_traveled_R <= 48000){
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ble->println("Waiting for inner wheel");
+        // ble->println("Waiting for inner wheel");
         cruise_speed(start_speed);
     }
     reset_distance_traveled_after_curve();
 }
 
 void curve_left(){
+    ble->println("Curve left");
     disable_PID();
     int start_speed = current_avg_speed;
     if (start_speed < 365){
@@ -424,9 +431,8 @@ void curve_left(){
     int counter = 1; 
     double total_acceleration_L = 0; 
     double total_acceleration_R = 0;
-    total_angle += current_angle;
-    total_angle -= 90;
-    current_angle = 0;
+    // total_angle += current_angle - 90;
+    // current_angle = 0;
     reset_distance_traveled_before_curve();
     int last_distance_traveled = avg_distance_traveled;
     accelerate_each_wheel_in_curve(speed_L, speed_R, -ACCELERATION_CURVES, ACCELERATION_CURVES);
@@ -458,7 +464,7 @@ void curve_left(){
     while(distance_traveled_L <= 48000){
         if (last_distance_traveled == avg_distance_traveled) continue; // if the systick has not updated our values, do not update pwm values etc.
         last_distance_traveled = avg_distance_traveled; // update the last distance traveled
-        ble->println("Waiting for inner wheel");
+        // ble->println("Waiting for inner wheel");
         cruise_speed(start_speed);
     }
     reset_distance_traveled_after_curve();

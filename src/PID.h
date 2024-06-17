@@ -233,78 +233,71 @@ std::vector<bool> find_walls(){
 
 // Function to determine if a wall is detected in front or either side of the robot
 std::array<bool, 4> find_walls_forward_looking(){
-    std::array<bool, 4> wallsVec = {false, false, false, false};
+    std::array<bool, 4> wallsVec = {true, true, false, true};
+
+    // build average of 3 sensor values for each sensor to avoid false positives
+
     
-    if(abs( total_angle + current_angle) > 20){
-        if((total_angle +  current_angle) < -20){  //severe right turn
-            if(Distance_Sensor[1] > MinSensorValues[1] * 0.6){      //front Wall
-                wallsVec[0] = true;
-            }
-            if(Distance_Sensor[0] > MinSensorValues[0] * 0.5){      //left Wall
-                wallsVec[3] = true;
-            }
-            if(Distance_Sensor[3] > MinSensorValues[3] && Distance_Sensor[4] > MinSensorValues[4]){       //right Wall
-                wallsVec[1] = true;
-            }
-        }
-        else{  //severe left turn
-            if(Distance_Sensor[4] > MinSensorValues[4] * 0.6){      //front Wall
-                wallsVec[0] = true;
-            }
-            if(Distance_Sensor[2] > MinSensorValues[2] && Distance_Sensor[1] > MinSensorValues[1]){      //left Wall
-                wallsVec[3] = true;
-            }
-            if(Distance_Sensor[5] > MinSensorValues[5] * 0.5){       //right Wall
-                wallsVec[1] = true;
-            }
-        }
-    }
-    
-    else{   //Normal case no severe rotation
-        if(Distance_Sensor[0] > MinSensorValues[0] * 0.7 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
-            wallsVec[3] = true;
-        }
-        // Right Wall: both left and right sensor must be above threshold
-        if(Distance_Sensor[5] > MinSensorValues[5] * 0.7 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
-            wallsVec[1] = true;
-        }
-        // Front Wall: only front sensor must be above threshold
-        // Check if right and left are walls ->be less sensitive in all cases, avoiding reflexcions of walls
-        // if (wallsVec[1] == true && wallsVec[3] == true)
-        // {
-        //     if(Distance_Sensor[2] > MinSensorValues[2] * 1.7){
-        //     // only use front and front right sensor
-        //     if(Distance_Sensor[3] > MinSensorValues[3] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.2) wallsVec[0] = true;
-        //     } // slight right rotation
-        //     else if(Distance_Sensor[3] > MinSensorValues[3] * 1.7){ 
-        //         // only use front and front left sensor
-        //         if(Distance_Sensor[2] > MinSensorValues[2] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.3) wallsVec[0] = true;
-        //     } // normal case 
-        //     else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 1.0){
-        //         wallsVec[0] = true;
-        // }
-        // }
-        // else{
-        if((current_angle + total_angle > 0)){
-            if(Distance_Sensor[6] > MinSensorValues[6] * 0.7 || Distance_Sensor[3] > MinSensorValues[3] * 0.5){
-                wallsVec[0] = true;
-            }
-        } 
-        else{
-            if(Distance_Sensor[6] > MinSensorValues[6] * 0.7 || Distance_Sensor[2] > MinSensorValues[2] * 0.8){
-                  wallsVec[0] = true;
-            }
+    //   //Normal case no severe rotation
+    //     if(Distance_Sensor[0] > MinSensorValues[0] * 0.7 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
+    //         wallsVec[3] = true;
+    //     }
+    //     // Right Wall: both left and right sensor must be above threshold
+    //     if(Distance_Sensor[5] > MinSensorValues[5] * 0.7 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
+    //         wallsVec[1] = true;
+    //     }
+    //     // Front Wall: only front sensor must be above threshold
+    //     // Check if right and left are walls ->be less sensitive in all cases, avoiding reflexcions of walls
+    //     // if (wallsVec[1] == true && wallsVec[3] == true)
+    //     // {
+    //     //     if(Distance_Sensor[2] > MinSensorValues[2] * 1.7){
+    //     //     // only use front and front right sensor
+    //     //     if(Distance_Sensor[3] > MinSensorValues[3] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.2) wallsVec[0] = true;
+    //     //     } // slight right rotation
+    //     //     else if(Distance_Sensor[3] > MinSensorValues[3] * 1.7){ 
+    //     //         // only use front and front left sensor
+    //     //         if(Distance_Sensor[2] > MinSensorValues[2] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.3) wallsVec[0] = true;
+    //     //     } // normal case 
+    //     //     else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 1.0){
+    //     //         wallsVec[0] = true;
+    //     // }
+    //     // }
+    //     // else{
+    //     if((current_angle > 0)){
+    //         if(Distance_Sensor[6] > MinSensorValues[6] * 0.7 || Distance_Sensor[3] > MinSensorValues[3] * 0.5){
+    //             wallsVec[0] = true;
+    //         }
+    //     } 
+    //     else{
+    //         if(Distance_Sensor[6] > MinSensorValues[6] * 0.7 || Distance_Sensor[2] > MinSensorValues[2] * 0.8){
+    //               wallsVec[0] = true;
+    //         }
           
-        }
+        
         
         
         // }
 
+    // }
+
+    if (Distance_Sensor[6] <= MinSensorValues[6] * 0.8){
+        wallsVec[0] = false;
     }
-    ble -> println("Sensor 1:" + String(Distance_Sensor[1]) + "Sensor 2: " + String(Distance_Sensor[2]) + "Sensor 4" + String(Distance_Sensor[4]) + "Sensor 6: " + String(Distance_Sensor[6] + "Sensor 3:" + String(Distance_Sensor[3])));
-    ble -> println("MinSensor_Values  Sensor2 :"+ String(MinSensorValues[2]) + "Sensor :"+ String(MinSensorValues[6] + "Sensor 3:"+ String(MinSensorValues[3])));
-    ble -> println("Walls: " + String(wallsVec[0]) + String(wallsVec[1]) + String(wallsVec[2]) + String(wallsVec[3]));
-    ble -> println("Angle: " + String(current_angle));
+    if (Distance_Sensor[0] <= MinSensorValues[0] * 0.85 && Distance_Sensor[1] <= MinSensorValues[1] * 0.9){
+        wallsVec[3] = false;
+    }
+    if (Distance_Sensor[5] <= MinSensorValues[5] * 0.85 && Distance_Sensor[4] <= MinSensorValues[4] * 0.9){
+        wallsVec[1] = false;
+    }
+
+
+
+    // ble->println("MinValues 5: " + String(MinSensorValues[5]) + " MinValues 4: " + String(MinSensorValues[4]));
+    // ble->println("Sensor 5:" + String(Distance_Sensor[5]) + "Sensor 4: " + String(Distance_Sensor[4]));
+    // ble->println("MinValues 0: " + String(MinSensorValues[0]) + " MinValues 1: " + String(MinSensorValues[1]));
+    // ble->println("Sensor 0:" + String(Distance_Sensor[0]) + "Sensor 1: " + String(Distance_Sensor[1]));
+    // ble->println("Walls: " + String(wallsVec[0]) + String(wallsVec[1]) + String(wallsVec[2]) + String(wallsVec[3]));
+    // ble->println();
     
     return wallsVec;
 }

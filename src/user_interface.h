@@ -122,59 +122,15 @@ void handleModeSelection(Mode mode) {
             delay(700); // Delay to allow the user to read the message
             display_print("Soft Reset completed");
             delay(700); // Delay to allow the user to read the message
-
-
-            // start(5);
-            // timer14->resume(); //starting systick timer
-            // stop();
-            // delay(10);
-            // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            // delay(50);
-            // reset_encoders();
-            // reset_PID_values();
-            // delay(50);
-            // // grab_ball();
-            // while(encoderTurned == false){
-            //     drive_forward(365, 365, 2000, 2);
-            //     curve_right();
-            // }
-            // stop();
-            // timer14->pause(); // stopping systick timer
-            // delay(200);
-            // stop();
-            // delay(200);
-            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-
-
             // always keep this last
             displayOptions(MODE_SOFT_RESET, false);
             break;
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
-            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-            // getBattery();
-            // drawBatteryStatus();
-            // delay(2000);
-            start(5);
-            stop();
-            timer14->resume(); //starting systick timer
-            delay(10);
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            delay(50);
-            reset_encoders();
-            reset_PID_values();
-            delay(20);
-            // grab_ball();
-            while(encoderTurned == false){
-                drive_forward(365, 365, 2000, 2);
-                curve_left();
-            }
-            stop();
-            timer14->pause(); // stopping systick timer
-            delay(200);
-            stop();
-            delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
+            getBattery();
+            drawBatteryStatus();
+            delay(2000);
             // always keep this last
             displayOptions(MODE_SHOW_DATA, false);
             break;
@@ -214,7 +170,6 @@ void handleModeSelection(Mode mode) {
             delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
-            //Imperial_March();
             // always keep this last
             displayOptions(MODE_BFS, false);
             break;
@@ -223,19 +178,14 @@ void handleModeSelection(Mode mode) {
             display_print("A* Mode selected");
             start(5);
             timer14->resume(); // starting systick timer
-            while(!encoderTurned){
-                find_walls_forward_looking();
-                delay(1000);
-            }
-            
-            // stop();
-            // delay(10);
-            // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            // reset_encoders();
-            // reset_PID_values();
-            // delay(50);
-            // a_star_algorithm();
-            // delay(200);
+            stop();
+            delay(10);
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            reset_encoders();
+            reset_PID_values();
+            delay(50);
+            a_star_algorithm();
+            delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             // always keep this last

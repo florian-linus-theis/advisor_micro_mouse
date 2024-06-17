@@ -52,7 +52,7 @@ void grab_ball(){
     // drive right curve 
     curve_right();
     // drive one forward
-    drive_forward(SPEED_MAPPING, 0, ACCELERATION_NORMAL, 1.05);
+    drive_forward(SPEED_MAPPING, 0, ACCELERATION_NORMAL, 1);
     rotate_right();
     // backup to wall 
     BackwardBoth(90);
@@ -69,7 +69,7 @@ void grab_ball(){
     move_ballgrabber_forward();
     // drive to ball 
     reset_PID_values(); 
-    drive_forward(200, 0, ACCELERATION_NORMAL, 0.24); 
+    drive_forward(200, 0, ACCELERATION_NORMAL, 0.3); // 0.24
     delay(400);
     // move ballgrabber backwards
     move_ballgrabber_backward();
@@ -80,6 +80,6 @@ void grab_ball(){
     rotate_right();
     reset_PID_values();
     // move back to exit 
-    drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.95);
+    drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 1);
     curve_right(); // now at northern edge of cell (0, 2)
 } 
