@@ -14,6 +14,7 @@ volatile double current_acc_R = 0;
 int current_micros = 0;
 int last_micros = 0;
 volatile double current_angle = 0;
+volatile double total_angle = 0;
 std::vector<int> PID_values = {0, 0};
 
 void update_encoders();

@@ -199,14 +199,19 @@ void handleModeSelection(Mode mode) {
             display_print("A* Mode selected");
             start(5);
             timer14->resume(); // starting systick timer
-            stop();
-            delay(10);
-            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
-            reset_encoders();
-            reset_PID_values();
-            delay(50);
-            a_star_algorithm();
-            delay(200);
+            while(!encoderTurned){
+                find_walls_forward_looking();
+                delay(1000);
+            }
+            
+            // stop();
+            // delay(10);
+            // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            // reset_encoders();
+            // reset_PID_values();
+            // delay(50);
+            // a_star_algorithm();
+            // delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             // always keep this last

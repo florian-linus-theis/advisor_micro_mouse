@@ -552,6 +552,8 @@ void curve_right(){
     // speed calculation
     int speed_L = static_cast<int>((start_speed / 3) * 4.6);
     int speed_R = static_cast<int>((start_speed / 3) * 1.5);
+    total_angle += current_angle;
+    current_angle = current_angle + 90;
     current_angle = 0;
     int last_distance_traveled = avg_distance_traveled;
     int distance_right_wheel = distance_traveled_R;
@@ -583,6 +585,8 @@ void curve_left(){
     int start_angle = current_angle;
     int speed_L = static_cast<int>((start_speed / 3) * 1.5);
     int speed_R = static_cast<int>((start_speed / 3) * 4.6);
+    total_angle += current_angle;
+    current_angle = current_angle - 90;
     current_angle = 0;
     int last_distance_traveled = avg_distance_traveled;
     int distance_left_wheel = distance_traveled_L;
