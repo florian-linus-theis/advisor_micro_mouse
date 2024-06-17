@@ -280,7 +280,7 @@ std::array<bool, 4> find_walls_forward_looking(){
 
     // }
 
-    if (Distance_Sensor[6] <= MinSensorValues[6] * 0.8){
+    if (Distance_Sensor[6] <= MinSensorValues[6] * 0.85){
         wallsVec[0] = false;
     }
     if (Distance_Sensor[0] <= MinSensorValues[0] * 0.85 && Distance_Sensor[1] <= MinSensorValues[1] * 0.9){
@@ -427,8 +427,8 @@ void encoder_based_move_function(int base_speed){
 
         std::vector<int> PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
         int both_zero = 0;
-        ble->println(PID_values_encoder[0]);
-        ble->println(PID_values_encoder[1]);
+        //ble->println(PID_values_encoder[0]);
+        //ble->println(PID_values_encoder[1]);
         if(default_base_speed + PID_values_encoder[0] > 50){
             ForwardLeft(default_base_speed + PID_values_encoder[0]);
             both_zero = 0;
@@ -492,7 +492,7 @@ int calc_correction_speed(int speed_case, int desired_speed, double kp, double k
 
     previous_speed[speed_case] = error;
     int output_duty = cap_output(speedToDutyCycle((kp * proportional + ki * integral_speed[speed_case] + kd * differential)), 500);
-    // ble->println("Speed Error: " + String(output_duty));
+    // ble->println("Speed Duty: " + String(output_duty));
     return output_duty;
 }
 
@@ -530,10 +530,12 @@ int calc_correction_acc(int acc_case, double desired_acc, double kp, double ki, 
     proportional = error;
     integral_acc[acc_case % 3] += error*dt;
     differential = (error-previous_acc[acc_case % 3])/dt;
+    // ble->println("Integral: " + String(integral_acc[acc_case % 3]));
+    // ble->println("Proportiional: " + String(proportional));
 
     previous_speed[acc_case % 3] = error;
     int current_duty = speedToDutyCycle((kp * proportional + ki * integral_acc[acc_case % 3] + kd * differential));
-    // ble->println("Acc Error: " + String(current_duty));
+    // ble->println("Acc Duty: " + String(current_duty));
     return cap_output(current_duty, 500);
 }
 

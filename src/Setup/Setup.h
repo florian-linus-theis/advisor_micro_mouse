@@ -95,6 +95,7 @@
 #define DUTY_FAST 400
 #define DUTY_FAST_CURVE 100
 #define SPEED_MAPPING 365
+#define SPEED_CURVES 365
 #define SPEED_FAST 500
 #define MINIMUM_DUTY 50
 #define TICKS_INNER_WHEEL 31000 // thorugh testing
@@ -118,6 +119,7 @@ extern void dfs_mapping();
 extern void bfs_algorithm();
 extern void a_star_algorithm();
 extern bool MAPPING_COMPLETE; 
+extern bool break_out_of_dfs;
 
 // ---------------------------------------
 // PID 
@@ -162,6 +164,7 @@ extern int calc_correction_acc(int, double, double, double, double);
 extern void reset_integral_acc();
 extern double avg_acceleration_L;
 extern double avg_acceleration_R;
+extern bool FORCE_ENCODERS;
 
 enum PID_CASES{
     X_ERROR = 0,
@@ -337,6 +340,7 @@ enum Mode {
     MODE_STANDBY,
     MODE_SOFT_RESET,
     MODE_SHOW_DATA,
+    MODE_MUSIC,
     MODE_MAP_MAZE,
     MODE_BFS,
     MODE_ASTAR,

@@ -269,15 +269,17 @@ void Running_in_the_90s (){
     delay(455);
     beat11();
     beat9();
-
+    delay(554);
     beat12();
+    delay(455);
     beat11();
     beat9();
+    delay(455);
     beat10();
-
+    delay(455);
     beat11();
     beat9();
-    delay(700);
+    delay(554);
     beat13();
     delay(270);
     beat14();

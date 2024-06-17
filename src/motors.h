@@ -7,7 +7,7 @@ std::vector<int> determine_correction_needed(){
         return {0,0};
     }
     // ble->println("ERROR: " + String(remapped_error[CURRENT_CASE_PID]));
-    if(CURRENT_CASE_PID != X_ERROR_ENCODER_BASED && (abs(remapped_error[CURRENT_CASE_PID])) > 1){
+    if(CURRENT_CASE_PID != X_ERROR_ENCODER_BASED && (abs(remapped_error[CURRENT_CASE_PID])) > 1 && !FORCE_ENCODERS){
         chosen_correction = PID_values;
         // every time we choose IR based correciton we reset the encoder based PID values	
         reset_encoder_PID_values();

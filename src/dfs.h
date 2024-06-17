@@ -32,61 +32,66 @@ void dfs_map_maze() {
         return;
     }
     Location& cur_loc = maze[cur_position[0]][cur_position[1]]; // Create a reference to the current location object for easier reference (added)
-    ble->println("Current Cell: (" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+    // ble->println("Current Cell: (" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
 
     if (!cur_loc.visited) { // If current location has not been visited
         cur_loc.set_visited(true); // Mark location as visited
         cur_loc.set_walls(get_walls()); // Set wall locations
-        ble->println("Current Walls: " + String(cur_loc.walls[0]) + ", " + String(cur_loc.walls[1]) + ", " + String(cur_loc.walls[2]) + ", " + String(cur_loc.walls[3]));
+        // ble->println("Current Walls: " + String(cur_loc.walls[0]) + ", " + String(cur_loc.walls[1]) + ", " + String(cur_loc.walls[2]) + ", " + String(cur_loc.walls[3]));
 
-        // std::vector<Location> neighbors; // Vector to store adjacent locations
+        std::vector<Location> neighbors; // Vector to store adjacent locations
         // If there is no north wall and north location is not visited, put it on loc_stack to explore later
         if (!cur_loc.walls[0] && !maze[cur_position[0]][cur_position[1] + 1].visited && !maze[cur_position[0]][cur_position[1] + 1].ballgreifer) {
-            loc_stack.push(maze[cur_position[0]][cur_position[1] + 1]);
-            // neighbors.push_back(maze[cur_position[0]][cur_position[1] + 1]);
+            // loc_stack.push(maze[cur_position[0]][cur_position[1] + 1]);
+            neighbors.push_back(maze[cur_position[0]][cur_position[1] + 1]);
         }
 
         // If there is no east wall and east location is not visited, put it on loc_stack to explore later
         if (!cur_loc.walls[1] && !maze[cur_position[0] + 1][cur_position[1]].visited && !maze[cur_position[0] + 1][cur_position[1]].ballgreifer) {
-            loc_stack.push(maze[cur_position[0] + 1][cur_position[1]]);
-            // neighbors.push_back(maze[cur_position[0] + 1][cur_position[1]]);
+            // loc_stack.push(maze[cur_position[0] + 1][cur_position[1]]);
+            neighbors.push_back(maze[cur_position[0] + 1][cur_position[1]]);
         }
 
         // If there is no south wall and south location is not visited, put it on loc_stack to explore later
         if (!cur_loc.walls[2] && !maze[cur_position[0]][cur_position[1] - 1].visited && !maze[cur_position[0]][cur_position[1] - 1].ballgreifer) {
-            loc_stack.push(maze[cur_position[0]][cur_position[1] - 1]);
-            // neighbors.push_back(maze[cur_position[0]][cur_position[1] - 1]);
+            // loc_stack.push(maze[cur_position[0]][cur_position[1] - 1]);
+            neighbors.push_back(maze[cur_position[0]][cur_position[1] - 1]);
         }
 
         // If there is no west wall and west location is not visited, put it on loc_stack to explore later
         if (!cur_loc.walls[3] && !maze[cur_position[0] - 1][cur_position[1]].visited && !maze[cur_position[0] - 1][cur_position[1]].ballgreifer) {
-            loc_stack.push(maze[cur_position[0] - 1][cur_position[1]]); 
-            // neighbors.push_back(maze[cur_position[0] - 1][cur_position[1]]);
+            // loc_stack.push(maze[cur_position[0] - 1][cur_position[1]]); 
+            neighbors.push_back(maze[cur_position[0] - 1][cur_position[1]]);
         }
 
-        // // check the direction of the current position and get the next straight position
-        // std::vector<int> straight_next_position (0, 2);
-        // if (cur_direction == 0) {
-        //     straight_next_position = {cur_position[0], cur_position[1] + 1};
-        // } else if (cur_direction == 1) {
-        //     straight_next_position = {cur_position[0] + 1, cur_position[1]};
-        // } else if (cur_direction == 2) {
-        //     straight_next_position = {cur_position[0], cur_position[1] - 1};
-        // } else if (cur_direction == 3) {
-        //     straight_next_position = {cur_position[0] - 1, cur_position[1]};
-        // }
+        // check the direction of the current position and get the next straight position
+        std::vector<int> straight_next_position (0, 2);
+        switch (cur_direction) {
+            case 0:
+                straight_next_position = {cur_position[0], cur_position[1] + 1};
+                break;
+            case 1:
+                straight_next_position = {cur_position[0] + 1, cur_position[1]};
+                break;
+            case 2:
+                straight_next_position = {cur_position[0], cur_position[1] - 1};
+                break;
+            case 3:
+                straight_next_position = {cur_position[0] - 1, cur_position[1]};
+                break;
+        }
 
-        // // push all neighbors except the straight one to the stack
-        // for (int i = 0; i < neighbors.size(); i++) {
-        //     if (neighbors[i].position != straight_next_position) {
-        //         loc_stack.push(neighbors[i]);
-        //         neighbors.erase(neighbors.begin() + i);
-        //     }
-        // }
-        // // push last straight item to the stack
-        // if (neighbors.size() > 0) {
-        //     loc_stack.push(neighbors[0]);
-        // }
+        // push all neighbors except the straight one to the stack
+        for (int i = 0; i < neighbors.size(); i++) {
+            if (neighbors[i].position != straight_next_position) {
+                loc_stack.push(neighbors[i]);
+                neighbors.erase(neighbors.begin() + i);
+            }
+        }
+        // push last straight item to the stack
+        if (neighbors.size() > 0) {
+            loc_stack.push(neighbors[0]);
+        }
 
     }
 
