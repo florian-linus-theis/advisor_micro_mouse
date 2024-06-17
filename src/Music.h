@@ -471,6 +471,21 @@ void Gas_song(){
         G_beat3();
 }
 
+void Gas_song_short(){
+        G_beat9();
+        G_beat10();
+        G_beat11();
+        G_beat12();
+        G_beat13();
+        G_beat0();
+        G_beat1();
+        G_beat0();
+        G_beat2();
+        G_beat0();
+        G_beat1();
+        G_beat3();
+}
+
 //Imperial March-----------------------------------------------------------------
 void Imperial_March(){
     std::vector<int> pitches {880, 880, 880, 685, 1047, 880, 685, 1047, 880};

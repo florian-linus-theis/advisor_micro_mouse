@@ -373,3 +373,10 @@ extern void serialize_maze(const std::vector<std::vector<Location>>&, std::vecto
 extern void deserialize_maze(const std::vector<int8_t>&, std::vector<std::vector<Location>>&);   
 extern void write_data_to_flash(uint32_t, const std::vector<uint8_t>&); 
 extern void read_maze_from_flash(uint32_t, std::vector<int8_t>&);
+
+// Music and celebration
+extern void Gas_song();
+extern void Gas_song_short();
+extern void celebrate();
+extern void move_ballgrabber_forward();
+extern void move_ballgrabber_backward();
