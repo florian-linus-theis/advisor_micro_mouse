@@ -370,6 +370,9 @@ void curve_right(){
     double total_acceleration_L = 0; 
     double total_acceleration_R = 0;
     int start_angle = current_angle;
+    total_angle += current_angle;
+    total_angle += 90;
+    current_angle = 0;
     reset_distance_traveled_before_curve();
     int last_distance_traveled = avg_distance_traveled;
     accelerate_each_wheel_in_curve(speed_L, speed_R, ACCELERATION_CURVES, -ACCELERATION_CURVES);
@@ -421,6 +424,9 @@ void curve_left(){
     int counter = 1; 
     double total_acceleration_L = 0; 
     double total_acceleration_R = 0;
+    total_angle += current_angle;
+    total_angle -= 90;
+    current_angle = 0;
     reset_distance_traveled_before_curve();
     int last_distance_traveled = avg_distance_traveled;
     accelerate_each_wheel_in_curve(speed_L, speed_R, -ACCELERATION_CURVES, ACCELERATION_CURVES);
