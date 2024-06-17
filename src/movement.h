@@ -396,7 +396,7 @@ void curve_right(){
     int counter = 1; 
     double total_acceleration_L = 0; 
     double total_acceleration_R = 0;
-    int start_angle = current_angle;
+    double start_angle = current_angle;
     // total_angle += current_angle + 90;
     reset_distance_traveled_before_curve();
     current_angle = 0;
@@ -449,7 +449,7 @@ void curve_left(){
     ble->println("Curve left");
     disable_PID();
     double start_speed = 365;
-    start_angle = current_angle;
+    double start_angle = current_angle;
     int speed_L = static_cast<int>(round((start_speed / 3) * 2));
     int speed_R = static_cast<int>((round(start_speed / 3) * 4));
     int counter = 1; 

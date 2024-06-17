@@ -13,6 +13,7 @@ void initialize_maze(){
   for (int i = 0; i < MAZE_HEIGHT; ++i) {
       for (int j = 0; j < MAZE_WIDTH; ++j) {
           maze[i][j] = Location({i, j});
+          maze[i][j].set_walls({true, true, true, true}); // if we have never reached cell we set the walls so that we do not go there by accident in bfs or a-star
       }
   }
 }
