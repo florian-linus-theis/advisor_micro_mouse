@@ -427,8 +427,8 @@ void encoder_based_move_function(int base_speed){
 
         std::vector<int> PID_values_encoder = calc_correction(X_ERROR_ENCODER_BASED);
         int both_zero = 0;
-        ble->println(PID_values_encoder[0]);
-        ble->println(PID_values_encoder[1]);
+        //ble->println(PID_values_encoder[0]);
+        //ble->println(PID_values_encoder[1]);
         if(default_base_speed + PID_values_encoder[0] > 50){
             ForwardLeft(default_base_speed + PID_values_encoder[0]);
             both_zero = 0;

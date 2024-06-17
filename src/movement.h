@@ -19,6 +19,7 @@ volatile int distance_traveled_R_PID = 0;
 volatile int avg_distance_traveled = 0; // TODO: evtl float
 int current_duty_cycle = 0;
 enum state{slow, fast};
+bool FORCE_ENCODERS = false; 
 
 // placeholder for encoder values
 int encoder_L = 0;
@@ -141,7 +142,7 @@ void printer_debugger(int average_distance_travelled, int distance_remaining, in
 
 void drive_forward(int desired_max_speed, int end_speed, double desired_acceleration, float squares){
     // first reset distances
-    ble->println("Driving forward");
+    //ble->println("Driving forward");
     reset_encoder_PID_values();
     reset_distance_before_straight();
     bool reached_end_speed = false;
@@ -168,14 +169,14 @@ void drive_forward(int desired_max_speed, int end_speed, double desired_accelera
         counter++; 
         // once i reach endspeed, I set the flag to true
         if (current_avg_speed >= desired_max_speed && !reached_end_speed){
-            ble->println("Reached end speed");
+            //ble->println("Reached end speed");
             reached_end_speed = true;
         }
         int braking_distance = calculate_braking_distance(end_speed, desired_acceleration, break_completely, true);
         if (!disappearing_wall_detected &&  avg_distance_traveled > ticks_until_walls_disappearing && side_walls_disappearing()){
             desired_distance = 32400 + avg_distance_traveled; // setting desired distance to 84154 (ticks to reach next middle square)
             disappearing_wall_detected = true; // such that we only set the distance once
-            ble->println("Side walls disappearing, setting distance remaining to 32400");
+            //ble->println("Side walls disappearing, setting distance remaining to 32400");
         }
         if (distance_remaining > braking_distance && !reached_end_speed){
             accelerate(desired_max_speed, desired_acceleration);
@@ -250,9 +251,13 @@ void decelerate(int end_speed, double desired_acceleration){
 }
 
 void break_immediately(){
-    ble->println("Breaking immediately");
-    ForwardBoth(0);
+    FORCE_ENCODERS = true;
+    // ForwardBoth(0);
+    ForwardLeft(0);
+    ForwardRight(0);
     while(current_avg_speed > 0){};
+    delay(10);
+    FORCE_ENCODERS = false;
 }
 
 
@@ -383,7 +388,7 @@ double avg_acceleration_L = 0;
 double avg_acceleration_R = 0;
 
 void curve_right(){
-    ble->println("Curve right");
+    //ble->println("Curve right");
     disable_PID();
     double start_speed = 365;
     // if (start_speed < 365){
@@ -446,7 +451,7 @@ void curve_right(){
 }
 
 void curve_left(){
-    ble->println("Curve left");
+    //ble->println("Curve left");
     disable_PID();
     double start_speed = 365;
     double start_angle = current_angle;

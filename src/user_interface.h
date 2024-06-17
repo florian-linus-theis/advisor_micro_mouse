@@ -51,7 +51,7 @@ void updateEncoderState() {
 
 // Function to display available options on the OLED screen
 void displayOptions(Mode currentMode, bool confirmation) {
-    const char* options[] = {"CAL", "SR", "BAT", "DFS", "BFS", "A*", "LF"};
+    const char* options[] = {"CAL", "SR", "BAT", "M", "DFS", "BFS", "A*", "LF"};
     int numOptions = MODE_MAX;
 
     // Clear the display buffer
@@ -76,7 +76,7 @@ void displayOptions(Mode currentMode, bool confirmation) {
         }
         display->print(options[i]);
         display->print(" ");
-        if (i == 2) {
+        if (i == 3) {
             display->println();
         }
     }
@@ -184,15 +184,7 @@ void handleModeSelection(Mode mode) {
             reset_encoders();
             reset_PID_values();
             delay(50);
-            SET_PID_MANUALLY = true;
-            CURRENT_CASE_PID = BLIND;
-            drive_forward(365, 365, 2000, 1);
-            curve_right();
-            curve_left();
-            curve_right();
-            curve_left();
-            drive_forward(365, 0, 2000, 1);
-            SET_PID_MANUALLY = false;
+            a_star_algorithm();
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
             // always keep this last
@@ -232,6 +224,17 @@ void handleModeSelection(Mode mode) {
             MAPPING_COMPLETE = true;
             delay(1000); // give user time to read the message
             displayOptions(MODE_LOAD_FLASH, false);
+            break;
+        case MODE_MUSIC: 
+            display_print("Music Mode selected");
+            Gas_song();
+            if (encoderTurned) {
+                encoderTurned = false;
+                break;
+            }
+            Running_in_the_90s();
+            delay(1000); // Delay to allow the user to read the message
+            displayOptions(MODE_MUSIC, false);
             break;
         default:
             display_print("Invalid mode");

@@ -217,9 +217,9 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
       max_values_right[i] = max_values_right[i] / measurements_maze;
     }
 
-    for(int i=0; i < ENUM_END; i++){
-      ble->println(String(i) + " " + String(max_values_right[i]));
-    }
+    // for(int i=0; i < ENUM_END; i++){
+    //   ble->println(String(i) + " " + String(max_values_right[i]));
+    // }
 
     //Compose needed upper- and loewer boundarys
     max_values_lower_boundary[X_ERROR] = max_values_left[X_ERROR];
@@ -253,40 +253,13 @@ void calibrate_sensors(int measurements_air, int measurements_maze){
       correction_offset[i] = correction_offset[i] / measurements_maze;
     }
 
-    for(int i=0; i < ENUM_END; i++){
-      ble->println("E" + String(i) + " " + String(correction_offset[i]));
-
-
-     // // for ballgrabber calibration while drivig towards ballgrabber
-    // display_print("Now facing Ballgrabber, finger left", 1);
-    // digitalWrite(LED_GREEN, HIGH);
-    // start(0);
-
-    // for(int i=0; i<measurements_maze; i++){
-    //     Distanz_Messung_Sensoren();
-    //     for(int j=0; j<7; j++) {
-    //         if (j == 4 || j == 5) continue;
-    //         ballgrabber_values[j] += Distance_Sensor[j];
-    //     }
+    // for(int i=0; i < ENUM_END; i++){
+    //   ble->println("E" + String(i) + " " + String(correction_offset[i]));
     // }
 
-    // // ballgrabber calibration while driving back from ballgrabber
-    // display_print("Now facing away from Ballgrabber, finger right", 1);
-    // digitalWrite(LED_GREEN, HIGH);
-    // start(0);
-    // for(int i=0; i<measurements_maze; i++){
-    //     Distanz_Messung_Sensoren();
-    //     for(int j=0; j<7; j++) {
-    //         if (j != 4 || j != 5) continue;
-    //         ballgrabber_values[j] += Distance_Sensor[j];
-    //     }
-    // }
-
-    // calculate average by dividing through # of measurements
      for(int i=0 ; i<7 ; i++){
         ballgrabber_calibration[i] = static_cast<int>(std::round(static_cast<double>(ballgrabber_values[i]) / measurements_maze));
         MinSensorValues[i] = static_cast<int>(std::round(static_cast<double>(min_values[i]) / measurements_maze));
         MaxSensorValues[i] = static_cast<int>(std::round(static_cast<double>(max_values[i]) / measurements_maze));
     }
-  }
 }

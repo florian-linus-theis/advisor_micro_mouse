@@ -164,6 +164,7 @@ extern int calc_correction_acc(int, double, double, double, double);
 extern void reset_integral_acc();
 extern double avg_acceleration_L;
 extern double avg_acceleration_R;
+extern bool FORCE_ENCODERS;
 
 enum PID_CASES{
     X_ERROR = 0,
@@ -339,6 +340,7 @@ enum Mode {
     MODE_STANDBY,
     MODE_SOFT_RESET,
     MODE_SHOW_DATA,
+    MODE_MUSIC,
     MODE_MAP_MAZE,
     MODE_BFS,
     MODE_ASTAR,

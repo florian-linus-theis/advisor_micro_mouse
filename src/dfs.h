@@ -32,12 +32,12 @@ void dfs_map_maze() {
         return;
     }
     Location& cur_loc = maze[cur_position[0]][cur_position[1]]; // Create a reference to the current location object for easier reference (added)
-    ble->println("Current Cell: (" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
+    // ble->println("Current Cell: (" + String(cur_position[0]) + ", " + String(cur_position[1]) + ")");
 
     if (!cur_loc.visited) { // If current location has not been visited
         cur_loc.set_visited(true); // Mark location as visited
         cur_loc.set_walls(get_walls()); // Set wall locations
-        ble->println("Current Walls: " + String(cur_loc.walls[0]) + ", " + String(cur_loc.walls[1]) + ", " + String(cur_loc.walls[2]) + ", " + String(cur_loc.walls[3]));
+        // ble->println("Current Walls: " + String(cur_loc.walls[0]) + ", " + String(cur_loc.walls[1]) + ", " + String(cur_loc.walls[2]) + ", " + String(cur_loc.walls[3]));
 
         std::vector<Location> neighbors; // Vector to store adjacent locations
         // If there is no north wall and north location is not visited, put it on loc_stack to explore later
