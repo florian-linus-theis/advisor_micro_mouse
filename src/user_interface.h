@@ -122,6 +122,30 @@ void handleModeSelection(Mode mode) {
             delay(700); // Delay to allow the user to read the message
             display_print("Soft Reset completed");
             delay(700); // Delay to allow the user to read the message
+
+
+            // start(5);
+            // timer14->resume(); //starting systick timer
+            // stop();
+            // delay(10);
+            // digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            // delay(50);
+            // reset_encoders();
+            // reset_PID_values();
+            // delay(50);
+            // // grab_ball();
+            // while(encoderTurned == false){
+            //     drive_forward(365, 365, 2000, 2);
+            //     curve_right();
+            // }
+            // stop();
+            // timer14->pause(); // stopping systick timer
+            // delay(200);
+            // stop();
+            // delay(200);
+            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
+
+
             // always keep this last
             displayOptions(MODE_SOFT_RESET, false);
             break;
@@ -132,20 +156,20 @@ void handleModeSelection(Mode mode) {
             // drawBatteryStatus();
             // delay(2000);
             start(5);
-            timer14->resume(); // starting systick timer
-            delay(100);
+            stop();
+            timer14->resume(); //starting systick timer
+            delay(10);
+            digitalWrite(MOTOR_ENABLE, LOW); // enable motor
+            delay(50);
             reset_encoders();
-            reset_PID_values();	
-            delay(4);
-            digitalWrite(MOTOR_ENABLE, LOW); //enbale motor
+            reset_PID_values();
+            delay(20);
             // grab_ball();
-            drive_forward(300, 0, 1);
-            rotate_right();
-            drive_forward(300, 0, 1);
-            rotate_right();
-            drive_forward(300, 0, 1);
-            right_turn_around();
-            enable_PID();
+            while(encoderTurned == false){
+                drive_forward(365, 365, 2000, 2);
+                curve_left();
+            }
+            stop();
             timer14->pause(); // stopping systick timer
             delay(200);
             stop();

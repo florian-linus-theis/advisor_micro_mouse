@@ -48,7 +48,7 @@ void disable_PID(){
 
  // Function to calculate the time difference between two calls -> delta t
 double calc_dt(){
-    double now = system_clock_micros() / 1000;
+    double now = static_cast<double>(system_clock_micros()) / 1000;
     dt = now-last_time;
     last_time = now;
     return dt;
@@ -146,7 +146,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) - correction_offset[X_ERROR];
         //ble->println("B: " + String(remapped_error[X_ERROR]));
-        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 0.5, 0.0001, 0.0003); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 1, 0, 0.0001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -165,7 +165,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) - correction_offset[X_ERROR_LEFT_WALL_ONLY];
         //ble->println("L: " + String(remapped_error[X_ERROR_LEFT_WALL_ONLY]));
-        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 0.5, 0.0001, 0.0003); // 12, 0.0001, 0.01
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 1, 0, 0.0001); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -175,7 +175,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) - correction_offset[X_ERROR_RIGHT_WALL_ONLY];
         //ble->println("R: " + String(remapped_error[X_ERROR_RIGHT_WALL_ONLY]));
-        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 0.5, 0.0001, 0.0003);
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 1, 0, 0.0001);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -296,7 +296,7 @@ bool side_walls_disappearing(){
     // delta_sensors > typical sensor values - min sensor values when there is still a wall
     int comp_left = Last_Distance_Sensor[0] - Distance_Sensor[0];
     int comp_right = Last_Distance_Sensor[5] - Distance_Sensor[5];
-    return Last_Distance_Sensor[0] - Distance_Sensor[0] > 65 || Last_Distance_Sensor[5] - Distance_Sensor[5] > 65;
+    return comp_left > 70 || comp_right > 70;
 }
 
 int determine_PID_case(){
@@ -448,6 +448,7 @@ void encoder_based_move_function(int base_speed){
 //------------------------------------------ PID controller for speed -------------------------------------
 
 std::vector<double> previous_speed(3,0);
+std::vector<double> integral_speed(3,0);
 
 int calc_correction_speed(int speed_case, int desired_speed, double kp, double ki, double kd){
     double current_speed = 0;
@@ -466,18 +467,65 @@ int calc_correction_speed(int speed_case, int desired_speed, double kp, double k
         break;
     }
 
-    double proportional, integral, differential;
+    static double proportional, differential;
     double error = static_cast<double>(desired_speed) - current_speed;
     dt = calc_dt();
 
     //ApplyPID
     proportional = error;
-    integral += error*dt;
+    integral_speed[speed_case] += error*dt;
     differential = (error-previous_speed[speed_case])/dt;
 
     previous_speed[speed_case] = error;
+    int output_duty = cap_output(speedToDutyCycle((kp * proportional + ki * integral_speed[speed_case] + kd * differential)), 500);
+    // ble->println("Speed Error: " + String(output_duty));
+    return output_duty;
+}
 
-    return cap_output(speedToDutyCycle(kp * proportional + ki * integral + kd * differential), 300);
+
+//------------------------------------------- acceleration controller ----------------------------------------
+
+
+std::vector<double> previous_acc(3,0);
+std::vector<double> integral_acc(3,0);
+
+int calc_correction_acc(int acc_case, double desired_acc, double kp, double ki, double kd){
+    double current_acc = 0;
+
+    switch (acc_case)
+    {
+    case LEFT_ACC:
+        current_acc = avg_acceleration_L;
+        break;
+    case RIGHT_ACC:
+        current_acc = avg_acceleration_R;
+        break;
+    case BOTH_ACC:
+        current_acc = (avg_acceleration_L+avg_acceleration_R)/2; 
+        break;
+    default:
+        current_acc = (avg_acceleration_L+avg_acceleration_R)/2; 
+        break;
+    }
+
+    static double proportional, differential;
+    double error = desired_acc - current_acc;
+    dt = calc_dt();
+
+    //ApplyPID
+    proportional = error;
+    integral_acc[acc_case % 3] += error*dt;
+    differential = (error-previous_acc[acc_case % 3])/dt;
+
+    previous_speed[acc_case % 3] = error;
+    int current_duty = speedToDutyCycle((kp * proportional + ki * integral_acc[acc_case % 3] + kd * differential));
+    // ble->println("Acc Error: " + String(current_duty));
+    return cap_output(current_duty, 500);
+}
+
+// function to reset the integral part of accelereation PID
+void reset_integral_acc(){
+    integral_acc = {0,0,0};
 }
 
 

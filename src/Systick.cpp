@@ -54,9 +54,6 @@ void Systick_Interrupt() {
   PID_values = determine_correction_needed();
   calc_average_PID_values();
 
-  if (counter % 20 == 0){
-    //ble->println("R: " + String(current_delta_speed_R) + " L: " + String(current_delta_speed_L));
-  }
   counter++;
 }
 
