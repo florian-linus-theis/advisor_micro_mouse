@@ -127,30 +127,10 @@ void handleModeSelection(Mode mode) {
             break;
         case MODE_SHOW_DATA:
             display_print("Data Mode selected");
-            // digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
-            // getBattery();
-            // drawBatteryStatus();
-            // delay(2000);
-            start(5);
-            timer14->resume(); // starting systick timer
-            delay(100);
-            reset_encoders();
-            reset_PID_values();	
-            delay(4);
-            digitalWrite(MOTOR_ENABLE, LOW); //enbale motor
-            // grab_ball();
-            drive_forward(300, 0, 1);
-            rotate_right();
-            drive_forward(300, 0, 1);
-            rotate_right();
-            drive_forward(300, 0, 1);
-            right_turn_around();
-            enable_PID();
-            timer14->pause(); // stopping systick timer
-            delay(200);
-            stop();
-            delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); //disable motor
+            getBattery();
+            drawBatteryStatus();
+            delay(2000);
             // always keep this last
             displayOptions(MODE_SHOW_DATA, false);
             break;
@@ -190,7 +170,6 @@ void handleModeSelection(Mode mode) {
             delay(200);
             digitalWrite(MOTOR_ENABLE, HIGH); // disable motor
             timer14->pause(); // stopping systick timer
-            //Imperial_March();
             // always keep this last
             displayOptions(MODE_BFS, false);
             break;

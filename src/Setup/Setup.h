@@ -106,6 +106,9 @@
 #define KNOWN_BRAKE_DIST_AT_SPEED_SLOW 20615 // actual: 20615 ticks but rounded to 21000
 #define MM_PER_TICK 0.000843628 // mm per tick during curves (already adding mean of both wheels) -> actual value: 0.0016873
 #define DEGREE_PER_TICK 0.0016112  // degree per tick during curves (= 360 * MM_PER_TICK / (PI * 60))
+#define ACCELERATION_NORMAL 1500
+#define ACCELERATION_FAST 2500
+#define ACCELERATION_CURVES 2000
 
 // Global Variables 
 extern bool SETUP_COMPLETE;
@@ -155,6 +158,10 @@ extern std::vector<int> correction_offset;
 extern double give_percent(double, int, int);
 extern std::vector<double> previous_speed;
 extern int calc_correction_speed(int, int, double, double, double);
+extern int calc_correction_acc(int, double, double, double, double);
+extern void reset_integral_acc();
+extern double avg_acceleration_L;
+extern double avg_acceleration_R;
 
 enum PID_CASES{
     X_ERROR = 0,
@@ -169,10 +176,13 @@ enum PID_CASES{
     ENUM_END = 9
 };
 
-enum SPEED_CASES{
+enum CORRECTION_CASES{
     LEFT_SPEED = 0,
     RIGHT_SPEED = 1,
-    BOTH_SPEEDS = 2
+    BOTH_SPEEDS = 2,
+    LEFT_ACC = 3,
+    RIGHT_ACC = 4,
+    BOTH_ACC = 5
 };
 
 // ---------------------------------------
@@ -235,7 +245,8 @@ extern int duty_R;
 extern volatile double current_delta_speed_L;
 extern volatile double current_delta_speed_R;
 extern volatile double current_avg_speed;
-extern volatile double current_angle; 
+extern volatile double current_angle;
+extern volatile double total_angle;
 extern volatile double current_acc_R;
 extern volatile double current_acc_L;
 extern void reset_distance_traveled_after_straight(void);
@@ -268,7 +279,7 @@ extern void move_actual();
 extern void move_forward_different(int, int, float);
 extern void accelerate_different(int, int);
 extern int decelerate_different(int, int);
-extern void drive_forward(int, int, float);
+extern void drive_forward(int, int, double, float);
 extern void backup_to_wall();
 extern int speedToDutyCycle(double);
 
@@ -318,6 +329,7 @@ extern int selected_option;
 extern bool optionSelected;
 extern volatile bool encoderTurned;
 extern bool confirmationPending;
+
 
 // Define an enum for all modes
 enum Mode {

@@ -48,7 +48,7 @@ void disable_PID(){
 
  // Function to calculate the time difference between two calls -> delta t
 double calc_dt(){
-    double now = system_clock_micros() / 1000;
+    double now = static_cast<double>(system_clock_micros()) / 1000;
     dt = now-last_time;
     last_time = now;
     return dt;
@@ -146,7 +146,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR] = give_percent(calcError(X_ERROR),max_values_lower_boundary[X_ERROR],max_values_upper_boundary[X_ERROR]) - correction_offset[X_ERROR];
         //ble->println("B: " + String(remapped_error[X_ERROR]));
-        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 0.5, 0.0001, 0.0003); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
+        output_G = applyPID(remapped_error[X_ERROR], X_ERROR, 1, 0, 0.0001); //<-- Case Specific kp,ki,kd-values can be defined here, +-5000 can later be switch out with calibration values
         output_G = cap_output(output_G, max_correction_speed); //1.7 0 0.5
         correction_left = -output_G;
         correction_right = output_G;
@@ -165,7 +165,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_LEFT_WALL_ONLY] = give_percent(calcError(X_ERROR_LEFT_WALL_ONLY),max_values_lower_boundary[X_ERROR_LEFT_WALL_ONLY],max_values_upper_boundary[X_ERROR_LEFT_WALL_ONLY]) - correction_offset[X_ERROR_LEFT_WALL_ONLY];
         //ble->println("L: " + String(remapped_error[X_ERROR_LEFT_WALL_ONLY]));
-        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 0.5, 0.0001, 0.0003); // 12, 0.0001, 0.01
+        output_G = applyPID(remapped_error[X_ERROR_LEFT_WALL_ONLY], X_ERROR_LEFT_WALL_ONLY, 1, 0, 0.0001); // 12, 0.0001, 0.01
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -175,7 +175,7 @@ std::vector<int> calc_correction(int PID_case){
         max_correction_speed = default_max_correction_speed_x;
         remapped_error[X_ERROR_RIGHT_WALL_ONLY] = give_percent(calcError(X_ERROR_RIGHT_WALL_ONLY),max_values_lower_boundary[X_ERROR_RIGHT_WALL_ONLY],max_values_upper_boundary[X_ERROR_RIGHT_WALL_ONLY]) - correction_offset[X_ERROR_RIGHT_WALL_ONLY];
         //ble->println("R: " + String(remapped_error[X_ERROR_RIGHT_WALL_ONLY]));
-        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 0.5, 0.0001, 0.0003);
+        output_G = applyPID(remapped_error[X_ERROR_RIGHT_WALL_ONLY], X_ERROR_RIGHT_WALL_ONLY, 1, 0, 0.0001);
         output_G = cap_output(output_G, max_correction_speed);
         correction_left = output_G;
         correction_right = -output_G;
@@ -233,57 +233,71 @@ std::vector<bool> find_walls(){
 
 // Function to determine if a wall is detected in front or either side of the robot
 std::array<bool, 4> find_walls_forward_looking(){
-    std::array<bool, 4> wallsVec = {false, false, false, false};
-    // int counter = 1; 
-    // int last_distance_traveled = avg_distance_traveled;
-    // std::vector<int> avg_distance_sensors = {0,0,0,0,0,0,0};
-    // // average 4 sensor values to get the most reliable results (period of 12ms ~ 3mm distance at mapping speed)
-    // while (counter < 5){
-    //     if (last_distance_traveled  == avg_distance_traveled) continue; 
-    //     counter++;
-    //     for (int i = 0; i < 7; i++){
-    //         avg_distance_sensors[i] += Distance_Sensor[i];
+    std::array<bool, 4> wallsVec = {true, true, false, true};
+
+    // build average of 3 sensor values for each sensor to avoid false positives
+
+    
+    //   //Normal case no severe rotation
+    //     if(Distance_Sensor[0] > MinSensorValues[0] * 0.7 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
+    //         wallsVec[3] = true;
     //     }
+    //     // Right Wall: both left and right sensor must be above threshold
+    //     if(Distance_Sensor[5] > MinSensorValues[5] * 0.7 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
+    //         wallsVec[1] = true;
+    //     }
+    //     // Front Wall: only front sensor must be above threshold
+    //     // Check if right and left are walls ->be less sensitive in all cases, avoiding reflexcions of walls
+    //     // if (wallsVec[1] == true && wallsVec[3] == true)
+    //     // {
+    //     //     if(Distance_Sensor[2] > MinSensorValues[2] * 1.7){
+    //     //     // only use front and front right sensor
+    //     //     if(Distance_Sensor[3] > MinSensorValues[3] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.2) wallsVec[0] = true;
+    //     //     } // slight right rotation
+    //     //     else if(Distance_Sensor[3] > MinSensorValues[3] * 1.7){ 
+    //     //         // only use front and front left sensor
+    //     //         if(Distance_Sensor[2] > MinSensorValues[2] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.3) wallsVec[0] = true;
+    //     //     } // normal case 
+    //     //     else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 1.0){
+    //     //         wallsVec[0] = true;
+    //     // }
+    //     // }
+    //     // else{
+    //     if((current_angle > 0)){
+    //         if(Distance_Sensor[6] > MinSensorValues[6] * 0.7 || Distance_Sensor[3] > MinSensorValues[3] * 0.5){
+    //             wallsVec[0] = true;
+    //         }
+    //     } 
+    //     else{
+    //         if(Distance_Sensor[6] > MinSensorValues[6] * 0.7 || Distance_Sensor[2] > MinSensorValues[2] * 0.8){
+    //               wallsVec[0] = true;
+    //         }
+          
+        
+        
+        
+        // }
+
     // }
-    // now averaging the sensor values
-    // for (int i = 0; i < 7; i++){
-    //     avg_distance_sensors[i] = avg_distance_sensors[i] / counter;
-    // }
-    // Left Wall Sensors:
-    if(Distance_Sensor[0] > MinSensorValues[0] * 0.75 || Distance_Sensor[1] > MinSensorValues[1] * 1.4){ 
-        wallsVec[3] = true;
+
+    if (Distance_Sensor[6] <= MinSensorValues[6] * 0.8){
+        wallsVec[0] = false;
     }
-    // Right Wall: both left and right sensor must be above threshold
-    if(Distance_Sensor[5] > MinSensorValues[5] * 0.75 || Distance_Sensor[4] > MinSensorValues[4] * 1.4) { 
-        wallsVec[1] = true;
+    if (Distance_Sensor[0] <= MinSensorValues[0] * 0.85 && Distance_Sensor[1] <= MinSensorValues[1] * 0.9){
+        wallsVec[3] = false;
     }
-    // Front Wall: only front sensor must be above threshold
-    // Check if right and left are walls ->be less sensitive in all cases, avoiding reflexcions of walls
-    if (wallsVec[1] == true && wallsVec[3] == true)
-    {
-        if(Distance_Sensor[2] > MinSensorValues[2] * 1.7){
-        // only use front and front right sensor
-        if(Distance_Sensor[3] > MinSensorValues[3] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.2) wallsVec[0] = true;
-        } // slight right rotation
-        else if(Distance_Sensor[3] > MinSensorValues[3] * 1.7){ 
-            // only use front and front left sensor
-            if(Distance_Sensor[2] > MinSensorValues[2] * 1.2 && Distance_Sensor[6] > MinSensorValues[6] * 1.3) wallsVec[0] = true;
-        } // normal case 
-        else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 1.0){
-            wallsVec[0] = true;
+    if (Distance_Sensor[5] <= MinSensorValues[5] * 0.85 && Distance_Sensor[4] <= MinSensorValues[4] * 0.9){
+        wallsVec[1] = false;
     }
-    }
-    else if(Distance_Sensor[2] > MinSensorValues[2] * 1.4){
-        // only use front and front right sensor
-        if(Distance_Sensor[3] > MinSensorValues[3] * 0.8 && Distance_Sensor[6] > MinSensorValues[6] * 0.75) wallsVec[0] = true;
-    } // slight right rotation
-    else if(Distance_Sensor[3] > MinSensorValues[3] * 1.4){ 
-        // only use front and front left sensor
-        if(Distance_Sensor[2] > MinSensorValues[2] * 0.75 && Distance_Sensor[6] > MinSensorValues[6] * 0.75) wallsVec[0] = true;
-    } // normal case 
-    else if(Distance_Sensor[6] + Distance_Sensor[2] + Distance_Sensor[3] > (MinSensorValues[6] + MinSensorValues[2] + MinSensorValues[3]) * 0.78){
-        wallsVec[0] = true;
-    }
+
+
+
+    // ble->println("MinValues 5: " + String(MinSensorValues[5]) + " MinValues 4: " + String(MinSensorValues[4]));
+    // ble->println("Sensor 5:" + String(Distance_Sensor[5]) + "Sensor 4: " + String(Distance_Sensor[4]));
+    // ble->println("MinValues 0: " + String(MinSensorValues[0]) + " MinValues 1: " + String(MinSensorValues[1]));
+    // ble->println("Sensor 0:" + String(Distance_Sensor[0]) + "Sensor 1: " + String(Distance_Sensor[1]));
+    // ble->println("Walls: " + String(wallsVec[0]) + String(wallsVec[1]) + String(wallsVec[2]) + String(wallsVec[3]));
+    // ble->println();
     
     return wallsVec;
 }
@@ -296,7 +310,7 @@ bool side_walls_disappearing(){
     // delta_sensors > typical sensor values - min sensor values when there is still a wall
     int comp_left = Last_Distance_Sensor[0] - Distance_Sensor[0];
     int comp_right = Last_Distance_Sensor[5] - Distance_Sensor[5];
-    return Last_Distance_Sensor[0] - Distance_Sensor[0] > 65 || Last_Distance_Sensor[5] - Distance_Sensor[5] > 65;
+    return comp_left > 70 || comp_right > 70;
 }
 
 int determine_PID_case(){
@@ -448,6 +462,7 @@ void encoder_based_move_function(int base_speed){
 //------------------------------------------ PID controller for speed -------------------------------------
 
 std::vector<double> previous_speed(3,0);
+std::vector<double> integral_speed(3,0);
 
 int calc_correction_speed(int speed_case, int desired_speed, double kp, double ki, double kd){
     double current_speed = 0;
@@ -466,18 +481,65 @@ int calc_correction_speed(int speed_case, int desired_speed, double kp, double k
         break;
     }
 
-    double proportional, integral, differential;
+    static double proportional, differential;
     double error = static_cast<double>(desired_speed) - current_speed;
     dt = calc_dt();
 
     //ApplyPID
     proportional = error;
-    integral += error*dt;
+    integral_speed[speed_case] += error*dt;
     differential = (error-previous_speed[speed_case])/dt;
 
     previous_speed[speed_case] = error;
+    int output_duty = cap_output(speedToDutyCycle((kp * proportional + ki * integral_speed[speed_case] + kd * differential)), 500);
+    // ble->println("Speed Error: " + String(output_duty));
+    return output_duty;
+}
 
-    return cap_output(speedToDutyCycle(kp * proportional + ki * integral + kd * differential), 300);
+
+//------------------------------------------- acceleration controller ----------------------------------------
+
+
+std::vector<double> previous_acc(3,0);
+std::vector<double> integral_acc(3,0);
+
+int calc_correction_acc(int acc_case, double desired_acc, double kp, double ki, double kd){
+    double current_acc = 0;
+
+    switch (acc_case)
+    {
+    case LEFT_ACC:
+        current_acc = avg_acceleration_L;
+        break;
+    case RIGHT_ACC:
+        current_acc = avg_acceleration_R;
+        break;
+    case BOTH_ACC:
+        current_acc = (avg_acceleration_L+avg_acceleration_R)/2; 
+        break;
+    default:
+        current_acc = (avg_acceleration_L+avg_acceleration_R)/2; 
+        break;
+    }
+
+    static double proportional, differential;
+    double error = desired_acc - current_acc;
+    dt = calc_dt();
+
+    //ApplyPID
+    proportional = error;
+    integral_acc[acc_case % 3] += error*dt;
+    differential = (error-previous_acc[acc_case % 3])/dt;
+
+    previous_speed[acc_case % 3] = error;
+    int current_duty = speedToDutyCycle((kp * proportional + ki * integral_acc[acc_case % 3] + kd * differential));
+    // ble->println("Acc Error: " + String(current_duty));
+    return cap_output(current_duty, 500);
+}
+
+// function to reset the integral part of accelereation PID
+void reset_integral_acc(){
+    integral_acc = {0,0,0};
 }
 
 

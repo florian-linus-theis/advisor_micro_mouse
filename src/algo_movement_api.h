@@ -81,12 +81,12 @@ void move_forward_mapping(int squares = 1){
 void move_forward_mapping_fast(int squares = 1){
     if (cur_position == std::vector<int>{0, 0}) {
         if (cur_direction == 0){
-            drive_forward(365, 365, 0.7778); // drive forward until edge of the cell 
+            drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.7778); // starter cell
             update_position();
             return;
         }
     }
-    drive_forward(365, 365, squares);
+    drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, squares); // drive forward until edge of the cell
     update_position();
 }
 
@@ -125,7 +125,7 @@ void turn_around_and_back_up(){
     backup_to_wall();
     update_direction(+2);
     update_position();
-    drive_forward(365, 365, 0.7778); // drive forward to the edge of the cell
+    drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.7778); // drive forward to the edge of the cell
 }
 
 
@@ -159,9 +159,9 @@ void set_dir_fast_mapping(int _dir) {
             turn_around_and_back_up();
             return;
         } else {
-            drive_forward(365, 0, 0.5);
+            drive_forward(SPEED_MAPPING, 0, ACCELERATION_NORMAL, 0.5);
             right_turn_around();
-            drive_forward(365, 365, 0.5);
+            drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.5);
             update_direction(+2);
             update_position();
             return;
@@ -260,12 +260,12 @@ void execute_movements(const std::vector<std::tuple<int, float>>& movement) {
     if (BALLGREIFER){
         grab_ball();
     } else {
-        drive_forward(SPEED_MAPPING, SPEED_MAPPING, 0.7778); // start square
+        drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, 0.7778); // start square
     }
     for (int i = 0; i < movement.size(); ++i) {
         switch (std::get<0>(movement[i])) {
             case FORWARD:
-                drive_forward(SPEED_MAPPING, SPEED_MAPPING, std::get<1>(movement[i]));
+                drive_forward(SPEED_MAPPING, SPEED_MAPPING, ACCELERATION_NORMAL, std::get<1>(movement[i]));
                 break;
             case RIGHT:
                 curve_right();
@@ -277,7 +277,7 @@ void execute_movements(const std::vector<std::tuple<int, float>>& movement) {
                 break;
         }
     }
-    drive_forward(SPEED_MAPPING, 0, 0.5); // stop inside final square
+    drive_forward(SPEED_MAPPING, 0, ACCELERATION_NORMAL, 0.5); // stop inside final square
 }
 
 
